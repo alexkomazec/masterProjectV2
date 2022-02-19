@@ -3,6 +3,8 @@ package com.akomazec.BaseSampleProject.Tools;
 import com.akomazec.BaseSampleProject.BaseSampleProject;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Brick;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectible;
+import com.akomazec.BaseSampleProject.Sprites.Enemy;
+import com.akomazec.BaseSampleProject.Sprites.FiredBy;
 import com.akomazec.BaseSampleProject.Sprites.MagicBall;
 import com.akomazec.BaseSampleProject.Sprites.Player;
 import com.badlogic.gdx.physics.box2d.Contact;
@@ -50,6 +52,61 @@ public class WorldContactListener implements ContactListener {
                     ((Collectible)fixA.getUserData()).shouldBeDestroyed = true;
                 }
             break;
+
+            case BaseSampleProject.PLAYER_BIT | BaseSampleProject.MAGIC_BIT:
+
+                if(fixA.getFilterData().categoryBits == BaseSampleProject.PLAYER_BIT)
+                {
+                    if( ( (MagicBall)fixB.getUserData()).firedBy == FiredBy.BY_ENEMY)
+                    {
+                        //Delete player
+                        ((Player)fixA.getUserData()).shouldBeDestroyed = true;
+                    }
+                }
+                else
+                {
+                    if( ( (MagicBall)fixA.getUserData()).firedBy == FiredBy.BY_ENEMY)
+                    {
+                        //Delete player
+                        ((Player)fixB.getUserData()).shouldBeDestroyed = true;
+                    }
+                }
+            break;
+
+            case BaseSampleProject.ENEMY_BIT | BaseSampleProject.MAGIC_BIT:
+
+                if(fixA.getFilterData().categoryBits == BaseSampleProject.ENEMY_BIT)
+                {
+                    if( ( (MagicBall)fixB.getUserData()).firedBy == FiredBy.BY_PLAYER)
+                    {
+                        //Delete player
+                        ((Enemy)fixA.getUserData()).shouldBeDestroyed = true;
+                    }
+                }
+                else
+                {
+                    if( ( (MagicBall)fixA.getUserData()).firedBy == FiredBy.BY_PLAYER)
+                    {
+                        //Delete player
+                        ((Enemy)fixB.getUserData()).shouldBeDestroyed = true;
+                    }
+                }
+                break;
+
+            case BaseSampleProject.ENEMY_BIT | BaseSampleProject.COLLECTIBLE_BIT:
+
+                if(fixA.getFilterData().categoryBits == BaseSampleProject.ENEMY_BIT)
+                {
+                    ((Enemy)fixA.getUserData()).powerUp();
+                    ((Collectible)fixB.getUserData()).shouldBeDestroyed = true;
+
+                }
+                else
+                {
+                    ((Enemy)fixB.getUserData()).powerUp();
+                    ((Collectible)fixA.getUserData()).shouldBeDestroyed = true;
+                }
+                break;
         }
     }
 

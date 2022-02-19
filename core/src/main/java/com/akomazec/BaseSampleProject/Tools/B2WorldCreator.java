@@ -3,6 +3,7 @@ package com.akomazec.BaseSampleProject.Tools;
 import com.akomazec.BaseSampleProject.BaseSampleProject;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Bricks;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectibles;
+import com.akomazec.BaseSampleProject.Sprites.Enemy;
 import com.akomazec.BaseSampleProject.Sprites.MagicBall;
 import com.akomazec.BaseSampleProject.Sprites.Player;
 import com.akomazec.BaseSampleProject.WorldSingleton;
@@ -14,6 +15,7 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
+import com.badlogic.gdx.utils.compression.lzma.Base;
 
 
 public class B2WorldCreator {
@@ -80,7 +82,8 @@ public class B2WorldCreator {
             fdef.shape = shape;
             fdef.filter.categoryBits = BaseSampleProject.GROUND_BIT;
             fdef.filter.maskBits = BaseSampleProject.MAGIC_BIT
-                    | BaseSampleProject.PLAYER_BIT;
+                    | BaseSampleProject.PLAYER_BIT
+                    | BaseSampleProject.ENEMY_BIT;
 
             /* Add fixture to body, also set object reference to the fixture */
             body.createFixture(fdef).setUserData(bricks.arrayOfBricks.get(brickIndex));
@@ -130,7 +133,9 @@ public class B2WorldCreator {
             fdef.filter.categoryBits = BaseSampleProject.COLLECTIBLE_BIT;
             fdef.filter.maskBits =
                       BaseSampleProject.GROUND_BIT
-                    | BaseSampleProject.PLAYER_BIT;
+                    | BaseSampleProject.PLAYER_BIT
+                    | BaseSampleProject.ENEMY_BIT
+                    | BaseSampleProject.MAGIC_BIT;
 
             /* Add fixture to body, also set object reference to the fixture */
             body.createFixture(fdef).
@@ -187,11 +192,44 @@ public class B2WorldCreator {
             magicBall.fdef.shape = magicBall.shape;
             magicBall.fdef.filter.categoryBits = BaseSampleProject.MAGIC_BIT;
             magicBall.fdef.filter.maskBits = BaseSampleProject.GROUND_BIT
-                    | BaseSampleProject.PLAYER_BIT;
+                    | BaseSampleProject.PLAYER_BIT
+                    | BaseSampleProject.ENEMY_BIT;
 
             //Create Fixture using set Fixture definition, and set user data
             magicBall.b2body.createFixture(magicBall.fdef).setUserData(magicBall);
     }
 
+    public void createEntity(Enemy enemy) {
+        for (RectangleMapObject object : map.getLayers().
+                get(3).
+                getObjects().
+                getByType(RectangleMapObject.class)) {
+
+            Rectangle rect = object.getRectangle();
+
+            //Set body definition
+            enemy.bdef.type = BodyDef.BodyType.DynamicBody;
+            enemy.bdef.position.set((rect.getX() + rect.getWidth() / 2),
+                    (rect.getY() + rect.getHeight() / 2));
+
+            //Create body in the world
+            enemy.b2body = world.getWorld().createBody(enemy.bdef);
+            enemy.b2body.setUserData(enemy);
+
+            //Set Fixture def
+            enemy.shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            enemy.fdef.shape = enemy.shape;
+            enemy.fdef.filter.categoryBits = BaseSampleProject.ENEMY_BIT;
+            enemy.fdef.filter.maskBits =
+                                BaseSampleProject.GROUND_BIT
+                            |   BaseSampleProject.MAGIC_BIT
+                            |   BaseSampleProject.PLAYER_BIT
+                            |   BaseSampleProject.COLLECTIBLE_BIT;
+
+            //Create Fixture using set Fixture definition, and set user data
+            enemy.b2body.createFixture(enemy.fdef).setUserData(enemy);
+
+        }
+    }
 
 }

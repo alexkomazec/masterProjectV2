@@ -25,19 +25,21 @@ public class MagicBall {
     public float height;
 
     public boolean shouldBeDestroyed;
+    public FiredBy firedBy;
 
     public MagicBall()
     {
 
     }
 
-    public void throwMe(float x, float y, int width, int height, Direction direction)
+    public void throwMe(float x, float y, int width, int height, Direction direction, FiredBy firedBy)
     {
         this.entityID = 1;
         this.bdef = new BodyDef();
         this.fdef = new FixtureDef();
         this.shape = new PolygonShape();
         this.direction = direction;
+        this.firedBy = firedBy;
 
         this.x = x;
         this.y = y;

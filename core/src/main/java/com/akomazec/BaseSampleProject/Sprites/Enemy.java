@@ -6,8 +6,7 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.FixtureDef;
 import com.badlogic.gdx.physics.box2d.PolygonShape;
 
-public class Player {
-
+public class Enemy {
     public int entityID;
 
     public Body b2body;
@@ -16,24 +15,24 @@ public class Player {
     public PolygonShape shape;
 
     public Direction direction;
-    public final FiredBy firedBy = FiredBy.BY_PLAYER;
+    public final FiredBy firedBy = FiredBy.BY_ENEMY;
 
     public int magicBallWidth;
     public int magicBallHeight;
 
     public Boolean shouldBeDestroyed;
 
-
-    public Player()
+    public Enemy()
     {
         this.entityID = 0;
         this.bdef = new BodyDef();
         this.fdef = new FixtureDef();
         this.shape = new PolygonShape();
         this.direction = Direction.RIGHT;
+
         this.magicBallWidth = 32;
         this.magicBallHeight = 32;
-        shouldBeDestroyed = false;
+        this.shouldBeDestroyed = false;
     }
 
     public void jump()
@@ -63,7 +62,7 @@ public class Player {
 
         Direction direction = this.direction;
 
-         magicBall.throwMe(
+        magicBall.throwMe(
                 magicBallX,
                 magicBallY,
                 width,
@@ -71,7 +70,7 @@ public class Player {
                 direction,
                 firedBy);
 
-         return magicBall;
+        return magicBall;
     }
 
     public void powerUp()
@@ -79,5 +78,4 @@ public class Player {
         this.magicBallWidth *= 2;
         this.magicBallHeight *= 2;
     }
-
 }

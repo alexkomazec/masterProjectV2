@@ -5,6 +5,7 @@ import com.akomazec.BaseSampleProject.Sprites.Bricks.Bricks;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectible;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectibles;
 import com.akomazec.BaseSampleProject.Sprites.Direction;
+import com.akomazec.BaseSampleProject.Sprites.Enemy;
 import com.akomazec.BaseSampleProject.Sprites.MagicBall;
 import com.akomazec.BaseSampleProject.Sprites.Player;
 import com.akomazec.BaseSampleProject.Tools.B2WorldCreator;
@@ -30,6 +31,7 @@ public class BaseSampleProject extends ApplicationAdapter {
 	private Texture image;
 
 	Player player;
+	Enemy enemy;
 
 	//Box2d variables
 	private WorldSingleton world;
@@ -49,6 +51,7 @@ public class BaseSampleProject extends ApplicationAdapter {
 	public static final short PLAYER_BIT = 2;
 	public static final short MAGIC_BIT = 4;
 	public static final short COLLECTIBLE_BIT = 8;
+	public static final short ENEMY_BIT = 16;
 
 	@Override
 	public void create() {
@@ -76,6 +79,9 @@ public class BaseSampleProject extends ApplicationAdapter {
 		this.player = new Player();
 		creator.createEntity(this.player);
 
+		this.enemy = new Enemy();
+		creator.createEntity(this.enemy);
+
 		this.bricks = new Bricks(world, tiledMap);
 		this.collectibles = new Collectibles(world,tiledMap);
 
@@ -102,6 +108,8 @@ public class BaseSampleProject extends ApplicationAdapter {
 
 	public void update()
 	{
+		updatePlayer();
+		updateEnemy();
 		handleInput();
 		updateMagicBalls();
 		updateBricks();
@@ -112,28 +120,56 @@ public class BaseSampleProject extends ApplicationAdapter {
 	}
 
 	public void handleInput(){
-		//control our player using immediate impulses
-		if (Gdx.input.isKeyJustPressed(Input.Keys.UP))
-			player.jump();
-		if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= 2)
+
+		if(player != null)
 		{
-			player.b2body.applyLinearImpulse(new Vector2(100f, 0),
-					player.b2body.getWorldCenter(),
-					true);
-			player.direction = Direction.RIGHT;
-		}
-		if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -2)
-		{
-			player.b2body.applyLinearImpulse(new Vector2(-100f, 0),
-					player.b2body.getWorldCenter(),
-					true);
-			player.direction = Direction.LEFT;
+			//control our player using immediate impulses
+			if (Gdx.input.isKeyJustPressed(Input.Keys.UP))
+				player.jump();
+			if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) && player.b2body.getLinearVelocity().x <= 2) {
+				player.b2body.applyLinearImpulse(new Vector2(100f, 0),
+						player.b2body.getWorldCenter(),
+						true);
+				player.direction = Direction.RIGHT;
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.LEFT) && player.b2body.getLinearVelocity().x >= -2) {
+				player.b2body.applyLinearImpulse(new Vector2(-100f, 0),
+						player.b2body.getWorldCenter(),
+						true);
+				player.direction = Direction.LEFT;
+			}
+
+			if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
+			{
+				magicBalls.add(player.fireMagicBall());
+			}
+
 		}
 
-		if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
+		if(enemy != null)
 		{
-			magicBalls.add(player.fireMagicBall());
+			/*Enemy controls*/
+			if (Gdx.input.isKeyJustPressed(Input.Keys.W))
+				enemy.jump();
+			if (Gdx.input.isKeyPressed(Input.Keys.D) && enemy.b2body.getLinearVelocity().x <= 2)
+			{
+				enemy.b2body.applyLinearImpulse(new Vector2(100f, 0),
+						enemy.b2body.getWorldCenter(),
+						true);
+				enemy.direction = Direction.RIGHT;
+			}
+			if (Gdx.input.isKeyPressed(Input.Keys.A) && enemy.b2body.getLinearVelocity().x >= -2)
+			{
+				enemy.b2body.applyLinearImpulse(new Vector2(-100f, 0),
+						enemy.b2body.getWorldCenter(),
+						true);
+				enemy.direction = Direction.LEFT;
+			}
 
+			if (Gdx.input.isKeyJustPressed(Input.Keys.F))
+			{
+				magicBalls.add(enemy.fireMagicBall());
+			}
 		}
 
 	}
@@ -219,6 +255,32 @@ public class BaseSampleProject extends ApplicationAdapter {
 					*/
 					i--;
 				}
+			}
+		}
+	}
+
+	void updatePlayer()
+	{
+		if(player != null)
+		{
+			if(player.shouldBeDestroyed)
+			{
+				/* Set the reference to point to null*/
+				world.getWorld().destroyBody(player.b2body);
+				player = null;
+			}
+		}
+	}
+
+	void updateEnemy()
+	{
+		if(enemy != null)
+		{
+			if(enemy.shouldBeDestroyed)
+			{
+				/* Set the reference to point to null*/
+				world.getWorld().destroyBody(enemy.b2body);
+				enemy = null;
 			}
 		}
 	}
