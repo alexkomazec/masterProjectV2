@@ -1,43 +1,29 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="19" nextobjectid="319">
+<map version="1.8" tiledversion="1.8.0" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="20" nextobjectid="660">
  <tileset firstgid="1" name="Ground" tilewidth="32" tileheight="32" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
    <image width="32" height="32" source="Ground.png"/>
   </tile>
  </tileset>
+ <tileset firstgid="2" name="Collectible" tilewidth="32" tileheight="32" tilecount="1" columns="1">
+  <image source="Collectible.png" width="32" height="32"/>
+ </tileset>
  <objectgroup color="#aa5500" id="2" name="Platform" tintcolor="#55ff00">
   <object id="250" name="PRVI" gid="1" x="32" y="3200" width="32" height="32"/>
   <object id="249" name="DRUGI" gid="1" x="0" y="3168" width="32" height="32"/>
   <object id="251" name="TRECI" gid="1" x="96" y="3168" width="32" height="32"/>
   <object id="252" name="CETVRTI" gid="1" x="96" y="3200" width="32" height="32"/>
-  <object id="292" gid="1" x="160" y="3104" width="32" height="32"/>
-  <object id="293" gid="1" x="224" y="3104" width="32" height="32"/>
-  <object id="294" gid="1" x="192" y="3104" width="32" height="32"/>
   <object id="295" gid="1" x="160" y="3168" width="32" height="32"/>
-  <object id="296" gid="1" x="160" y="3136" width="32" height="32"/>
-  <object id="297" gid="1" x="224" y="3136" width="32" height="32"/>
-  <object id="298" gid="1" x="192" y="3136" width="32" height="32"/>
   <object id="299" gid="1" x="192" y="3168" width="32" height="32"/>
   <object id="300" gid="1" x="224" y="3168" width="32" height="32"/>
-  <object id="301" gid="1" x="192" y="3072" width="32" height="32"/>
-  <object id="302" gid="1" x="192" y="3040" width="32" height="32"/>
-  <object id="303" gid="1" x="192" y="3008" width="32" height="32"/>
-  <object id="304" gid="1" x="160" y="2976" width="32" height="32"/>
-  <object id="305" gid="1" x="224" y="2944" width="32" height="32"/>
-  <object id="306" gid="1" x="224" y="2976" width="32" height="32"/>
-  <object id="307" gid="1" x="256" y="2976" width="32" height="32"/>
-  <object id="308" gid="1" x="192" y="2944" width="32" height="32"/>
-  <object id="309" gid="1" x="192" y="2976" width="32" height="32"/>
-  <object id="310" gid="1" x="160" y="2944" width="32" height="32"/>
-  <object id="311" gid="1" x="256" y="2944" width="32" height="32"/>
-  <object id="312" gid="1" x="224" y="2912" width="32" height="32"/>
-  <object id="313" gid="1" x="224" y="2912" width="32" height="32"/>
-  <object id="314" gid="1" x="192" y="2912" width="32" height="32"/>
-  <object id="315" gid="1" x="160" y="2912" width="32" height="32"/>
-  <object id="316" gid="1" x="256" y="2912" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="18" name="Players">
   <object id="280" name="Player" x="32" y="3136" width="32" height="32"/>
+ </objectgroup>
+ <objectgroup id="19" name="Collectible">
+  <object id="657" gid="2" x="160" y="3136" width="32" height="32"/>
+  <object id="658" gid="2" x="192" y="3136" width="32" height="32"/>
+  <object id="659" gid="2" x="224" y="3136" width="32" height="32"/>
  </objectgroup>
 </map>

@@ -2,6 +2,7 @@ package com.akomazec.BaseSampleProject.Tools;
 
 import com.akomazec.BaseSampleProject.BaseSampleProject;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Bricks;
+import com.akomazec.BaseSampleProject.Sprites.Collects.Collectibles;
 import com.akomazec.BaseSampleProject.Sprites.MagicBall;
 import com.akomazec.BaseSampleProject.Sprites.Player;
 import com.akomazec.BaseSampleProject.WorldSingleton;
@@ -77,12 +78,65 @@ public class B2WorldCreator {
 
             shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
             fdef.shape = shape;
+            fdef.filter.categoryBits = BaseSampleProject.GROUND_BIT;
+            fdef.filter.maskBits = BaseSampleProject.MAGIC_BIT
+                    | BaseSampleProject.PLAYER_BIT;
 
             /* Add fixture to body, also set object reference to the fixture */
             body.createFixture(fdef).setUserData(bricks.arrayOfBricks.get(brickIndex));
         }
-
      }
+
+    public void createCollectibles(Collectibles collectibles)
+    {
+        //create body and fixture variables
+        BodyDef bdef = new BodyDef();
+        PolygonShape shape = new PolygonShape();
+        FixtureDef fdef = new FixtureDef();
+        Body body;
+
+        //create ground bodies/fixtures
+        for(TextureMapObject object : map.getLayers().
+                get(2).
+                getObjects().
+                getByType(TextureMapObject.class))
+        {
+
+            float width = 1;
+            float height = 1;
+
+            String mapTilewidth = object.getProperties().get("width").toString();
+            String mapTileheight = object.getProperties().get("height").toString();
+
+            width = Float.parseFloat(mapTilewidth);
+            height = Float.parseFloat(mapTileheight);
+
+            float xPos = object.getX();
+            float yPos = object.getY();
+
+            Rectangle rect = new Rectangle(xPos, yPos, width, height);
+
+            bdef.type = BodyDef.BodyType.StaticBody;
+            bdef.position.set((rect.getX() + rect.getWidth() / 2),
+                    (rect.getY() + rect.getHeight() / 2));
+
+            body = world.getWorld().createBody(bdef);
+
+            collectibles.addCollectible(body, object, false);
+            int collectibleIndex = collectibles.arrayOfCollectibles.size - 1;
+
+            shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            fdef.shape = shape;
+            fdef.filter.categoryBits = BaseSampleProject.COLLECTIBLE_BIT;
+            fdef.filter.maskBits =
+                      BaseSampleProject.GROUND_BIT
+                    | BaseSampleProject.PLAYER_BIT;
+
+            /* Add fixture to body, also set object reference to the fixture */
+            body.createFixture(fdef).
+                    setUserData(collectibles.arrayOfCollectibles.get(collectibleIndex));
+        }
+    }
 
     public void createEntity(Player player)
     {
@@ -108,7 +162,8 @@ public class B2WorldCreator {
                 player.fdef.shape = player.shape;
                 player.fdef.filter.categoryBits = BaseSampleProject.PLAYER_BIT;
                 player.fdef.filter.maskBits = BaseSampleProject.GROUND_BIT
-                        | BaseSampleProject.MAGIC_BIT;
+                        | BaseSampleProject.MAGIC_BIT
+                        | BaseSampleProject.COLLECTIBLE_BIT;
 
                 //Create Fixture using set Fixture definition, and set user data
                 player.b2body.createFixture(player.fdef).setUserData(player);

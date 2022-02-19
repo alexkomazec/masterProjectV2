@@ -2,7 +2,9 @@ package com.akomazec.BaseSampleProject.Tools;
 
 import com.akomazec.BaseSampleProject.BaseSampleProject;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Brick;
+import com.akomazec.BaseSampleProject.Sprites.Collects.Collectible;
 import com.akomazec.BaseSampleProject.Sprites.MagicBall;
+import com.akomazec.BaseSampleProject.Sprites.Player;
 import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
@@ -31,6 +33,21 @@ public class WorldContactListener implements ContactListener {
                 {
                     ((MagicBall)fixB.getUserData()).shouldBeDestroyed = true;
                     ((Brick)fixA.getUserData()).shouldBeDestroyed = true;
+                }
+            break;
+
+            case BaseSampleProject.PLAYER_BIT | BaseSampleProject.COLLECTIBLE_BIT:
+
+                if(fixA.getFilterData().categoryBits == BaseSampleProject.PLAYER_BIT)
+                {
+                    ((Player)fixA.getUserData()).powerUp();
+                    ((Collectible)fixB.getUserData()).shouldBeDestroyed = true;
+
+                }
+                else
+                {
+                    ((Player)fixB.getUserData()).powerUp();
+                    ((Collectible)fixA.getUserData()).shouldBeDestroyed = true;
                 }
             break;
         }

@@ -2,6 +2,8 @@ package com.akomazec.BaseSampleProject;
 
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Brick;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Bricks;
+import com.akomazec.BaseSampleProject.Sprites.Collects.Collectible;
+import com.akomazec.BaseSampleProject.Sprites.Collects.Collectibles;
 import com.akomazec.BaseSampleProject.Sprites.Direction;
 import com.akomazec.BaseSampleProject.Sprites.MagicBall;
 import com.akomazec.BaseSampleProject.Sprites.Player;
@@ -40,11 +42,13 @@ public class BaseSampleProject extends ApplicationAdapter {
 
 	ArrayList<MagicBall> magicBalls;
 	Bricks bricks;
+	Collectibles collectibles;
 
 	//Box2D Collision Bits
 	public static final short GROUND_BIT = 1;
 	public static final short PLAYER_BIT = 2;
 	public static final short MAGIC_BIT = 4;
+	public static final short COLLECTIBLE_BIT = 8;
 
 	@Override
 	public void create() {
@@ -73,8 +77,10 @@ public class BaseSampleProject extends ApplicationAdapter {
 		creator.createEntity(this.player);
 
 		this.bricks = new Bricks(world, tiledMap);
+		this.collectibles = new Collectibles(world,tiledMap);
 
 		creator.createBricks(this.bricks);
+		creator.createCollectibles(this.collectibles);
 		//bricks.removeBrick(0);
 		//bricks.removeBrick(0);
 		//bricks.removeBrick(0);
@@ -99,6 +105,7 @@ public class BaseSampleProject extends ApplicationAdapter {
 		handleInput();
 		updateMagicBalls();
 		updateBricks();
+		updateCollectibles();
 
 		//takes 1 step in the physics simulation(60 times per second)
 		world.getWorld().step(1 / 60f, 6, 2);
@@ -178,6 +185,31 @@ public class BaseSampleProject extends ApplicationAdapter {
 
 				//Handle indexing
 				if (i + 1 == bricks.arrayOfBricks.size) {
+					/* Case:	Last element in the array has been deleted
+					 			Just go out of the loop
+					*/
+				} else {
+					/* Case:	Some mid element has been deleted
+					 			Just go out of the loop
+					*/
+					i--;
+				}
+			}
+		}
+	}
+
+	void updateCollectibles()
+	{
+		for (int i = 0; i < collectibles.arrayOfCollectibles.size; i++)
+		{
+			Collectible collectible = collectibles.arrayOfCollectibles.get(i);
+
+			if(collectible.shouldBeDestroyed) {
+				//Remove the collectible
+				collectibles.removeCollectible(i);
+
+				//Handle indexing
+				if (i + 1 == collectibles.arrayOfCollectibles.size) {
 					/* Case:	Last element in the array has been deleted
 					 			Just go out of the loop
 					*/

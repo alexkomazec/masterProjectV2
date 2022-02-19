@@ -17,6 +17,9 @@ public class Player {
 
     public Direction direction;
 
+    public int magicBallWidth;
+    public int magicBallHeight;
+
     public Player()
     {
         this.entityID = 0;
@@ -24,6 +27,8 @@ public class Player {
         this.fdef = new FixtureDef();
         this.shape = new PolygonShape();
         this.direction = Direction.RIGHT;
+        this.magicBallWidth = 32;
+        this.magicBallHeight = 32;
     }
 
     public void jump()
@@ -35,8 +40,8 @@ public class Player {
     {
         MagicBall magicBall = new MagicBall();
 
-        int width = 32;
-        int height = 32;
+        int width = this.magicBallWidth;
+        int height = this.magicBallHeight;
         float magicBallX;
         float magicBallY;
 
@@ -61,6 +66,12 @@ public class Player {
                 direction);
 
          return magicBall;
+    }
+
+    public void powerUp()
+    {
+        this.magicBallWidth *= 2;
+        this.magicBallHeight *= 2;
     }
 
 }
