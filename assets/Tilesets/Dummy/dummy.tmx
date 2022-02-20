@@ -50,7 +50,7 @@
   <object id="699" gid="1" x="160" y="2944" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="18" name="Players">
-  <object id="280" name="Player" x="32" y="3136" width="32" height="32"/>
+  <object id="280" name="Player" x="480" y="2720" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="19" name="Collectible">
   <object id="657" gid="2" x="96" y="2912" width="32" height="32"/>
@@ -58,6 +58,6 @@
   <object id="659" gid="2" x="256" y="2688" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="20" name="Enemy">
-  <object id="665" x="544" y="2720" width="32" height="32"/>
+  <object id="665" x="32" y="3136" width="32" height="32"/>
  </objectgroup>
 </map>
