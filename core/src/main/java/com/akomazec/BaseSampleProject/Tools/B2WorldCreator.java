@@ -36,8 +36,8 @@ public class B2WorldCreator {
 
     public B2WorldCreator(WorldSingleton world, TiledMap map)
     {
-         this.world = world;
-         this.map = map;
+        this.world = world;
+        this.map = map;
     }
 
     public void createBricks(Bricks bricks)
@@ -88,7 +88,7 @@ public class B2WorldCreator {
             /* Add fixture to body, also set object reference to the fixture */
             body.createFixture(fdef).setUserData(bricks.arrayOfBricks.get(brickIndex));
         }
-     }
+    }
 
     public void createCollectibles(Collectibles collectibles)
     {
@@ -132,10 +132,10 @@ public class B2WorldCreator {
             fdef.shape = shape;
             fdef.filter.categoryBits = BaseSampleProject.COLLECTIBLE_BIT;
             fdef.filter.maskBits =
-                      BaseSampleProject.GROUND_BIT
-                    | BaseSampleProject.PLAYER_BIT
-                    | BaseSampleProject.ENEMY_BIT
-                    | BaseSampleProject.MAGIC_BIT;
+                    BaseSampleProject.GROUND_BIT
+                            | BaseSampleProject.PLAYER_BIT
+                            | BaseSampleProject.ENEMY_BIT
+                            | BaseSampleProject.MAGIC_BIT;
 
             /* Add fixture to body, also set object reference to the fixture */
             body.createFixture(fdef).
@@ -143,60 +143,69 @@ public class B2WorldCreator {
         }
     }
 
-    public void createEntity(Player player)
+    public void createEntity(Player player, float x_pos, float y_pos)
     {
-            for(RectangleMapObject object : map.getLayers().
-                    get(1).
-                    getObjects().
-                    getByType(RectangleMapObject.class))
+
+        for(RectangleMapObject object : map.getLayers().
+                get(1).
+                getObjects().
+                getByType(RectangleMapObject.class))
+        {
+
+            Rectangle rect = object.getRectangle();
+
+            //Set body definition
+            player.bdef.type = BodyDef.BodyType.DynamicBody;
+
+            if(x_pos > 0 && y_pos > 0)
             {
-
-                Rectangle rect = object.getRectangle();
-
-                //Set body definition
-                player.bdef.type = BodyDef.BodyType.DynamicBody;
+                player.bdef.position.set(x_pos, y_pos);
+            }
+            else
+            {
                 player.bdef.position.set((rect.getX() + rect.getWidth() / 2) ,
                         (rect.getY() + rect.getHeight() / 2));
-
-                //Create body in the world
-                player.b2body = world.getWorld().createBody(player.bdef);
-                player.b2body.setUserData(player);
-
-                //Set Fixture def
-                player.shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
-                player.fdef.shape = player.shape;
-                player.fdef.filter.categoryBits = BaseSampleProject.PLAYER_BIT;
-                player.fdef.filter.maskBits = BaseSampleProject.GROUND_BIT
-                        | BaseSampleProject.MAGIC_BIT
-                        | BaseSampleProject.COLLECTIBLE_BIT;
-
-                //Create Fixture using set Fixture definition, and set user data
-                player.b2body.createFixture(player.fdef).setUserData(player);
-
             }
+
+            //Create body in the world
+            player.b2body = world.getWorld().createBody(player.bdef);
+            player.b2body.setUserData(player);
+
+            //Set Fixture def
+            player.shape.setAsBox(rect.getWidth() / 2, rect.getHeight() / 2);
+            player.fdef.shape = player.shape;
+            player.fdef.filter.categoryBits = BaseSampleProject.PLAYER_BIT;
+            player.fdef.filter.maskBits = BaseSampleProject.GROUND_BIT
+                    | BaseSampleProject.MAGIC_BIT
+                    | BaseSampleProject.COLLECTIBLE_BIT;
+
+            //Create Fixture using set Fixture definition, and set user data
+            player.b2body.createFixture(player.fdef).setUserData(player);
+
+        }
     }
 
     public void createEntity(MagicBall magicBall)
     {
 
-            //Set body definition
-            magicBall.bdef.type = BodyDef.BodyType.DynamicBody;
-            magicBall.bdef.position.set(magicBall.x, magicBall.y);
+        //Set body definition
+        magicBall.bdef.type = BodyDef.BodyType.DynamicBody;
+        magicBall.bdef.position.set(magicBall.x, magicBall.y);
 
-            //Create body in the world
-            magicBall.b2body = world.getWorld().createBody(magicBall.bdef);
-            magicBall.b2body.setUserData(magicBall);
+        //Create body in the world
+        magicBall.b2body = world.getWorld().createBody(magicBall.bdef);
+        magicBall.b2body.setUserData(magicBall);
 
-            //Set Fixture def
-            magicBall.shape.setAsBox(magicBall.width/2, magicBall.height/2);
-            magicBall.fdef.shape = magicBall.shape;
-            magicBall.fdef.filter.categoryBits = BaseSampleProject.MAGIC_BIT;
-            magicBall.fdef.filter.maskBits = BaseSampleProject.GROUND_BIT
-                    | BaseSampleProject.PLAYER_BIT
-                    | BaseSampleProject.ENEMY_BIT;
+        //Set Fixture def
+        magicBall.shape.setAsBox(magicBall.width/2, magicBall.height/2);
+        magicBall.fdef.shape = magicBall.shape;
+        magicBall.fdef.filter.categoryBits = BaseSampleProject.MAGIC_BIT;
+        magicBall.fdef.filter.maskBits = BaseSampleProject.GROUND_BIT
+                | BaseSampleProject.PLAYER_BIT
+                | BaseSampleProject.ENEMY_BIT;
 
-            //Create Fixture using set Fixture definition, and set user data
-            magicBall.b2body.createFixture(magicBall.fdef).setUserData(magicBall);
+        //Create Fixture using set Fixture definition, and set user data
+        magicBall.b2body.createFixture(magicBall.fdef).setUserData(magicBall);
     }
 
     public void createEntity(Enemy enemy) {
@@ -221,7 +230,7 @@ public class B2WorldCreator {
             enemy.fdef.shape = enemy.shape;
             enemy.fdef.filter.categoryBits = BaseSampleProject.ENEMY_BIT;
             enemy.fdef.filter.maskBits =
-                                BaseSampleProject.GROUND_BIT
+                    BaseSampleProject.GROUND_BIT
                             |   BaseSampleProject.MAGIC_BIT
                             |   BaseSampleProject.PLAYER_BIT
                             |   BaseSampleProject.COLLECTIBLE_BIT;

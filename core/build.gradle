@@ -10,4 +10,9 @@ dependencies {
 	api "com.badlogicgames.gdx:gdx-bullet:$gdxVersion"
 	api "com.badlogicgames.gdx:gdx-freetype:$gdxVersion"
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
+	// https://mvnrepository.com/artifact/io.socket/socket.io-client
+	implementation 'io.socket:socket.io-client:2.0.1'
+	// https://mvnrepository.com/artifact/io.socket/engine.io-client
+	implementation 'io.socket:engine.io-client:2.0.0'
+
 }
