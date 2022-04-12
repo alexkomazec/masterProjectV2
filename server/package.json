@@ -18,6 +18,7 @@
   "homepage": "https://github.com/alexkomazec/masterProjectV2#readme",
   "dependencies": {
     "express": "^4.17.3",
+    "ip": "^1.1.5",
     "socket.io": "^4.4.1"
   }
 }

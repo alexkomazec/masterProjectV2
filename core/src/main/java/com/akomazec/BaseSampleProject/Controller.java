@@ -12,17 +12,26 @@ import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
+import java.net.URISyntaxException;
+
+import io.socket.client.IO;
+import io.socket.client.Socket;
+
 public class Controller {
 
     Viewport viewport;
     Stage stage;
     boolean upPressed, downPressed, leftPressed, rightPressed;
     OrthographicCamera cam;
+    Socket socket;
+    String url;
 
-    public Controller(OrthographicCamera camera){
+    public Controller(OrthographicCamera camera, Socket socket, String url){
         cam = camera;
         viewport = new FitViewport(640, 480, cam);
         stage = new Stage(viewport, BaseSampleProject.batch);
+        this.socket = socket;
+        this.url = url;
 
         stage.addListener(new InputListener(){
 
@@ -40,6 +49,7 @@ public class Controller {
                         break;
                     case Input.Keys.RIGHT:
                         rightPressed = true;
+
                         break;
                 }
                 return true;

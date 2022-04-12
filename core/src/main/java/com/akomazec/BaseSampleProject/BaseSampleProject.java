@@ -104,7 +104,10 @@ public class BaseSampleProject extends ApplicationAdapter {
 		camera = new OrthographicCamera();
 		camera.setToOrtho(false,w,h);
 		camera.update();
-		controller = new Controller(camera);
+
+		createSocket();
+		configSocketEvents();
+		controller = new Controller(camera, socket, url);
 
 		tiledMap = new TmxMapLoader().load("Tilesets/Dummy/dummy.tmx");
 		tiledMapRenderer = new OrthogonalTiledMapRendererWithSprites(tiledMap);
@@ -129,21 +132,20 @@ public class BaseSampleProject extends ApplicationAdapter {
 		//bricks.removeBrick(0);
 		//bricks.removeBrick(0);
 
-		createSocket();
-		configSocketEvents();
+
 		connectSocket();
 
 		for(int index = 0; index < 1000; index++)
 		{
 			long startTime = TimeUtils.nanoTime();
-			socket.emit("LEFT");
+			//socket.emit("LEFT");
 			timer = 0;
 			long elapsedTime = TimeUtils.timeSinceNanos(startTime);
 			//System.out.println("elapsedTime: " + elapsedTime + " ns");
 		}
 
-		player = new Player();
-		creator.createEntity(player,-1.0f,-1.0f);
+		//player = new Player();
+		//creator.createEntity(player,-1.0f,-1.0f);
 
 	}
 
@@ -215,25 +217,34 @@ public class BaseSampleProject extends ApplicationAdapter {
 
 
 		if(controller.isRightPressed())
+		{
 			player.turnRight();
+			isAnyKeyPressed = "RIGHT";
+		}
 		else if (controller.isLeftPressed())
+		{
 			player.turnLeft();
+			isAnyKeyPressed = "LEFT";
+		}
 		else if (controller.isUpPressed())
+		{
 			player.jump();
+			isAnyKeyPressed = "JUMP";
+		}
 		else
 		{
 
 		}
 
-		/*if(isAnyKeyPressed != "NONE")
+		if(isAnyKeyPressed != "NONE")
 		{
-			socket.emit("UpdatePlayerPosition", player.clientID, isAnyKeyPressed);
+			socket.emit("updatePlayerPosition", player.clientID, isAnyKeyPressed);
 
 			//socket.emit("oooooooooo");
 			isAnyKeyPressed = "NONE";
 
 			System.out.println("Moved!");
-		}*/
+		}
 		/*if(enemy != null)
 		{
 			if (Gdx.input.isKeyJustPressed(Input.Keys.W))
@@ -416,7 +427,7 @@ public class BaseSampleProject extends ApplicationAdapter {
 				//Gdx.app.log("SocketIO", "New Player Connect: " + id);
 				//otherPlayers.put(id, new Player());
 			}
-		}).on("playerDisconnected", new Emitter.Listener() {
+			}).on("playerDisconnected", new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
 				JSONObject data = (JSONObject) args[0];
@@ -429,14 +440,21 @@ public class BaseSampleProject extends ApplicationAdapter {
 					Gdx.app.log("SocketIO", "Error getting disconnected PlayerID");
 				}
 			}
-		}).on("FromServer_PlayerMoved", new Emitter.Listener() {
+		}).on("playerMoved", new Emitter.Listener() {
 			@Override
 			public void call(Object... args) {
 
-				int playerId = (int) args[0];
-				String moveType = (String) args[1];
+				JSONArray objects = (JSONArray) args[0];
+				Integer playerId = 0;
+				String moveType  = "";
+				playerId = objects.optInt(0);
+				moveType = objects.optString(1);
 
-				System.out.println("Player " + playerId);
+				System.out.println("playerId " + playerId);
+				System.out.println("moveType " + moveType);
+
+
+				//System.out.println("Player " + playerId);
 				//otherPlayers.get(playerId).b2body.setTransform(convertToFloat(pos_x), convertToFloat(pos_y),convertToFloat(0));
 				//otherPlayers.get(playerId).b2body.setTransform(convertToFloat(pos_x), convertToFloat(pos_y),convertToFloat(0));
 
@@ -459,12 +477,12 @@ public class BaseSampleProject extends ApplicationAdapter {
 			}
 		});
 
-		this.socket.on("GetUpdatedPosition", new Emitter.Listener() {
+		this.socket.on("getUpdatedPosition", new Emitter.Listener() {
 			@Override
 			public void call(Object... args)
 			{
 				System.out.println("updated position:" + "x: " + player.b2body.getPosition().x + "y: " + player.b2body.getPosition().y);
-				socket.emit("refreshPlayerPosition", player.b2body.getPosition().x, player.b2body.getPosition().y, player.clientID);
+				socket.emit("refreshPlayersPosition", player.b2body.getPosition().x, player.b2body.getPosition().y, player.clientID);
 			}
 		});
 
@@ -525,14 +543,10 @@ public class BaseSampleProject extends ApplicationAdapter {
 			}
 		});
 
-		this.socket.on("assignID2Player", new Emitter.Listener() {
-			@Override
-			public void call(Object... args)
-			{
-				player.clientID = (int)args[0];
-				System.out.println("assignID2Player:" + player.clientID);
-				socket.emit("addPlayer", player.bdef.position.x, player.bdef.position.y, player.clientID);
-			}
+		this.socket.on("assignID2Player", args -> {
+			player.clientID = (int)args[0];
+			System.out.println("assignID2Player:" + player.clientID);
+			socket.emit("addPlayer", player.bdef.position.x, player.bdef.position.y, player.clientID);
 		});
 	}
 
