@@ -32,4 +32,11 @@ define("REFRESH_PLAYERS_POSITION", "refreshPlayersPosition")
 /* This event is emmited on request, when the player moves, player must notify server, and server should broadcast that*/
 define("UPDATE_PLAYER_POSITION", "updatePlayerPosition")
 
+/* This event is used to notify clients that some player has moved */
 define("SOME_PLAYER_MOVED","playerMoved")
+
+/* This event is used to get the information that magic has fired by some player*/
+define("MAGIC_FIRED","magicFired")
+
+/* This event is used to broadcast information that some player fires magic*/
+define("PLAYRED_FIRED_MAGIC","playerFiredMagic")

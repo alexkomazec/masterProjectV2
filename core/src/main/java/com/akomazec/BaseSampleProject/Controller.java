@@ -21,10 +21,11 @@ public class Controller {
 
     Viewport viewport;
     Stage stage;
-    boolean upPressed, downPressed, leftPressed, rightPressed;
+    boolean upPressed, downPressed, leftPressed, rightPressed, firePressed;
     OrthographicCamera cam;
     Socket socket;
     String url;
+    public boolean cooldownFlag;
 
     public Controller(OrthographicCamera camera, Socket socket, String url){
         cam = camera;
@@ -32,6 +33,7 @@ public class Controller {
         stage = new Stage(viewport, BaseSampleProject.batch);
         this.socket = socket;
         this.url = url;
+        cooldownFlag = false;
 
         stage.addListener(new InputListener(){
 
@@ -79,6 +81,10 @@ public class Controller {
 
         Table table = new Table();
         table.left().bottom();
+
+        Table table1 = new Table();
+        table1.left();
+
 
         Image upImg = new Image(new Texture("flatDark25.png"));
         upImg.setSize(50, 50);
@@ -144,6 +150,24 @@ public class Controller {
             }
         });
 
+        Image fireImg = new Image(new Texture("flatDark27.png"));
+        fireImg.setSize(50, 50);
+        fireImg.addListener(new InputListener()
+        {
+
+            @Override
+            public boolean touchDown(InputEvent event, float x, float y, int pointer, int button) {
+                firePressed = true;
+                return true;
+            }
+
+            @Override
+            public void touchUp(InputEvent event, float x, float y, int pointer, int button) {
+                firePressed = false;
+                cooldownFlag = false;
+            }
+        });
+
         table.add();
         table.add(upImg).size(upImg.getWidth(), upImg.getHeight());
         table.add();
@@ -154,8 +178,12 @@ public class Controller {
         table.row().padBottom(5);
         table.add();
         table.add(downImg).size(downImg.getWidth(), downImg.getHeight());
-        table.add();
 
+        table1.row().padBottom(110);
+        table1.add().padRight(480);
+        table1.add(fireImg).size(fireImg.getWidth(), fireImg.getHeight());
+
+        stage.addActor(table1);
         stage.addActor(table);
     }
 
@@ -178,6 +206,8 @@ public class Controller {
     public boolean isRightPressed() {
         return rightPressed;
     }
+
+    public boolean isFirePressed() { return firePressed;}
 
     public void resize(int width, int height){
         viewport.update(width, height);

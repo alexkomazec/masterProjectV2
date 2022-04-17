@@ -4,6 +4,7 @@ import com.akomazec.BaseSampleProject.Sprites.Bricks.Brick;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Bricks;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectible;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectibles;
+import com.akomazec.BaseSampleProject.Sprites.Direction;
 import com.akomazec.BaseSampleProject.Sprites.Player;
 import com.akomazec.BaseSampleProject.Tools.B2WorldCreator;
 import com.akomazec.BaseSampleProject.Tools.OrthogonalTiledMapRendererWithSprites;
@@ -37,7 +38,7 @@ import io.socket.emitter.Emitter;
 
 /** {@link com.badlogic.gdx.ApplicationListener} implementation shared by all platforms. */
 public class BaseSampleProject extends ApplicationAdapter {
-	private final float UPDATE_TIME = 1/60;
+	private final float UPDATE_TIME = 1/60f;
 	float timer;
 
 	public static SpriteBatch batch;
@@ -85,7 +86,7 @@ public class BaseSampleProject extends ApplicationAdapter {
 		if(timer >= (UPDATE_TIME) && player != null && player.hasMoved())
 		{
 			long startTime = TimeUtils.nanoTime();
-			socket.emit("LEFT");
+			//socket.emit("LEFT");
 			timer = 0;
 			long elapsedTime = TimeUtils.timeSinceNanos(startTime);
 			//System.out.println("elapsedTime: " + elapsedTime + " ns");
@@ -212,6 +213,7 @@ public class BaseSampleProject extends ApplicationAdapter {
 			if (Gdx.input.isKeyJustPressed(Input.Keys.SPACE))
 			{
 				player.fireMagicBall();
+				socket.emit("magicFired", player.clientID);
 			}
 		}
 
@@ -230,6 +232,12 @@ public class BaseSampleProject extends ApplicationAdapter {
 		{
 			player.jump();
 			isAnyKeyPressed = "JUMP";
+		}
+		else if (controller.isFirePressed() && (!controller.cooldownFlag))
+		{
+			player.fireMagicBall();
+			controller.cooldownFlag = true;
+			socket.emit("magicFired", player.clientID);
 		}
 		else
 		{
@@ -357,6 +365,21 @@ public class BaseSampleProject extends ApplicationAdapter {
 		{
 			player.updateMagicBalls();
 		}
+
+		/* Check if there are any players */
+		if(!otherPlayers.isEmpty())
+		{
+			/* There are some players */
+			for (Player player : otherPlayers.values()) {
+
+				/*Check if any of these player casted some magic balls*/
+				if(!player.magicBalls.isEmpty())
+				{
+					player.updateMagicBalls();
+				}
+			}
+
+		}
 	}
 
 	private void createSocket()
@@ -461,10 +484,12 @@ public class BaseSampleProject extends ApplicationAdapter {
 				if(moveType.equals("LEFT"))
 				{
 					otherPlayers.get(playerId).turnLeft();
+					otherPlayers.get(playerId).direction = Direction.LEFT;
 				}
 				else if(moveType.equals("RIGHT"))
 				{
 					otherPlayers.get(playerId).turnRight();
+					otherPlayers.get(playerId).direction = Direction.RIGHT;
 				}
 				else if(moveType.equals("JUMP"))
 				{
@@ -547,6 +572,11 @@ public class BaseSampleProject extends ApplicationAdapter {
 			player.clientID = (int)args[0];
 			System.out.println("assignID2Player:" + player.clientID);
 			socket.emit("addPlayer", player.bdef.position.x, player.bdef.position.y, player.clientID);
+		});
+
+		this.socket.on("playerFiredMagic", args -> {
+			int clientID = (int)args[0];
+			otherPlayers.get(clientID).fireMagicBall();
 		});
 	}
 

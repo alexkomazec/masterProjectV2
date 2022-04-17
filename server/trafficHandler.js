@@ -55,6 +55,7 @@ function registerEvents(socket)
     socket.on(constants.ADD_PLAYER, clbkAddPlayerToTheTable)
     socket.on(constants.REFRESH_PLAYERS_POSITION, clbkRefreshPlayerTable)
     socket.on(constants.UPDATE_PLAYER_POSITION, clbkUpdatePlayerPosition)
+    socket.on(constants.MAGIC_FIRED, clbkPlayerFiresMagic)
 }
 
 function printPlayers()
@@ -215,6 +216,18 @@ function clbkPrintOnDisconnect()
 }
 
 /* ---------- Custom Event callbacks -------------------------------------------------------------------------*/
+
+/* clbkPlayerFiresMagic: Receives the event from the player which casts the spell*/
+
+/* Input parameters: 
+    - clientID: Player's unique identifier
+*/
+function clbkPlayerFiresMagic(clientID)
+{ 
+    let tempSocket = arrPlayers[findThePlayer(clientID)].socket
+    emit(tempSocket, BROADCAST, constants.PLAYRED_FIRED_MAGIC, 
+        clientID) //Payload
+}
 
 /* clbkUpdatePlayerPosition: Refersh the players' table with lastest players' info, and broacast the table */
 
