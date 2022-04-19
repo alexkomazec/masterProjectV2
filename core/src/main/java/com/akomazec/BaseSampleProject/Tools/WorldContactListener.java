@@ -1,6 +1,7 @@
 package com.akomazec.BaseSampleProject.Tools;
 
 import com.akomazec.BaseSampleProject.BaseSampleProject;
+import com.akomazec.BaseSampleProject.Screens.MainScreen;
 import com.akomazec.BaseSampleProject.Sprites.Bricks.Brick;
 import com.akomazec.BaseSampleProject.Sprites.Collects.Collectible;
 import com.akomazec.BaseSampleProject.Sprites.Enemy;
@@ -23,9 +24,9 @@ public class WorldContactListener implements ContactListener {
         int cDef = fixA.getFilterData().categoryBits | fixB.getFilterData().categoryBits;
 
         switch (cDef){
-            case BaseSampleProject.MAGIC_BIT | BaseSampleProject.GROUND_BIT:
+            case MainScreen.MAGIC_BIT | MainScreen.GROUND_BIT:
 
-                if(fixA.getFilterData().categoryBits == BaseSampleProject.MAGIC_BIT)
+                if(fixA.getFilterData().categoryBits == MainScreen.MAGIC_BIT)
                 {
                     ((MagicBall)fixA.getUserData()).shouldBeDestroyed = true;
                     ((Brick)fixB.getUserData()).shouldBeDestroyed = true;
@@ -38,9 +39,9 @@ public class WorldContactListener implements ContactListener {
                 }
             break;
 
-            case BaseSampleProject.PLAYER_BIT | BaseSampleProject.COLLECTIBLE_BIT:
+            case MainScreen.PLAYER_BIT | MainScreen.COLLECTIBLE_BIT:
 
-                if(fixA.getFilterData().categoryBits == BaseSampleProject.PLAYER_BIT)
+                if(fixA.getFilterData().categoryBits == MainScreen.PLAYER_BIT)
                 {
                     ((Player)fixA.getUserData()).powerUp();
                     ((Collectible)fixB.getUserData()).shouldBeDestroyed = true;
@@ -53,9 +54,9 @@ public class WorldContactListener implements ContactListener {
                 }
             break;
 
-            case BaseSampleProject.PLAYER_BIT | BaseSampleProject.MAGIC_BIT:
+            case MainScreen.PLAYER_BIT | MainScreen.MAGIC_BIT:
 
-                if(fixA.getFilterData().categoryBits == BaseSampleProject.PLAYER_BIT)
+                if(fixA.getFilterData().categoryBits == MainScreen.PLAYER_BIT)
                 {
                     if( ( (MagicBall)fixB.getUserData()).firedBy == FiredBy.BY_ENEMY)
                     {
@@ -73,9 +74,9 @@ public class WorldContactListener implements ContactListener {
                 }
             break;
 
-            case BaseSampleProject.ENEMY_BIT | BaseSampleProject.MAGIC_BIT:
+            case MainScreen.ENEMY_BIT | MainScreen.MAGIC_BIT:
 
-                if(fixA.getFilterData().categoryBits == BaseSampleProject.ENEMY_BIT)
+                if(fixA.getFilterData().categoryBits == MainScreen.ENEMY_BIT)
                 {
                     if( ( (MagicBall)fixB.getUserData()).firedBy == FiredBy.BY_PLAYER)
                     {
@@ -93,9 +94,9 @@ public class WorldContactListener implements ContactListener {
                 }
                 break;
 
-            case BaseSampleProject.ENEMY_BIT | BaseSampleProject.COLLECTIBLE_BIT:
+            case MainScreen.ENEMY_BIT | MainScreen.COLLECTIBLE_BIT:
 
-                if(fixA.getFilterData().categoryBits == BaseSampleProject.ENEMY_BIT)
+                if(fixA.getFilterData().categoryBits == MainScreen.ENEMY_BIT)
                 {
                     ((Enemy)fixA.getUserData()).powerUp();
                     ((Collectible)fixB.getUserData()).shouldBeDestroyed = true;

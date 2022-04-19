@@ -4,6 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
@@ -27,10 +28,10 @@ public class Controller {
     String url;
     public boolean cooldownFlag;
 
-    public Controller(OrthographicCamera camera, Socket socket, String url){
+    public Controller(OrthographicCamera camera, Socket socket, String url, SpriteBatch batch){
         cam = camera;
         viewport = new FitViewport(640, 480, cam);
-        stage = new Stage(viewport, BaseSampleProject.batch);
+        stage = new Stage(viewport, batch);
         this.socket = socket;
         this.url = url;
         cooldownFlag = false;
