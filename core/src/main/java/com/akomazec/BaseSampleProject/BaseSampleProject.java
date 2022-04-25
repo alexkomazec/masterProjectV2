@@ -39,9 +39,9 @@ public class BaseSampleProject extends Game {
 	public IO.Options options;
 
 	Emitter emitter = new Emitter();
-	//private static String url = "http://localhost:8080";
-	//private static String url = "http://138.68.160.152:5000";
-	public static String url = "http://192.168.0.18:5000";
+	//public static String url = "http://localhost:8080";
+	public static String url = "http://138.68.160.152:5000";
+	//public static String url = "http://192.168.0.18:5000";
 
 	public Player player;
 	public HashMap<Integer, Player> otherPlayers;
