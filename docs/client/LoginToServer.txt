@@ -1,0 +1,15 @@
+Note
+Tasks step by step
+
+CLIENT SIDE:
+Migrate socket instance , and socket stuff to game (screen dispatacher)
+For login Fill handshake.auth with .needToLogin = true, .username, .password, and socket.connect
+For Register Fill handshake.auth with .needToLogin = true, .username, .password, and socket.connect
+Change screen to Main screen if login is successful
+
+SERVER SIDE:
+Implement Mongoose schema for a player: Username, Password, isCurrentlyLoggedin, TBD for MongoDB collection
+Implement Mongoose model for a player
+Implement Middleware functions to check handshake.auth fields
+Implement communication between Server, and MongoDB collection
+TODO:Implement What happens on disconnection (currently connected flag tr/false), refresh player table

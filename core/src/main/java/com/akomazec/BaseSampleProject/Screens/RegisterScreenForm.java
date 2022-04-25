@@ -1,5 +1,6 @@
 package com.akomazec.BaseSampleProject.Screens;
 
+import com.akomazec.BaseSampleProject.BaseSampleProject;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
@@ -12,7 +13,7 @@ import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 
 public class RegisterScreenForm extends VisWindow {
-    public RegisterScreenForm()
+    public RegisterScreenForm(BaseSampleProject game)
     {
         super("User Register");
 
@@ -56,12 +57,13 @@ public class RegisterScreenForm extends VisWindow {
             {
                 String password1 = password.getText();
                 String password2 = confirmPassword.getText();
+
                 if(password1.equals(password2))
                 {
-                    Dialogs.showOKDialog(getStage(), "Credentials",
-                            "Username: " + username.getText() +
-                                    "\nPassword: " + password.getText());
-                    fadeOut();
+                    game.options.auth.put("needToLogin", "false");
+                    game.options.auth.put("username", username.getText());
+                    game.options.auth.put("password",password.getText());
+                    game.connectSocket();
                 }
                 else
                 {
@@ -70,9 +72,18 @@ public class RegisterScreenForm extends VisWindow {
             }
         });
 
+        cancelButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor)
+            {
+                fadeOut();
+            }
+        });
+
         pack();
         setSize(getWidth() + 60, getHeight());
         centerWindow();
         addCloseButton();
+        
     }
 }

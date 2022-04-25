@@ -8,21 +8,25 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 
-public class ConnectToServer extends ScreenAdapter
+public class ConnectToServerScreen extends ScreenAdapter
 {
     private Stage stage;
-    public ConnectToServer(BaseSampleProject game)
+    private final BaseSampleProject game;
+    private LoginScreenForm loginScreenForm;
+
+    public ConnectToServerScreen(BaseSampleProject game)
     {
-        stage = new Stage(new ScreenViewport());
+        this.game = game;
     }
     
     @Override
     public void show() 
     {
+        this.stage = new Stage(new ScreenViewport());
         VisUI.load(VisUI.SkinScale.X1);
         Gdx.input.setInputProcessor(stage);
-        stage.addActor(new LoginScreenForm());
-        System.out.println("Show screen, LoginScreen");
+        loginScreenForm = new LoginScreenForm(this.game);
+        stage.addActor(loginScreenForm);
     }
 
     @Override
@@ -31,6 +35,11 @@ public class ConnectToServer extends ScreenAdapter
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		stage.draw();
+
+		if(loginScreenForm.readyToChangeScreen)
+		{
+            game.setScreen(new MainScreen(game));
+        }
     }
 
 }

@@ -1,21 +1,38 @@
 package com.akomazec.BaseSampleProject.Screens;
 
+import com.akomazec.BaseSampleProject.BaseSampleProject;
+import com.akomazec.BaseSampleProject.Sprites.Player;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
-import com.kotcrab.vis.ui.util.TableUtils;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
-import com.kotcrab.vis.ui.widget.*;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.VisValidatableTextField;
+import com.kotcrab.vis.ui.widget.VisWindow;
 
-public class LoginScreenForm extends VisWindow {
+import org.json.JSONException;
+import org.json.JSONObject;
 
-	public LoginScreenForm () {
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
+public class LoginScreenForm extends VisWindow
+{
+	private BaseSampleProject game;
+	private Stage stage;
+	public boolean readyToChangeScreen = false;
+
+	public LoginScreenForm (BaseSampleProject game) {
 		super("Enter your credentials");
-
+		this.game = game;
+		configSocketEvents();
 		VisTextButton cancelButton = new VisTextButton("Cancel");
-		VisTextButton acceptButton = new VisTextButton("Login");
+		VisTextButton loginButton = new VisTextButton("Login");
 		VisTextButton registerButton = new VisTextButton("Register");
 
 		VisValidatableTextField username = new VisValidatableTextField();
@@ -27,7 +44,7 @@ public class LoginScreenForm extends VisWindow {
 		VisTable buttonTable = new VisTable(true);
 		buttonTable.add(errorLabel).expand().fill();
 		buttonTable.add(cancelButton);
-		buttonTable.add(acceptButton);
+		buttonTable.add(loginButton);
 		buttonTable.add(registerButton);
 
 		add(new VisLabel("e-mail: "));
@@ -40,25 +57,37 @@ public class LoginScreenForm extends VisWindow {
 		buttonTable.center();
 
 		SimpleFormValidator validator; //for GWT compatibility
-		validator = new SimpleFormValidator(acceptButton, errorLabel, "smooth");
+		validator = new SimpleFormValidator(loginButton, errorLabel, "smooth");
 		validator.setSuccessMessage("all good!");
 		validator.notEmpty(username, "e-mail can not be empty");
 		validator.notEmpty(password, "password can not be empty");
 
-		acceptButton.addListener(new ChangeListener() {
+		loginButton.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				Dialogs.showOKDialog(getStage(), "Credentials", 
-				"Username: " + username.getText() +
-				"\nPassword: " + password.getText());
-				fadeOut();
+
+				if(stage == null)
+				{
+					stage = getStage();
+				}
+
+				game.options.auth.put("needToLogin", "true");
+				game.options.auth.put("username", username.getText());
+				game.options.auth.put("password",password.getText());
+				game.connectSocket();
 			}
 		});
 
 		cancelButton.addListener(new ChangeListener() {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
-				Dialogs.showOKDialog(getStage(), "message", "you can't escape this!");
+
+				if(stage == null)
+				{
+					stage = getStage();
+				}
+
+				Dialogs.showOKDialog(stage, "message", "you can't escape this!");
 			}
 		});
 
@@ -66,7 +95,7 @@ public class LoginScreenForm extends VisWindow {
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
 				Stage stage = getStage();
-				stage.addActor(new RegisterScreenForm());
+				stage.addActor(new RegisterScreenForm(game));
 			}
 		});
 
@@ -74,5 +103,32 @@ public class LoginScreenForm extends VisWindow {
 		setSize(getWidth() + 60, getHeight());
 		centerWindow();
 		addCloseButton();
+	}
+
+	public void configSocketEvents()
+	{
+		this.game.socket.on(Socket.EVENT_CONNECT_ERROR, args -> {
+
+			JSONObject message = (JSONObject) args[0];
+			if(stage == null)
+			{
+				stage = getStage();
+			}
+
+			try {
+				Dialogs.showErrorDialog(stage,message.getString("message"));
+			} catch (JSONException e) {
+				e.printStackTrace();
+			}
+		});
+
+		this.game.socket.on(Socket.EVENT_CONNECT, args -> {
+			Gdx.app.log("SocketIO", "Connected");
+
+			game.player = new Player();
+			game.creator.createEntity(game.player,-1.0f,-1.0f);
+			readyToChangeScreen = true;
+		});
+
 	}
 }
