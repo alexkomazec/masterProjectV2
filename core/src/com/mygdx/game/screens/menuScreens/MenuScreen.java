@@ -15,6 +15,7 @@ import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.assets.AssetDescriptors;
 
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.screens.GameScreen;
 
 public class MenuScreen extends  MenuScreenBase {
 
@@ -49,7 +50,7 @@ public class MenuScreen extends  MenuScreenBase {
             public void changed(ChangeEvent event, Actor actor) {
                 CheckAndPlayMenuSound();
 
-                log.debug("GAME SCREEN" );
+                game.setScreen(new GameScreen());
                 //game.setScreen(new SelectionMenu(game,getViewport()));
             }
         });
@@ -60,7 +61,7 @@ public class MenuScreen extends  MenuScreenBase {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 CheckAndPlayMenuSound();
-                game.setScreen(new DifficultyScreen(game));
+                game.changeScreen(MyGdxGame.DIFFICULTY_SCREEN);
             }
         });
 
@@ -70,7 +71,7 @@ public class MenuScreen extends  MenuScreenBase {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 CheckAndPlayMenuSound();
-                game.setScreen(new OptionsScreen(game));
+                game.changeScreen(MyGdxGame.OPTIONS_SCREEN);
             }
         });
 

@@ -92,7 +92,7 @@ public class DifficultyScreen extends MenuScreenBase {
 
     private void back() {
         CheckAndPlayMenuSound();
-        game.setScreen(new MenuScreen(game));
+        game.changeScreen(MyGdxGame.MENU_SCREEN);
     }
 
     private void difficultyChanged() {

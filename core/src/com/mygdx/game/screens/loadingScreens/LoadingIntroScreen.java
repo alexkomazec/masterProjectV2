@@ -29,7 +29,7 @@ public class LoadingIntroScreen extends LoadingScreenBase {
         super.render(delta);
 
         if(changeScreen) {
-            game.setScreen(new MenuScreen(game));
+            game.changeScreen(MyGdxGame.MENU_SCREEN);
         }
     }
 
