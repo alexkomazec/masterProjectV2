@@ -1,0 +1,2 @@
+1. Load/Unload right map according to the level
+2. Render Map
