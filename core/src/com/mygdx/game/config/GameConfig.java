@@ -11,7 +11,9 @@ public class GameConfig {
 
     //INFO: Creating a body with width 16 and height 16, in box2D world it is represented as 16 meters x 16 meters body
     //      which is too heavy, so scalling is important part.
-    public static final float PPM = 16; // pixels per meter
+    private static final float PPM = 32; // pixels per meter
+    public static final float MULTIPLY_BY_PPM = PPM;
+    public static final float DIVIDE_BY_PPM = 1/PPM;
 
     public static final float WIDTH = 800f; //pixels
     public static final float HEIGHT  = 416f; //pixels
@@ -91,7 +93,7 @@ public class GameConfig {
     public static final int SURVIVAL_DIFFICULTY_HARD= (int)(SURVIVAL_DIFFICULTY*HARD_MULTIPLIER); // 150% of normal
 
     // == Names of Level Maps
-    public static final String LEVEL1 = "maps/valleyOfTheHungry_Level1/valleyOfTheHungry.tmx";
+    public static final String LEVEL1 = "tiledMaps/dummy.tmx";
     public static final String LEVEL2 = "SnowWave";
     public static final String LEVEL3 = "EternalSummer";
     public static final String LEVEL4 = "TheGreatSea";
@@ -115,10 +117,12 @@ public class GameConfig {
     public static final String PLAYER_NAME = "player";
     public static final String EXIT_DOOR_NAME = "exit_door";
 
+    //Box2D Collision Bits
     public static final short GROUND_BIT = 1;
-    public static final short HERO_BIT = 2;
-    public static final short EXIT_DOOR_BIT = 4;
-    public static final short BONUS_DOOR_BIT = 8;
+    public static final short PLAYER_BIT = 2;
+    public static final short MAGIC_BIT = 4;
+    public static final short COLLECTIBLE_BIT = 8;
+    public static final short ENEMY_BIT = 16;
 
     public enum HeroType{WARRIOR_SELECTED,MAGE_SELECTED,HUNTER_SELECTED};
 
@@ -143,23 +147,6 @@ public class GameConfig {
     //without having graphics
     public static final boolean box2dBodyRenderrer_flag = ENABLE_IT;
 
-
-    //Hardcoded hero frames per movement
-    //Developer should count the number of frames per image that represents a movement
-    //Pros of this way: Developer can provide a tape of frames (A few frames grouped into one picture)
-    //Cons of this way: Developer could not code generic implementation that can automically
-    //                  decide number of frames per tape
-
-    //According to warriorMoves folder. Note that all heroes should have the same number of frames
-    public static final int NUM_OF_FRAMES_ATTACK = 8;
-    public static final int NUM_OF_FRAMES_SHOOT = 10;
-    public static final int NUM_OF_FRAMES_CAST = 6;
-    public static final int NUM_OF_FRAMES_DEAD = 5;
-    public static final int NUM_OF_FRAMES_FALL = 4;
-    public static final int NUM_OF_FRAMES_JUMP = 4;
-    public static final int NUM_OF_FRAMES_HURT = 3;
-    public static final int NUM_OF_FRAMES_RUN = 9;
-    public static final int NUM_OF_FRAMES_STAND = 1;
 
     private GameConfig(){}
 }
