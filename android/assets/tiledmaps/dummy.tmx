@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="22" nextobjectid="702">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="23" nextobjectid="729">
  <tileset firstgid="1" name="Ground" tilewidth="32" tileheight="32" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -18,11 +18,6 @@
   <object id="299" gid="1" x="192" y="3168" width="32" height="32"/>
   <object id="300" gid="1" x="224" y="3168" width="32" height="32"/>
   <object id="660" name="PRVI" gid="1" x="96" y="3168" width="32" height="32"/>
-  <object id="661" gid="1" x="320" y="3200" width="32" height="32"/>
-  <object id="662" gid="1" x="352" y="3200" width="32" height="32"/>
-  <object id="663" gid="1" x="384" y="3200" width="32" height="32"/>
-  <object id="664" gid="1" x="417.333" y="3200" width="32" height="32"/>
-  <object id="666" gid="1" x="288" y="3200" width="32" height="32"/>
   <object id="674" gid="1" x="192" y="3040" width="32" height="32"/>
   <object id="675" gid="1" x="224" y="3040" width="32" height="32"/>
   <object id="676" gid="1" x="288" y="3040" width="32" height="32"/>
@@ -49,16 +44,48 @@
   <object id="698" gid="1" x="96" y="2944" width="32" height="32"/>
   <object id="699" gid="1" x="160" y="2944" width="32" height="32"/>
   <object id="701" gid="1" x="640" y="3008" width="32" height="32"/>
+  <object id="710" gid="1" x="320" y="3200" width="32" height="32"/>
+  <object id="712" gid="1" x="352" y="3200" width="32" height="32"/>
+  <object id="713" gid="1" x="384" y="3200" width="32" height="32"/>
+  <object id="714" gid="1" x="416" y="3200" width="32" height="32"/>
+  <object id="715" gid="1" x="448" y="3200" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="18" name="Players">
-  <object id="280" name="Player" x="480" y="2720" width="32" height="32"/>
+  <object id="705" name="Player" x="194.5" y="3103" width="32" height="32">
+   <ellipse/>
+  </object>
  </objectgroup>
  <objectgroup id="19" name="Collectible">
   <object id="657" gid="2" x="96" y="2912" width="32" height="32"/>
-  <object id="658" gid="2" x="288" y="3168" width="32" height="32"/>
+  <object id="658" gid="2" x="320" y="3168" width="32" height="32"/>
   <object id="659" gid="2" x="256" y="2688" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="20" name="Enemy">
-  <object id="665" x="32" y="3136" width="32" height="32"/>
+ <objectgroup id="22" name="CloudEnemies">
+  <object id="728" x="360" y="2595" width="32" height="32">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="20" name="BasicEnemies">
+  <object id="709" x="384" y="3136" width="32" height="32">
+   <properties>
+    <property name="NoOfSteps" type="int" value="2"/>
+    <property name="StartingDirectionLeft" type="bool" value="true"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="726" x="574.667" y="2944" width="32" height="32">
+   <properties>
+    <property name="NoOfSteps" type="int" value="2"/>
+    <property name="StartingDirectionLeft" type="bool" value="false"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="727" x="512" y="2720" width="32" height="32">
+   <properties>
+    <property name="NoOfSteps" type="int" value="1"/>
+    <property name="StartingDirectionLeft" type="bool" value="false"/>
+   </properties>
+   <ellipse/>
+  </object>
  </objectgroup>
 </map>
