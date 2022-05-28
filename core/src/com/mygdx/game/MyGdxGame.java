@@ -1,10 +1,17 @@
 package com.mygdx.game;
 
+import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Game;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.maps.tiled.TiledMap;
+import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
+import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.gameworld.GameWorld;
+import com.mygdx.game.gameworld.GameWorldCreator;
+import com.mygdx.game.gameworld.TileMapHandler;
+import com.mygdx.game.gameworld.WorldSingleton;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.loadingScreens.LoadingIntroScreen;
 import com.mygdx.game.screens.menuScreens.DifficultyScreen;
@@ -32,7 +39,13 @@ public class MyGdxGame extends Game {
 	/*Class Members*/
 	private SpriteBatch				batch;
 	private AssetManagmentHandler 	assetManagmentHandler;
-	private static MyGdxGame 		instance = null;
+
+	private TileMapHandler			tileMapHandler;
+	private GameWorldCreator 		gameWorldCreator;
+	private GameWorld				gameWorld;
+
+	private PooledEngine 			pooledEngine;
+	private static MyGdxGame 		instance;
 
 	/*Class Methods*/
 
@@ -54,16 +67,14 @@ public class MyGdxGame extends Game {
 	@Override
 	public void create() {
 
-		Gdx.app.setLogLevel(Gdx.app.LOG_DEBUG);
-
-		//Initilazing world
-		//box2dWorld = Box2dWorld.getInstance();
-		//box2dWorld.getWorld().setContactListener(new WorldContactListener());
+		tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
+		gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
 
 		batch = new SpriteBatch();
-		//ViewPortConfiguration.setupPhysicalSize();
 		assetManagmentHandler = new AssetManagmentHandler();
+		gameWorldCreator = GameWorldCreator.getInstance();
 
+		pooledEngine = new PooledEngine();
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);
 	}
 
@@ -100,6 +111,22 @@ public class MyGdxGame extends Game {
 				this.setScreen(loadingIntroScreen);
 				break;
 		}
+	}
+
+	public TileMapHandler getTileMapHandler() {
+		return tileMapHandler;
+	}
+
+	public GameWorldCreator getWorldCreator() {
+		return gameWorldCreator;
+	}
+
+	public GameWorld getGameWorld() {
+		return gameWorld;
+	}
+
+	public PooledEngine getPooledEngine() {
+		return pooledEngine;
 	}
 
 	@Override

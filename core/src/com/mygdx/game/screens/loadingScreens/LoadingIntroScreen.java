@@ -2,7 +2,6 @@ package com.mygdx.game.screens.loadingScreens;
 
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.assets.AssetDescriptors;
-import com.mygdx.game.screens.menuScreens.MenuScreen;
 
 public class LoadingIntroScreen extends LoadingScreenBase {
 
