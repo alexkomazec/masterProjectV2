@@ -6,18 +6,17 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Logger;
-import com.mygdx.game.KeyboardController;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
+import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.PhysicsDebugSystem;
 import com.mygdx.game.entitycomponentsystem.system.PhysicsSystem;
 import com.mygdx.game.entitycomponentsystem.system.PlayerControlSystem;
 import com.mygdx.game.entitycomponentsystem.system.RenderTiledMapSystem;
 import com.mygdx.game.entitycomponentsystem.system.SteeringSystem;
-import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
 
 public class GameScreen implements Screen {
@@ -27,16 +26,17 @@ public class GameScreen implements Screen {
 
     private final MyGdxGame game;
     private final OrthographicCamera camera;
-    private final KeyboardController keyboardController;
 
     public GameScreen()
     {
-        this.keyboardController = new KeyboardController();
         this.game = MyGdxGame.getInstance();
         this.camera = new OrthographicCamera();
 
         this.game.getPooledEngine().addSystem(
-                new PlayerControlSystem(this.keyboardController,
+                new InputManagerSystem()
+        );
+        this.game.getPooledEngine().addSystem(
+                new PlayerControlSystem(
                         game.getWorldCreator(),
                         game.getPooledEngine(),
                         game.getGameWorld().getWorldSingleton().getWorld())
@@ -63,7 +63,7 @@ public class GameScreen implements Screen {
     @Override
     public void show()
     {
-        Gdx.input.setInputProcessor(this.keyboardController);
+        int testPlayerID = 5;
 
         ViewPortConfiguration.setupPhysicalSize();
         this.camera.setToOrtho(false,
@@ -76,10 +76,17 @@ public class GameScreen implements Screen {
                 this.game.getGameWorld().getWorldSingleton().getWorld(),
                 game.getPooledEngine());
 
-        this.game.getWorldCreator().createPlayers(
+        InputManagerSystem inputManagerSystemTemp =
+                this.game.getPooledEngine().getSystem(InputManagerSystem.class);
+
+        inputManagerSystemTemp.assignPlayerToInputProcessor(testPlayerID);
+
+        this.game.getWorldCreator().createPlayer(
                 this.game.getGameWorld(),
                 game.getPooledEngine(),
-                this.camera);
+                this.camera,
+                testPlayerID,
+                true);
 
         this.game.getWorldCreator().createEnemies(
                 this.game.getGameWorld(),
@@ -113,12 +120,12 @@ public class GameScreen implements Screen {
 
     @Override
     public void resume() {
-        Gdx.input.setInputProcessor(this.keyboardController);
     }
 
     @Override
     public void hide() {
-
+        game.getPooledEngine().removeAllEntities();
+        game.getPooledEngine().removeAllSystems();
     }
 
     @Override

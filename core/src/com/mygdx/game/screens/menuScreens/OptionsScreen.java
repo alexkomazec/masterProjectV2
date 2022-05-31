@@ -116,9 +116,4 @@ public class OptionsScreen extends MenuScreenBase {
             }
         }
     }
-
-    private void back() {
-        game.changeScreen(MyGdxGame.MENU_SCREEN);
-    }
-
 }

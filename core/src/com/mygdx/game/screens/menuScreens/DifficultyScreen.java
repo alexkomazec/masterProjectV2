@@ -90,11 +90,6 @@ public class DifficultyScreen extends MenuScreenBase {
         return table;
     }
 
-    private void back() {
-        CheckAndPlayMenuSound();
-        game.changeScreen(MyGdxGame.MENU_SCREEN);
-    }
-
     private void difficultyChanged() {
         CheckBox checked = checkBoxGroup.getChecked();
 

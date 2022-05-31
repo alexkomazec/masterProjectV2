@@ -1,0 +1,20 @@
+Client handler module consists everything needed for online mode:
+    1. Socket from Socket IO library, used to connect to the server
+    2. Socket events, and socket configuration
+    3. IP address/port of the server
+    
+Client Handler need to:
+    ============ Initialization phase ============
+    1. Create socket from Socket io library
+    2. Configure socket options
+    3. Register all needed socket events
+
+    ============ Login/Register phase ============
+    4. Handle Login/Registration proces fromm a client side
+
+    ============ Realtime data upload/download ============
+    5. Handle data during gampelay:
+        1. Forward local data from user to the server
+        2. Receive online data from the server
+        3. Delegate received data to required modules 
+            Note: Game objects will be locally updated upon online data retrieval

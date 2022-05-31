@@ -16,6 +16,7 @@ import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.loadingScreens.LoadingIntroScreen;
 import com.mygdx.game.screens.menuScreens.DifficultyScreen;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
+import com.mygdx.game.screens.menuScreens.ModeSelectionScreen;
 import com.mygdx.game.screens.menuScreens.OptionsScreen;
 
 public class MyGdxGame extends Game {
@@ -27,6 +28,7 @@ public class MyGdxGame extends Game {
 	public final static int OPTIONS_SCREEN 			= 2;
 	public final static int DIFFICULTY_SCREEN 		= 3;
 	public final static int LOADING_INTRO_SCREEN 	= 4;
+	public final static int MODE_SELECTION_SCREEN 	= 5;
 
 	/* List of screen references */
 	private MenuScreen 			menuScreen;
@@ -34,6 +36,7 @@ public class MyGdxGame extends Game {
 	private OptionsScreen 		optionsScreen;
 	private DifficultyScreen 	difficultyScreen;
 	private LoadingIntroScreen 	loadingIntroScreen;
+	private ModeSelectionScreen modeSelectionScreen;
 
 
 	/*Class Members*/
@@ -67,14 +70,14 @@ public class MyGdxGame extends Game {
 	@Override
 	public void create() {
 
-		tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
-		gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
+		this.tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
+		this.gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
 
-		batch = new SpriteBatch();
-		assetManagmentHandler = new AssetManagmentHandler();
-		gameWorldCreator = GameWorldCreator.getInstance();
+		this.batch = new SpriteBatch();
+		this.assetManagmentHandler = new AssetManagmentHandler();
+		this.gameWorldCreator = GameWorldCreator.getInstance();
 
-		pooledEngine = new PooledEngine();
+		this.pooledEngine = new PooledEngine();
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);
 	}
 
@@ -109,6 +112,10 @@ public class MyGdxGame extends Game {
 			case LOADING_INTRO_SCREEN:
 				if(loadingIntroScreen == null) loadingIntroScreen = new LoadingIntroScreen(this);
 				this.setScreen(loadingIntroScreen);
+				break;
+			case MODE_SELECTION_SCREEN:
+				if(modeSelectionScreen == null) modeSelectionScreen = new ModeSelectionScreen(this);
+				this.setScreen(modeSelectionScreen);
 				break;
 		}
 	}

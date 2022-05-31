@@ -7,7 +7,6 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;
-import com.mygdx.game.KeyboardController;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.config.GameConfig;
@@ -23,19 +22,17 @@ public class PlayerControlSystem extends IteratingSystem{
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
-	KeyboardController keyboardController;
 	GameWorldCreator gameWorldCreator;
 	PooledEngine pooledEngine;
 	World world;
+	boolean alreadyFired;
 	
 	
 	@SuppressWarnings("unchecked")
-	public PlayerControlSystem(KeyboardController keyboardController,
-							   GameWorldCreator gameWorldCreator,
+	public PlayerControlSystem(GameWorldCreator gameWorldCreator,
 							   PooledEngine pooledEngine,
 							   World world) {
 		super(Family.all(PlayerComponent.class).get());
-		this.keyboardController = keyboardController;
 		this.gameWorldCreator = gameWorldCreator;
 		this.pooledEngine = pooledEngine;
 		this.world = world;
@@ -46,87 +43,100 @@ public class PlayerControlSystem extends IteratingSystem{
 	}
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
-		B2dBodyComponent b2body = bodm.get(entity);
-		StateComponent state = sm.get(entity);
-		PlayerComponent player = pm.get(entity);
+		B2dBodyComponent b2dbodyComponent = bodm.get(entity);
+		StateComponent stateComponent = sm.get(entity);
+		PlayerComponent playerComponent = pm.get(entity);
 
-		player.cam.position.x = b2body.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM;
-		player.cam.position.y = b2body.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+		playerComponent.cam.position.x = b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM;
+		playerComponent.cam.position.y = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
 
 		ViewPortConfiguration.calculateViewport(10, 10);
 
-		if (b2body.body.getLinearVelocity().y > 0 && state.get() != StateComponent.STATE_FALLING) {
-			state.set(StateComponent.STATE_FALLING);
+		if (b2dbodyComponent.body.getLinearVelocity().y > 0 && stateComponent.get() != StateComponent.STATE_FALLING) {
+			stateComponent.set(StateComponent.STATE_FALLING);
 			System.out.println("setting to Falling");
 		}
 
-		if (b2body.body.getLinearVelocity().y == 0) {
-			if (state.get() == StateComponent.STATE_FALLING) {
-				state.set(StateComponent.STATE_NORMAL);
+		if (b2dbodyComponent.body.getLinearVelocity().y == 0) {
+			if (stateComponent.get() == StateComponent.STATE_FALLING) {
+				stateComponent.set(StateComponent.STATE_NORMAL);
 				System.out.println("setting to normal");
 			}
-			if (b2body.body.getLinearVelocity().x != 0 && state.get() != StateComponent.STATE_MOVING) {
-				state.set(StateComponent.STATE_MOVING);
+			if (b2dbodyComponent.body.getLinearVelocity().x != 0 && stateComponent.get() != StateComponent.STATE_MOVING) {
+				stateComponent.set(StateComponent.STATE_MOVING);
 				System.out.println("setting to moving");
 			}
 		}
 
-		if (this.keyboardController.left)
+		if (isInputCommandTrue(GameConfig.LEFT, playerComponent))
 		{
-			b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, -7f, 0.2f), b2body.body.getLinearVelocity().y);
-			player.direction = Direction.LEFT;
+			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
+			playerComponent.direction = Direction.LEFT;
 		}
 
-		if (this.keyboardController.right)
+		if (isInputCommandTrue(GameConfig.RIGHT, playerComponent))
 		{
-			b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, 7f, 0.2f), b2body.body.getLinearVelocity().y);
-			player.direction = Direction.RIGHT;
+			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
+			playerComponent.direction = Direction.RIGHT;
 		}
 
-		if (!this.keyboardController.left && !keyboardController.right)
+		/*
+		Clarification: If left, and right are not in state "pressed" linear velocity to x axis
+		should be 0. Wanted to avoid "sliding on ice" effect
+		*/
+		if (!isInputCommandTrue(GameConfig.LEFT, playerComponent) && !isInputCommandTrue(GameConfig.RIGHT, playerComponent))
 		{
-			b2body.body.setLinearVelocity(MathUtils.lerp(b2body.body.getLinearVelocity().x, 0, 0.1f), b2body.body.getLinearVelocity().y);
-
+			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 0, 0.1f), b2dbodyComponent.body.getLinearVelocity().y);
 		}
 
-		if (this.keyboardController.up &&
-				(state.get() == StateComponent.STATE_NORMAL || state.get() == StateComponent.STATE_MOVING)) {
-			b2body.body.applyLinearImpulse(0, 10f * b2body.body.getMass(), b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
-			state.set(StateComponent.STATE_JUMPING);
+		if (isInputCommandTrue(GameConfig.UP, playerComponent) &&
+				(stateComponent.get() == StateComponent.STATE_NORMAL || stateComponent.get() == StateComponent.STATE_MOVING)) {
+			b2dbodyComponent.body.applyLinearImpulse(0, 10f * b2dbodyComponent.body.getMass(), b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
+			stateComponent.set(StateComponent.STATE_JUMPING);
 			System.out.println("setting to jumping");
-			player.onPlatform = false;
+			playerComponent.onPlatform = false;
 		}
 
-		if (this.keyboardController.down)
+		if (isInputCommandTrue(GameConfig.DOWN, playerComponent))
 		{
-			b2body.body.applyLinearImpulse(0, -5f, b2body.body.getWorldCenter().x, b2body.body.getWorldCenter().y, true);
+			b2dbodyComponent.body.applyLinearImpulse(0, -5f, b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
 		}
 
-		if (this.keyboardController.space && (!this.keyboardController.isMagicFired))
+		if (isInputCommandTrue(GameConfig.SPACE, playerComponent) && (!alreadyFired))
 		{
 			float startBulletPositionX;
 			float startBulletPositionY;
 			float xVel;
 
-			if(player.direction == Direction.LEFT)
+			if(playerComponent.direction == Direction.LEFT)
 			{
-				startBulletPositionX = (b2body.body.getPosition().x* GameConfig.MULTIPLY_BY_PPM) - 16f*3;
+				startBulletPositionX = (b2dbodyComponent.body.getPosition().x* GameConfig.MULTIPLY_BY_PPM) - 16f*3;
 				xVel = -7;
 			}
 			else
 			{
-				startBulletPositionX = (b2body.body.getPosition().x* GameConfig.MULTIPLY_BY_PPM) + 16f;
+				startBulletPositionX = (b2dbodyComponent.body.getPosition().x* GameConfig.MULTIPLY_BY_PPM) + 16f;
 				xVel = 7;
 			}
 
-			startBulletPositionY = b2body.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+			startBulletPositionY = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
 
 			this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
 											xVel,0,
 											BulletComponent.Owner.PLAYER, this.pooledEngine,
 											world);
-			this.keyboardController.isMagicFired = true;
+			alreadyFired = true;
 		}
 
+		/* Space has been unpressed, and magic has been already fired, need reset*/
+		if(!isInputCommandTrue(GameConfig.SPACE, playerComponent) && alreadyFired)
+		{
+			alreadyFired = false;
+		}
+	}
+
+	private boolean isInputCommandTrue(int inputCommandID, PlayerComponent playerComponent)
+	{
+		return playerComponent.abInputCommandList[inputCommandID];
 	}
 }

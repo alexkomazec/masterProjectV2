@@ -1,5 +1,6 @@
 package com.mygdx.game.gameworld;
 
+import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Game;
@@ -21,7 +22,9 @@ import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
+import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
+import com.mygdx.game.entitycomponentsystem.components.RemoteInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
@@ -151,24 +154,28 @@ public class GameWorldCreator {
         pooledEngine.addEntity(entity);
     }
 
-    public void createPlayers(GameWorld gameWorld,
-                              PooledEngine pooledEngine,OrthographicCamera orthographicCamera)
+    public void createPlayer(GameWorld gameWorld,
+                             PooledEngine pooledEngine,
+                             OrthographicCamera orthographicCamera,
+                             int playerID,
+                             boolean isLocalPlayer)
     {
         TiledMap map = gameWorld.getTiledMap();
 
         //Create Players
         for(EllipseMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_PLAYERS).
+                get(GameWorld.TM_LAYER_PLAYERS_SPAWN_SPOTS).
                 getObjects().
                 getByType(EllipseMapObject.class))
         {
-            createPlayer(object, gameWorld, pooledEngine, orthographicCamera);
+            createPlayer(object, gameWorld, pooledEngine, orthographicCamera,playerID, isLocalPlayer);
         }
 
     }
 
     private void createPlayer(MapObject object, GameWorld gameWorld,
-                             PooledEngine pooledEngine, OrthographicCamera orthographicCamera)
+                              PooledEngine pooledEngine, OrthographicCamera orthographicCamera,
+                              int playerID, boolean isLocalPlayer)
     {
         Entity entity = pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
@@ -179,8 +186,10 @@ public class GameWorldCreator {
         StateComponent stateComponent = pooledEngine.createComponent(StateComponent.class);
         SteeringComponent steeringComponent = pooledEngine.createComponent(SteeringComponent.class);
         Rectangle rectangle = getRectangle(object);
+        Component inputTypeForPlayerComponent;
 
         playerComponent.cam = orthographicCamera;
+        playerComponent.playerID = playerID;
         entity.add(playerComponent);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
@@ -207,6 +216,16 @@ public class GameWorldCreator {
         entity.add(steeringComponent);
 
         entity.add(collisionComponent);
+
+        if(isLocalPlayer)
+        {
+            inputTypeForPlayerComponent = pooledEngine.createComponent(LocalInputComponent.class);
+        }
+        else
+        {
+            inputTypeForPlayerComponent = pooledEngine.createComponent(RemoteInputComponent.class);
+        }
+        entity.add(inputTypeForPlayerComponent);
 
         gameWorld.setPlayer(entity);
         pooledEngine.addEntity(entity);
@@ -268,6 +287,7 @@ public class GameWorldCreator {
         entity.add(typeComponent);
 
         pooledEngine.addEntity(entity);
+
 
         return entity;
     }

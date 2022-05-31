@@ -1,13 +1,18 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Input.Keys;
-import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.common.InputAdapterWrapper;
+import com.mygdx.game.config.GameConfig;
 
-public class KeyboardController implements InputProcessor {
-	public boolean left,right,up,down, space, isMagicFired;
-	public boolean isDragged;
-	public Vector2 mouseLocation = new Vector2(0,0);
+public class KeyboardController extends InputAdapterWrapper {
+
+	private final Vector2 mouseLocation = new Vector2(0,0);
+
+	public KeyboardController()
+	{
+		abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+	}
 
 	@Override
 	public boolean keyDown(int keycode) {
@@ -15,23 +20,23 @@ public class KeyboardController implements InputProcessor {
 		switch (keycode)
         {
 	        case Keys.LEFT:
-	            left = true;
+				abInputCommandList[GameConfig.LEFT] = true;
 	            keyProcessed = true;
 	            break;
 	        case Keys.RIGHT:
-	            right = true;
+				abInputCommandList[GameConfig.RIGHT] = true;
 	            keyProcessed = true;
 	            break;
 	        case Keys.UP:
-	            up = true;
+				abInputCommandList[GameConfig.UP] = true;
 	            keyProcessed = true;
 	            break;
 	        case Keys.DOWN:
-	            down = true;
+				abInputCommandList[GameConfig.DOWN] = true;
 	            keyProcessed = true;
 	            break;
 			case Keys.SPACE:
-				space = true;
+				abInputCommandList[GameConfig.SPACE] = true;
 				keyProcessed = true;
         }
 		return keyProcessed;
@@ -42,25 +47,24 @@ public class KeyboardController implements InputProcessor {
 		switch (keycode) // switch code base on the variable keycode
         {
 	        case Keys.LEFT:
-	            left = false;
+				abInputCommandList[GameConfig.LEFT] = false;
 	            keyProcessed = true;
 	            break;
 	        case Keys.RIGHT:
-	            right = false;
+				abInputCommandList[GameConfig.RIGHT] = false;
 	            keyProcessed = true;
 	            break;
 	        case Keys.UP:
-	            up = false;
+				abInputCommandList[GameConfig.UP] = false;
 	            keyProcessed = true;
 	            break;
 	        case Keys.DOWN:
-	            down = false;
+				abInputCommandList[GameConfig.DOWN] = false;
 	            keyProcessed = true;
 	            break;
 			case Keys.SPACE:
-				space = false;
+				abInputCommandList[GameConfig.SPACE] = false;
 				keyProcessed = true;
-				isMagicFired = false;
         }
 		return keyProcessed;
 	}
@@ -80,10 +84,10 @@ public class KeyboardController implements InputProcessor {
 
 	@Override
 	public boolean touchDragged(int screenX, int screenY, int pointer) {
-		isDragged = true;
+		boolean isDragged = true;
 		mouseLocation.x = screenX;
 		mouseLocation.y = screenY;
-		// TODO Auto-generated method stub
+
 		return false;
 	}
 

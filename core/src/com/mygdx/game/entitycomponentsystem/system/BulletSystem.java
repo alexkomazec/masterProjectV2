@@ -1,5 +1,7 @@
 package com.mygdx.game.entitycomponentsystem.system;
 
+import static com.mygdx.game.entitycomponentsystem.components.BulletComponent.MAX_LIVING_TIME;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
@@ -23,25 +25,16 @@ public class BulletSystem extends IteratingSystem{
 		//get box 2d body and bullet components
 		B2dBodyComponent b2body = Mapper.b2dCom.get(entity);
 		BulletComponent bullet = Mapper.bulletCom.get(entity);
+		bullet.livingTime +=deltaTime;
 
 		float xVel = bullet.xVel * GameConfig.MULTIPLY_BY_PPM;
 		float yVel = bullet.yVel * GameConfig.MULTIPLY_BY_PPM;
 
 		// apply bullet velocity to bullet body
 		b2body.body.setLinearVelocity(xVel, yVel);
-		
-		// get player pos
-		B2dBodyComponent playerBodyComp = Mapper.b2dCom.get(gameWorld.getPlayer());
-		float px = playerBodyComp.body.getPosition().x;
-		float py = playerBodyComp.body.getPosition().y;
-		
-		//get bullet pos
-		float bx = b2body.body.getPosition().x;
 
-		float distanceX = Math.abs(bx - px);
-
-		// if bullet is 30 units away from player on any axis then it is probably off screen
-		if(distanceX > 30){
+		if(bullet.livingTime >= MAX_LIVING_TIME)
+		{
 			bullet.isDead = true;
 		}
 		

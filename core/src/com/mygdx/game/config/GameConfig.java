@@ -147,6 +147,16 @@ public class GameConfig {
     //without having graphics
     public static final boolean box2dBodyRenderrer_flag = ENABLE_IT;
 
+    /* Input commands stuff*/
+
+    //No of currently implemented input commands
+    public static final int LIST_COMMANDS_MAX = 5;
+
+    public static final int LEFT        = 0;
+    public static final int RIGHT       = 1;
+    public static final int UP          = 2;
+    public static final int DOWN        = 3;
+    public static final int SPACE       = 4;
 
     private GameConfig(){}
 }

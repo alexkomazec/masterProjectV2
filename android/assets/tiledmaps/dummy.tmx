@@ -10,14 +10,14 @@
   <image source="Collectible.png" width="32" height="32"/>
  </tileset>
  <objectgroup color="#aa5500" id="2" name="Platform" tintcolor="#55ff00">
-  <object id="250" name="PRVI" gid="1" x="32" y="3200" width="32" height="32"/>
-  <object id="249" name="DRUGI" gid="1" x="0" y="3168" width="32" height="32"/>
-  <object id="251" name="TRECI" gid="1" x="96" y="3168" width="32" height="32"/>
-  <object id="252" name="CETVRTI" gid="1" x="96" y="3200" width="32" height="32"/>
+  <object id="250" gid="1" x="32" y="3200" width="32" height="32"/>
+  <object id="249" gid="1" x="0" y="3168" width="32" height="32"/>
+  <object id="251" gid="1" x="96" y="3168" width="32" height="32"/>
+  <object id="252" gid="1" x="96" y="3200" width="32" height="32"/>
   <object id="295" gid="1" x="160" y="3168" width="32" height="32"/>
   <object id="299" gid="1" x="192" y="3168" width="32" height="32"/>
   <object id="300" gid="1" x="224" y="3168" width="32" height="32"/>
-  <object id="660" name="PRVI" gid="1" x="96" y="3168" width="32" height="32"/>
+  <object id="660" gid="1" x="96" y="3168" width="32" height="32"/>
   <object id="674" gid="1" x="192" y="3040" width="32" height="32"/>
   <object id="675" gid="1" x="224" y="3040" width="32" height="32"/>
   <object id="676" gid="1" x="288" y="3040" width="32" height="32"/>
@@ -50,8 +50,8 @@
   <object id="714" gid="1" x="416" y="3200" width="32" height="32"/>
   <object id="715" gid="1" x="448" y="3200" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="18" name="Players">
-  <object id="705" name="Player" x="194.5" y="3103" width="32" height="32">
+ <objectgroup id="18" name="PlayersSpawnSpots">
+  <object id="705" x="194.5" y="3103" width="32" height="32">
    <ellipse/>
   </object>
  </objectgroup>

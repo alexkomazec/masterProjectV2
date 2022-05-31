@@ -103,10 +103,11 @@ public abstract class MenuScreenBase extends ScreenAdapter {
         stage.dispose();
     }
 
-    public Viewport getViewport() {
-        return viewport;
-    }
-
     // == protected methods == //
     protected abstract Actor createUi();
+
+    protected void back() {
+        game.changeScreen(MyGdxGame.MENU_SCREEN);
+    }
+
 }

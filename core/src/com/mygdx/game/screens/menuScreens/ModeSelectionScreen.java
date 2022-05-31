@@ -1,6 +1,6 @@
 package com.mygdx.game.screens.menuScreens;
 
-import static com.mygdx.game.MyGdxGame.MODE_SELECTION_SCREEN;
+import static com.mygdx.game.MyGdxGame.GAME_SCREEN;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
@@ -17,16 +17,13 @@ import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.screens.GameScreen;
 
-public class MenuScreen extends  MenuScreenBase {
+public class ModeSelectionScreen extends  MenuScreenBase {
 
-    private static final String CLASS_NAME  = MenuScreen.class.getSimpleName();
+    private static final String CLASS_NAME  = ModeSelectionScreen.class.getSimpleName();
     private static final Logger log         = new Logger(CLASS_NAME, Logger.DEBUG);
 
-    public MenuScreen(MyGdxGame game) {
+    public ModeSelectionScreen(MyGdxGame game) {
         super(game);
-        //Fresh start, force garbage collector to clean all the garbage
-        //When the menu screen has been created(For the first time or when
-        // losing a game and come to the menu screen again)
         System.gc();
     }
 
@@ -43,43 +40,42 @@ public class MenuScreen extends  MenuScreenBase {
         TextureRegion backgroundRegion = backGround.findRegion(GameConfig.BACKGROUND);
         table.setBackground(new TextureRegionDrawable(backgroundRegion));
 
-        // start game
-        TextButton playButton = new TextButton("START GAME", uiskin);
+        TextButton playButton = new TextButton("Offline - SinglePlayer", uiskin);
         playButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                CheckAndPlayMenuSound();
-                game.changeScreen(MODE_SELECTION_SCREEN);
+                game.changeScreen(GAME_SCREEN);
             }
         });
 
-        // set difficulty button
-        TextButton setDifficulty = new TextButton("SET DIFFICULTY", uiskin);
+        TextButton setDifficulty = new TextButton("Offline - Co-op", uiskin);
         setDifficulty.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                CheckAndPlayMenuSound();
-                game.changeScreen(MyGdxGame.DIFFICULTY_SCREEN);
             }
         });
 
-        // options button
-        TextButton optionsButton = new TextButton("OPTIONS", uiskin);
+        TextButton optionsButton = new TextButton("Online Co-op", uiskin);
         optionsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                CheckAndPlayMenuSound();
-                game.changeScreen(MyGdxGame.OPTIONS_SCREEN);
+
             }
         });
 
-        // quit button
-        TextButton quitButton = new TextButton("QUIT", uiskin);
+        TextButton quitButton = new TextButton("Online - PvP", uiskin);
         quitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                CheckAndPlayMenuSound();
-                quit();
+
+            }
+        });
+
+        TextButton backButton = new TextButton("Back", uiskin);
+        backButton.addListener(new ChangeListener() {
+            @Override
+            public void changed(ChangeEvent event, Actor actor) {
+                back();
             }
         });
 
@@ -90,7 +86,8 @@ public class MenuScreen extends  MenuScreenBase {
         buttonTable.add(playButton).row();
         buttonTable.add(setDifficulty).row();
         buttonTable.add(optionsButton).row();
-        buttonTable.add(quitButton);
+        buttonTable.add(quitButton).row();
+        buttonTable.add(backButton);
 
         buttonTable.center();
 
@@ -102,9 +99,4 @@ public class MenuScreen extends  MenuScreenBase {
         return table;
     }
 
-    private void quit()
-    {
-        CheckAndPlayMenuSound();
-        Gdx.app.exit();
-    }
 }
