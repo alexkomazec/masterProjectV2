@@ -44,6 +44,7 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         playButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                game.setConnectionType(GameConfig.LOCAL_CONNECTION);
                 game.changeScreen(GAME_SCREEN);
             }
         });

@@ -3,15 +3,13 @@ package com.mygdx.game;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.maps.tiled.TiledMap;
-import com.badlogic.gdx.physics.box2d.Box2DDebugRenderer;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.gameworld.TileMapHandler;
-import com.mygdx.game.gameworld.WorldSingleton;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.loadingScreens.LoadingIntroScreen;
 import com.mygdx.game.screens.menuScreens.DifficultyScreen;
@@ -50,6 +48,8 @@ public class MyGdxGame extends Game {
 	private PooledEngine 			pooledEngine;
 	private static MyGdxGame 		instance;
 
+	private ClientHandler clientHandler = null;
+	private boolean connectionType;
 	/*Class Methods*/
 
 	private MyGdxGame()
@@ -134,6 +134,23 @@ public class MyGdxGame extends Game {
 
 	public PooledEngine getPooledEngine() {
 		return pooledEngine;
+	}
+
+	public ClientHandler getClientHandler() {
+		return clientHandler;
+	}
+
+	public void setClientHandler()
+	{
+		this.clientHandler = new ClientHandler(pooledEngine);
+	}
+
+	public boolean getConnectionType() {
+		return connectionType;
+	}
+
+	public void setConnectionType(boolean connectionType) {
+		this.connectionType = connectionType;
 	}
 
 	@Override

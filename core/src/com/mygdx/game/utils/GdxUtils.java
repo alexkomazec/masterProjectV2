@@ -49,4 +49,13 @@ public class GdxUtils {
         return aimTo(shooter, new Vector2(target.x,target.y));
     }
 
+    public static Boolean[] convPrimArr2ObjArr(boolean[] ab)
+    {
+        Boolean[] aB = new Boolean[ab.length];
+
+        for (int index = 0; index < ab.length; index++) {
+            aB[index] = ab[index];
+        }
+        return aB;
+    }
 }

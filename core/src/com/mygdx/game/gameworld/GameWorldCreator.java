@@ -3,24 +3,22 @@ package com.mygdx.game.gameworld;
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.OrthographicCamera;
-import com.badlogic.gdx.graphics.g2d.Animation;
-import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.ai.SteeringPresets;
+import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
+import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -181,6 +179,7 @@ public class GameWorldCreator {
         B2dBodyComponent b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = pooledEngine.createComponent(TransformComponent.class);
         PlayerComponent playerComponent = pooledEngine.createComponent(PlayerComponent.class);
+        ControlledInputComponent cntrlInComp = pooledEngine.createComponent(ControlledInputComponent.class);
         CollisionComponent collisionComponent = pooledEngine.createComponent(CollisionComponent.class);
         TypeComponent typeComponent = pooledEngine.createComponent(TypeComponent.class);
         StateComponent stateComponent = pooledEngine.createComponent(StateComponent.class);
@@ -216,6 +215,7 @@ public class GameWorldCreator {
         entity.add(steeringComponent);
 
         entity.add(collisionComponent);
+        entity.add(cntrlInComp);
 
         if(isLocalPlayer)
         {
