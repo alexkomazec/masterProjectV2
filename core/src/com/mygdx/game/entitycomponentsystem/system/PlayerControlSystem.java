@@ -12,6 +12,7 @@ import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
+import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
@@ -22,6 +23,8 @@ public class PlayerControlSystem extends IteratingSystem{
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
+	ComponentMapper<ControlledInputComponent> cp;
+
 	GameWorldCreator gameWorldCreator;
 	PooledEngine pooledEngine;
 	World world;
@@ -40,12 +43,15 @@ public class PlayerControlSystem extends IteratingSystem{
 		pm = ComponentMapper.getFor(PlayerComponent.class);
 		bodm = ComponentMapper.getFor(B2dBodyComponent.class);
 		sm = ComponentMapper.getFor(StateComponent.class);
+		cp = ComponentMapper.getFor(ControlledInputComponent.class);
 	}
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
+
 		B2dBodyComponent b2dbodyComponent = bodm.get(entity);
 		StateComponent stateComponent = sm.get(entity);
 		PlayerComponent playerComponent = pm.get(entity);
+		ControlledInputComponent cntrlComponent = cp.get(entity);
 
 		playerComponent.cam.position.x = b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM;
 		playerComponent.cam.position.y = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
@@ -68,13 +74,13 @@ public class PlayerControlSystem extends IteratingSystem{
 			}
 		}
 
-		if (isInputCommandTrue(GameConfig.LEFT, playerComponent))
+		if (isInputCommandTrue(GameConfig.LEFT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			playerComponent.direction = Direction.LEFT;
 		}
 
-		if (isInputCommandTrue(GameConfig.RIGHT, playerComponent))
+		if (isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			playerComponent.direction = Direction.RIGHT;
@@ -84,12 +90,12 @@ public class PlayerControlSystem extends IteratingSystem{
 		Clarification: If left, and right are not in state "pressed" linear velocity to x axis
 		should be 0. Wanted to avoid "sliding on ice" effect
 		*/
-		if (!isInputCommandTrue(GameConfig.LEFT, playerComponent) && !isInputCommandTrue(GameConfig.RIGHT, playerComponent))
+		if (!isInputCommandTrue(GameConfig.LEFT, cntrlComponent) && !isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 0, 0.1f), b2dbodyComponent.body.getLinearVelocity().y);
 		}
 
-		if (isInputCommandTrue(GameConfig.UP, playerComponent) &&
+		if (isInputCommandTrue(GameConfig.UP, cntrlComponent) &&
 				(stateComponent.get() == StateComponent.STATE_NORMAL || stateComponent.get() == StateComponent.STATE_MOVING)) {
 			b2dbodyComponent.body.applyLinearImpulse(0, 10f * b2dbodyComponent.body.getMass(), b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
 			stateComponent.set(StateComponent.STATE_JUMPING);
@@ -97,12 +103,12 @@ public class PlayerControlSystem extends IteratingSystem{
 			playerComponent.onPlatform = false;
 		}
 
-		if (isInputCommandTrue(GameConfig.DOWN, playerComponent))
+		if (isInputCommandTrue(GameConfig.DOWN, cntrlComponent))
 		{
 			b2dbodyComponent.body.applyLinearImpulse(0, -5f, b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
 		}
 
-		if (isInputCommandTrue(GameConfig.SPACE, playerComponent) && (!alreadyFired))
+		if (isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && (!alreadyFired))
 		{
 			float startBulletPositionX;
 			float startBulletPositionY;
@@ -129,14 +135,14 @@ public class PlayerControlSystem extends IteratingSystem{
 		}
 
 		/* Space has been unpressed, and magic has been already fired, need reset*/
-		if(!isInputCommandTrue(GameConfig.SPACE, playerComponent) && alreadyFired)
+		if(!isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && alreadyFired)
 		{
 			alreadyFired = false;
 		}
 	}
 
-	private boolean isInputCommandTrue(int inputCommandID, PlayerComponent playerComponent)
+	private boolean isInputCommandTrue(int inputCommandID, ControlledInputComponent cntrlInCom)
 	{
-		return playerComponent.abInputCommandList[inputCommandID];
+		return cntrlInCom.abInputCommandList[inputCommandID];
 	}
 }

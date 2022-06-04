@@ -7,10 +7,13 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.InputProcessor;
 import com.mygdx.game.KeyboardController;
 import com.mygdx.game.common.InputAdapterWrapper;
+import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 
 import java.util.HashMap;
+
+import javax.naming.ldap.Control;
 
 public class InputManagerSystem extends IteratingSystem {
 
@@ -27,16 +30,18 @@ public class InputManagerSystem extends IteratingSystem {
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
-        int playerID                    = playerComponent.playerID;
-        HashMap.Entry<InputAdapterWrapper, Integer> localEntry = null;
+
+        PlayerComponent playerComponent         = entity.getComponent(PlayerComponent.class);
+        ControlledInputComponent cntrlInComp    = entity.getComponent(ControlledInputComponent.class);
+        int playerID                            = playerComponent.playerID;
+        HashMap.Entry<InputAdapterWrapper, Integer> localEntry  = null;
 
         /* Iterate through HashMap to find a specified Input processor that player */
         for (HashMap.Entry<InputAdapterWrapper, Integer> tempEntry : hmpInputprocessor.entrySet())
         {
             Integer value = tempEntry.getValue();
 
-            if(value.intValue() == playerID)
+            if(value == playerID)
             {
                 localEntry = tempEntry;
                 break;
@@ -47,14 +52,16 @@ public class InputManagerSystem extends IteratingSystem {
         if(localEntry != null)
         {
             InputAdapterWrapper key = localEntry.getKey();
+            int abInputCommandListLength = cntrlInComp.abInputCommandList.length;
             /* Iterate through all input commands */
-            for (int index = 0; index < playerComponent.abInputCommandList.length; index++) {
+            for (int index = 0; index < abInputCommandListLength; index++) {
 
-                boolean plInputCommand = playerComponent.abInputCommandList[index];
+                boolean plInputCommand =  cntrlInComp.abInputCommandList[index];
                 boolean inputProcInputCommand = key.getInputCommand(index);
                 if(plInputCommand != inputProcInputCommand)
                 {
-                    playerComponent.abInputCommandList[index] = inputProcInputCommand;
+                    cntrlInComp.abInputCommandList[index] = inputProcInputCommand;
+                    cntrlInComp.newInputHappend = true;
                 }
             }
         }
