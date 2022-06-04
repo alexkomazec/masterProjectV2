@@ -7,7 +7,9 @@ import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.common.ViewPortConfiguration;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
@@ -59,6 +61,11 @@ public class GameScreen implements Screen {
                 new BulletSystem(game.getGameWorld()));
         this.game.getPooledEngine().addSystem(
                 new SteeringSystem());
+
+        if(this.game.getConnectionType() == GameConfig.ONLINE_CONNECTION)
+        {
+            this.game.setClientHandler();
+        }
     }
     @Override
     public void show()

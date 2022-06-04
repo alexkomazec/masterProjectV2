@@ -158,5 +158,9 @@ public class GameConfig {
     public static final int DOWN        = 3;
     public static final int SPACE       = 4;
 
+    /* Types of game connectivity */
+    public static final boolean LOCAL_CONNECTION = false;
+    public static final boolean ONLINE_CONNECTION = true;
+
     private GameConfig(){}
 }
