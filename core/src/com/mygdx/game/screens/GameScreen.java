@@ -61,11 +61,6 @@ public class GameScreen implements Screen {
                 new BulletSystem(game.getGameWorld()));
         this.game.getPooledEngine().addSystem(
                 new SteeringSystem());
-
-        if(this.game.getConnectionType() == GameConfig.ONLINE_CONNECTION)
-        {
-            this.game.setClientHandler();
-        }
     }
     @Override
     public void show()

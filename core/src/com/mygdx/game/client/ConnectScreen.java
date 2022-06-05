@@ -1,5 +1,7 @@
 package com.mygdx.game.client;
 
+import static com.mygdx.game.MyGdxGame.GAME_SCREEN;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL30;
@@ -7,14 +9,18 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.client.forms.LoginForm;
+import com.mygdx.game.client.forms.RegisterForm;
 
 public class ConnectScreen extends ScreenAdapter
 {
-    /*private Stage stage;
+    private Stage stage;
     private final MyGdxGame game;
-    private LoginScreenForm loginScreenForm;
+    private LoginForm loginScreenForm;
+    private RegisterForm registerForm;
+    private boolean readyToChangeScreen = false;
 
-    public ConnectScreen(BaseSampleProject game)
+    public ConnectScreen(MyGdxGame game)
     {
         this.game = game;
     }
@@ -25,7 +31,7 @@ public class ConnectScreen extends ScreenAdapter
         this.stage = new Stage(new ScreenViewport());
         VisUI.load(VisUI.SkinScale.X1);
         Gdx.input.setInputProcessor(stage);
-        loginScreenForm = new LoginScreenForm(this.game);
+        loginScreenForm = new LoginForm(this.game, this);
         stage.addActor(loginScreenForm);
     }
 
@@ -36,10 +42,21 @@ public class ConnectScreen extends ScreenAdapter
 		stage.act(Math.min(Gdx.graphics.getDeltaTime(), 1 / 30f));
 		stage.draw();
 
-		if(loginScreenForm.readyToChangeScreen)
+		if(this.readyToChangeScreen)
 		{
-            game.setScreen(new MainScreen(game));
+            game.changeScreen(GAME_SCREEN);
         }
-    }*/
+    }
 
+    public RegisterForm getRegisterForm() {
+        return registerForm;
+    }
+
+    public void setRegisterForm() {
+        this.registerForm = new RegisterForm(this.game);
+    }
+
+    public void setReadyToChangeScreen(boolean readyToChangeScreen) {
+        this.readyToChangeScreen = readyToChangeScreen;
+    }
 }

@@ -2,12 +2,15 @@ package com.mygdx.game.client;
 
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
 import com.brashmonkey.spriter.Player;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 import com.mygdx.game.entitycomponentsystem.system.DataTransmittingSystem;
+import com.mygdx.game.gameworld.WorldSingleton;
 
 
 import org.json.JSONArray;
@@ -22,8 +25,17 @@ import io.socket.client.Socket;
 
 public class ClientHandler {
 
-    public Socket socket;
-    public IO.Options options;
+    public static ClientHandler instance;
+
+    public static ClientHandler getInstance(PooledEngine pooledEngine) {
+        if (instance == null) {
+            instance = new ClientHandler(pooledEngine);
+        }
+        return instance;
+    }
+
+    private Socket socket;
+    private IO.Options options;
     public static String url = "http://138.68.160.152:5000";
 
     private Array<ReceivedMessage> receivedMessage;
@@ -36,7 +48,7 @@ public class ClientHandler {
     private static final int REMOTE_PLAYER_CONNECTED_REQ = 5;
     private static final int CONNECTION_ESTABLISHED_REQ = 6; /* Connection Established, create player */
 
-    public ClientHandler(PooledEngine pooledEngine) {
+    private ClientHandler(PooledEngine pooledEngine) {
         createSocket();
         receivedMessage = new Array<>();
         pooledEngine.addSystem(new DataReceivingSystem(this));
@@ -237,4 +249,17 @@ public class ClientHandler {
         readyToChangeScreen = true;
     }*/
 
+    public IO.Options getOptions()
+    {
+        return options;
+    }
+
+    public void connectSocket()
+    {
+        this.socket.connect();
+    }
+
+    public Socket getSocket() {
+        return socket;
+    }
 }

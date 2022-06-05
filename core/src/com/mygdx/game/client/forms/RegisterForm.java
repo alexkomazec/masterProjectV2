@@ -10,18 +10,19 @@ import com.kotcrab.vis.ui.widget.VisTable;
 import com.kotcrab.vis.ui.widget.VisTextButton;
 import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
+import com.mygdx.game.MyGdxGame;
 
-public class RegisterForm {//extends VisWindow {
-    /*public RegisterForm(BaseSampleProject game)
+public class RegisterForm extends VisWindow {
+    public RegisterForm(final MyGdxGame game)
     {
         super("User Register");
 
         VisTextButton cancelButton = new VisTextButton("Cancel");
         VisTextButton registerButton = new VisTextButton("Register");
 
-        VisValidatableTextField username = new VisValidatableTextField();
-        VisValidatableTextField password = new VisValidatableTextField();
-        VisValidatableTextField confirmPassword = new VisValidatableTextField();
+        final VisValidatableTextField username = new VisValidatableTextField();
+        final VisValidatableTextField password = new VisValidatableTextField();
+        final VisValidatableTextField confirmPassword = new VisValidatableTextField();
 
         VisLabel errorLabel = new VisLabel();
         errorLabel.setColor(Color.RED);
@@ -59,10 +60,10 @@ public class RegisterForm {//extends VisWindow {
 
                 if(password1.equals(password2))
                 {
-                    game.options.auth.put("needToLogin", "false");
-                    game.options.auth.put("username", username.getText());
-                    game.options.auth.put("password",password.getText());
-                    game.connectSocket();
+                    game.getClientHandler().getOptions().auth.put("needToLogin", "false");
+                    game.getClientHandler().getOptions().auth.put("username", username.getText());
+                    game.getClientHandler().getOptions().auth.put("password",password.getText());
+                    game.getClientHandler().connectSocket();
                 }
                 else
                 {
@@ -84,5 +85,5 @@ public class RegisterForm {//extends VisWindow {
         centerWindow();
         addCloseButton();
         
-    }*/
+    }
 }

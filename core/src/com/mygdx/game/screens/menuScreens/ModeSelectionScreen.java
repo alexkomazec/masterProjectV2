@@ -1,5 +1,6 @@
 package com.mygdx.game.screens.menuScreens;
 
+import static com.mygdx.game.MyGdxGame.CONNECT_SCREEN;
 import static com.mygdx.game.MyGdxGame.GAME_SCREEN;
 
 import com.badlogic.gdx.Gdx;
@@ -28,7 +29,8 @@ public class ModeSelectionScreen extends  MenuScreenBase {
     }
 
     @Override
-    protected Actor createUi() {
+    protected Actor createUi()
+    {
         Table table = new Table();
 
         //Getting texture atlas from asset manager
@@ -60,7 +62,9 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         optionsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                game.setConnectionType(GameConfig.ONLINE_CONNECTION);
+                game.setClientHandler();
+                game.changeScreen(CONNECT_SCREEN);
             }
         });
 
@@ -68,7 +72,9 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         quitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
+                game.setConnectionType(GameConfig.ONLINE_CONNECTION);
+                game.setClientHandler();
+                game.changeScreen(CONNECT_SCREEN);
             }
         });
 

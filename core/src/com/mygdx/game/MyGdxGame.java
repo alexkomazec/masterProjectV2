@@ -5,6 +5,7 @@ import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.client.ClientHandler;
+import com.mygdx.game.client.ConnectScreen;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.gameworld.GameWorld;
@@ -27,6 +28,7 @@ public class MyGdxGame extends Game {
 	public final static int DIFFICULTY_SCREEN 		= 3;
 	public final static int LOADING_INTRO_SCREEN 	= 4;
 	public final static int MODE_SELECTION_SCREEN 	= 5;
+	public final static int CONNECT_SCREEN			= 6;
 
 	/* List of screen references */
 	private MenuScreen 			menuScreen;
@@ -35,6 +37,7 @@ public class MyGdxGame extends Game {
 	private DifficultyScreen 	difficultyScreen;
 	private LoadingIntroScreen 	loadingIntroScreen;
 	private ModeSelectionScreen modeSelectionScreen;
+	private ConnectScreen		connectScreen;
 
 
 	/*Class Members*/
@@ -117,6 +120,11 @@ public class MyGdxGame extends Game {
 				if(modeSelectionScreen == null) modeSelectionScreen = new ModeSelectionScreen(this);
 				this.setScreen(modeSelectionScreen);
 				break;
+			case CONNECT_SCREEN:
+				if(connectScreen == null) connectScreen = new ConnectScreen(this);
+				this.setScreen(connectScreen);
+				break;
+
 		}
 	}
 
@@ -142,7 +150,7 @@ public class MyGdxGame extends Game {
 
 	public void setClientHandler()
 	{
-		this.clientHandler = new ClientHandler(pooledEngine);
+		this.clientHandler = ClientHandler.getInstance(pooledEngine);
 	}
 
 	public boolean getConnectionType() {

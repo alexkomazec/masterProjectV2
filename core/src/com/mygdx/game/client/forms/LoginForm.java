@@ -1,21 +1,43 @@
 package com.mygdx.game.client.forms;
 
-public class LoginForm //extends VisWindow
-{
-	/*private MyGdxGame game;
-	private Stage stage;
-	public boolean readyToChangeScreen = false;
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.kotcrab.vis.ui.util.dialog.Dialogs;
+import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
+import com.kotcrab.vis.ui.widget.VisLabel;
+import com.kotcrab.vis.ui.widget.VisTable;
+import com.kotcrab.vis.ui.widget.VisTextButton;
+import com.kotcrab.vis.ui.widget.VisValidatableTextField;
+import com.kotcrab.vis.ui.widget.VisWindow;
+import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.client.ConnectScreen;
 
-	public LoginForm(MyGdxGame game) {
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import io.socket.client.Socket;
+import io.socket.emitter.Emitter;
+
+public class LoginForm extends VisWindow
+{
+	private MyGdxGame game;
+	private Stage stage;
+	private ConnectScreen connectScreen;
+
+	public LoginForm(final MyGdxGame game, final ConnectScreen connectScreen) {
 		super("Enter your credentials");
 		this.game = game;
+		this.connectScreen = connectScreen;
 		configSocketEvents();
 		VisTextButton cancelButton = new VisTextButton("Cancel");
 		VisTextButton loginButton = new VisTextButton("Login");
 		VisTextButton registerButton = new VisTextButton("Register");
 
-		VisValidatableTextField username = new VisValidatableTextField();
-		VisValidatableTextField password = new VisValidatableTextField();
+		final VisValidatableTextField username = new VisValidatableTextField();
+		final VisValidatableTextField password = new VisValidatableTextField();
 
 		VisLabel errorLabel = new VisLabel();
 		errorLabel.setColor(Color.RED);
@@ -50,10 +72,10 @@ public class LoginForm //extends VisWindow
 					stage = getStage();
 				}
 
-				game.options.auth.put("needToLogin", "true");
-				game.options.auth.put("username", username.getText());
-				game.options.auth.put("password",password.getText());
-				game.connectSocket();
+				game.getClientHandler().getOptions().auth.put("needToLogin", "true");
+				game.getClientHandler().getOptions().auth.put("username", username.getText());
+				game.getClientHandler().getOptions().auth.put("password",password.getText());
+				game.getClientHandler().connectSocket();
 			}
 		});
 
@@ -74,7 +96,8 @@ public class LoginForm //extends VisWindow
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
 				Stage stage = getStage();
-				stage.addActor(new com.akomazec.BaseSampleProject.Screens.RegisterScreenForm(game));
+				connectScreen.setRegisterForm();
+				stage.addActor(connectScreen.getRegisterForm());
 			}
 		});
 
@@ -86,30 +109,36 @@ public class LoginForm //extends VisWindow
 
 	public void configSocketEvents()
 	{
-		this.game.socket.on(Socket.EVENT_CONNECT_ERROR, args -> {
-
-			JSONObject message = (JSONObject) args[0];
-			if(stage == null)
+		final ConnectScreen connectScreen = this.connectScreen;
+		this.game.getClientHandler().getSocket().on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener()
+		{
+			@Override
+			public void call(Object... args)
 			{
-				stage = getStage();
-			}
+				JSONObject message = (JSONObject) args[0];
+				if(stage == null)
+				{
+					stage = getStage();
+				}
 
-			try {
-				Dialogs.showErrorDialog(stage,message.getString("message"));
-			} catch (JSONException e) {
-				e.printStackTrace();
+				try {
+					Dialogs.showErrorDialog(stage,message.getString("message"));
+				} catch (JSONException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
-		this.game.socket.on(Socket.EVENT_CONNECT, args -> {
-			Gdx.app.log("SocketIO", "Connected");
-
-			game.player = new Player();
-			game.creator.createEntity(game.player,-1.0f,-1.0f);
-			readyToChangeScreen = true;
+		this.game.getClientHandler().getSocket().on(Socket.EVENT_CONNECT,new Emitter.Listener()
+		{
+			@Override
+			public void call(Object... args) {
+				//game.player = new Player();
+				//game.creator.createEntity(game.player,-1.0f,-1.0f);
+				connectScreen.setReadyToChangeScreen(true);
+				Gdx.app.log("SocketIO", "Connected");
+			}
 		});
-
 	}
 
-	 */
 }
