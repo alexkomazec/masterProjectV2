@@ -33,6 +33,7 @@ public class GameScreen implements Screen {
     {
         this.game = MyGdxGame.getInstance();
         this.camera = new OrthographicCamera();
+        this.game.getGameWorldCreator().setOrthographicCamera(this.camera);
 
         this.game.getPooledEngine().addSystem(
                 new InputManagerSystem()
@@ -65,40 +66,16 @@ public class GameScreen implements Screen {
     @Override
     public void show()
     {
-        int testPlayerID = 5;
-
         ViewPortConfiguration.setupPhysicalSize();
         this.camera.setToOrtho(false,
                 ViewPortConfiguration.physicalWidth,
                 ViewPortConfiguration.physicalHeight);
         this.camera.update();
 
-        this.game.getWorldCreator().createPlatforms(
-                this.game.getGameWorld().getTiledMap(),
-                this.game.getGameWorld().getWorldSingleton().getWorld(),
-                game.getPooledEngine());
-
-        InputManagerSystem inputManagerSystemTemp =
-                this.game.getPooledEngine().getSystem(InputManagerSystem.class);
-
-        inputManagerSystemTemp.assignPlayerToInputProcessor(testPlayerID);
-
-        this.game.getWorldCreator().createPlayer(
-                this.game.getGameWorld(),
-                game.getPooledEngine(),
-                this.camera,
-                testPlayerID,
-                true);
-
-        this.game.getWorldCreator().createEnemies(
-                this.game.getGameWorld(),
-                game.getPooledEngine());
-
-        this.game.getWorldCreator().createClouds(
-                this.game.getGameWorld().getTiledMap(),
-                this.game.getGameWorld(),
-                game.getPooledEngine()
-        );
+        this.game.getWorldCreator().createPlatforms();
+        this.game.getWorldCreator().createPlayer(true,null);
+        this.game.getWorldCreator().createEnemies();
+        this.game.getWorldCreator().createClouds();
     }
 
     @Override

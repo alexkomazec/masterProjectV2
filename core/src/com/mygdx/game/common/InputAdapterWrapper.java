@@ -8,6 +8,7 @@ public class InputAdapterWrapper extends InputAdapter {
     *  input data from the input processor
     * */
     protected boolean[] abInputCommandList;
+    protected boolean inputProcesorSet = false;
 
     public boolean getInputCommand(int inputCommandID) {
         return abInputCommandList[inputCommandID];
@@ -16,5 +17,13 @@ public class InputAdapterWrapper extends InputAdapter {
     public void setInputCommand(int inputCommandID, boolean value)
     {
         abInputCommandList[inputCommandID] = value;
+    }
+
+    public boolean isInputProcesorSet() {
+        return inputProcesorSet;
+    }
+
+    public void setInputProcesorSet(boolean inputProcesorSet) {
+        this.inputProcesorSet = inputProcesorSet;
     }
 }

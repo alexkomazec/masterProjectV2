@@ -8,6 +8,7 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
@@ -44,8 +45,8 @@ public class PhysicsSystem extends IteratingSystem {
                 TransformComponent tfm = tm.get(entity);
                 B2dBodyComponent bodyComp = bm.get(entity);
                 Vector2 position = bodyComp.body.getPosition();
-                tfm.position.x = position.x;
-                tfm.position.y = position.y;
+                tfm.position.x = position.x * GameConfig.MULTIPLY_BY_PPM;
+                tfm.position.y = position.y * GameConfig.MULTIPLY_BY_PPM;
                 //TODO check this works
                 if(bodyComp.isDead){
                 	System.out.println("Removing a body and entity");

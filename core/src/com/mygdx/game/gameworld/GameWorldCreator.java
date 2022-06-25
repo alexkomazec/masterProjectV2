@@ -9,6 +9,7 @@ import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.mygdx.game.ai.SteeringPresets;
@@ -27,13 +28,19 @@ import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
+import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 
 
 public class GameWorldCreator {
 
     private BodyCreator bodyCreator;
-
+    private static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
+
+    GameWorld gameWorld;
+    PooledEngine pooledEngine;
+    OrthographicCamera orthographicCamera;
+
 
     public static GameWorldCreator getInstance() {
         if (instance == null) {
@@ -48,40 +55,40 @@ public class GameWorldCreator {
         this.bodyCreator = BodyCreator.getInstance();
     }
 
-    public void createClouds(TiledMap map, GameWorld gameWorld, PooledEngine pooledEngine)
+    public void createClouds()
     {
+        TiledMap map = this.gameWorld.getTiledMap();
         for(EllipseMapObject object : map.getLayers().
                 get(GameWorld.TM_LAYER_CLOUD_ENEMIES).
                 getObjects().
                 getByType(EllipseMapObject.class))
         {
-            createCloud(object, gameWorld, pooledEngine);
+            createCloud(object);
         };
     }
 
-    private void createCloud(MapObject object, GameWorld gameWorld,
-                               PooledEngine pooledEngine)
+    private void createCloud(MapObject object)
     {
-        Entity entity = pooledEngine.createEntity();
-        B2dBodyComponent b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
-        TransformComponent transformComponent = pooledEngine.createComponent(TransformComponent.class);
-        CollisionComponent collisionComponent = pooledEngine.createComponent(CollisionComponent.class);
-        TypeComponent typeComponent = pooledEngine.createComponent(TypeComponent.class);
-        StateComponent stateComponent = pooledEngine.createComponent(StateComponent.class);
-        EnemyComponent enemyComponent = pooledEngine.createComponent(EnemyComponent.class);
-        SteeringComponent steeringComponent = pooledEngine.createComponent(SteeringComponent.class);
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        CollisionComponent collisionComponent = this.pooledEngine.createComponent(CollisionComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        StateComponent stateComponent = this.pooledEngine.createComponent(StateComponent.class);
+        EnemyComponent enemyComponent = this.pooledEngine.createComponent(EnemyComponent.class);
+        SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
         Rectangle rectangle = getRectangle(object);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
-                gameWorld.getWorldSingleton().getWorld(),
+                this.gameWorld.getWorldSingleton().getWorld(),
                 true);
 
         b2dBodyComponent.body.setGravityScale(0f);  // no gravity for our floating enemy
         b2dBodyComponent.body.setLinearDamping(0.3f); // setting linear dampening so the enemy slows down in our box2d world(or it can float on forever)
 
-        transformComponent.position.set(rectangle.getX(), rectangle.getY(),0);
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
         typeComponent.type = TypeComponent.ENEMY;
         stateComponent.set(StateComponent.STATE_NORMAL);
         b2dBodyComponent.body.setUserData(entity);
@@ -102,35 +109,36 @@ public class GameWorldCreator {
         entity.add(stateComponent);
         entity.add(steeringComponent);
 
-        pooledEngine.addEntity(entity);
+        this.pooledEngine.addEntity(entity);
     }
 
-    public void createPlatforms(TiledMap map, World world, PooledEngine pooledEngine)
+    public void createPlatforms()
     {
+        TiledMap map = this.gameWorld.getTiledMap();
         //Create Platform
         for(TextureMapObject object : map.getLayers().
                 get(GameWorld.TM_LAYER_PLATFORM).
                 getObjects().
                 getByType(TextureMapObject.class))
         {
-            createPlatform(object, world, pooledEngine);
+            createPlatform(object);
         };
     }
 
-    private void createPlatform (TextureMapObject object, World world, PooledEngine pooledEngine)
+    private void createPlatform (TextureMapObject object)
     {
-        Entity entity = pooledEngine.createEntity();
-        B2dBodyComponent    b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
-        TypeComponent       typeComponent = pooledEngine.createComponent(TypeComponent.class);
-        TransformComponent  transformComponent = pooledEngine.createComponent(TransformComponent.class);
-        BrickComponent      brickComponent = pooledEngine.createComponent(BrickComponent.class);
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent    b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TypeComponent       typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        TransformComponent  transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        BrickComponent      brickComponent = this.pooledEngine.createComponent(BrickComponent.class);
         Rectangle rectangle = getRectangle(object);
 
         //Create a box2d body for each tiled object in the layer
         b2dBodyComponent.body = bodyCreator.makeBoxPolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.StaticBody,
-                world,
+                this.gameWorld.getWorldSingleton().getWorld(),
                 true);
 
         /* Set an object that represents an unique ID for the body */
@@ -142,23 +150,19 @@ public class GameWorldCreator {
         entity.add(typeComponent);
 
         /* Set transformation component*/
-        transformComponent.position.set(rectangle.getX(), rectangle.getY(), 0);
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
         entity.add(transformComponent);
 
         /* Add the index to the brick component*/
         brickComponent.textureMapObject = object;
         entity.add(brickComponent);
 
-        pooledEngine.addEntity(entity);
+        this.pooledEngine.addEntity(entity);
     }
 
-    public void createPlayer(GameWorld gameWorld,
-                             PooledEngine pooledEngine,
-                             OrthographicCamera orthographicCamera,
-                             int playerID,
-                             boolean isLocalPlayer)
+    public void createPlayer(boolean isLocalPlayer, Vector2 position)
     {
-        TiledMap map = gameWorld.getTiledMap();
+        TiledMap map = this.gameWorld.getTiledMap();
 
         //Create Players
         for(EllipseMapObject object : map.getLayers().
@@ -166,35 +170,34 @@ public class GameWorldCreator {
                 getObjects().
                 getByType(EllipseMapObject.class))
         {
-            createPlayer(object, gameWorld, pooledEngine, orthographicCamera,playerID, isLocalPlayer);
+            createPlayer(object, position, isLocalPlayer);
         }
 
     }
 
-    private void createPlayer(MapObject object, GameWorld gameWorld,
-                              PooledEngine pooledEngine, OrthographicCamera orthographicCamera,
-                              int playerID, boolean isLocalPlayer)
+    private void createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer)
     {
-        Entity entity = pooledEngine.createEntity();
-        B2dBodyComponent b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
-        TransformComponent transformComponent = pooledEngine.createComponent(TransformComponent.class);
-        PlayerComponent playerComponent = pooledEngine.createComponent(PlayerComponent.class);
-        ControlledInputComponent cntrlInComp = pooledEngine.createComponent(ControlledInputComponent.class);
-        CollisionComponent collisionComponent = pooledEngine.createComponent(CollisionComponent.class);
-        TypeComponent typeComponent = pooledEngine.createComponent(TypeComponent.class);
-        StateComponent stateComponent = pooledEngine.createComponent(StateComponent.class);
-        SteeringComponent steeringComponent = pooledEngine.createComponent(SteeringComponent.class);
-        Rectangle rectangle = getRectangle(object);
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        PlayerComponent playerComponent = this.pooledEngine.createComponent(PlayerComponent.class);
+        ControlledInputComponent cntrlInComp = this.pooledEngine.createComponent(ControlledInputComponent.class);
+        CollisionComponent collisionComponent = this.pooledEngine.createComponent(CollisionComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        StateComponent stateComponent = this.pooledEngine.createComponent(StateComponent.class);
+        SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
         Component inputTypeForPlayerComponent;
+        Rectangle rectangle;
 
-        playerComponent.cam = orthographicCamera;
-        playerComponent.playerID = playerID;
+        rectangle = (isLocalPlayer) ? getRectangle(object) : getRectangle(position);
+        playerComponent.playerID = currentAvailablePlayerID;
+        currentAvailablePlayerID++;
         entity.add(playerComponent);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
-                gameWorld.getWorldSingleton().getWorld(),
+                this.gameWorld.getWorldSingleton().getWorld(),
                 true);
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
@@ -202,7 +205,11 @@ public class GameWorldCreator {
         b2dBodyComponent.body.setSleepingAllowed(false);
         entity.add(b2dBodyComponent);
 
-        transformComponent.position.set(rectangle.getX(), rectangle.getY(),0);
+        transformComponent.position.set(b2dBodyComponent.body.getPosition().x
+                                        * GameConfig.MULTIPLY_BY_PPM,
+                                        b2dBodyComponent.body.getPosition().y
+                                        * GameConfig.MULTIPLY_BY_PPM);
+
         entity.add(transformComponent);
 
         typeComponent.type = TypeComponent.PLAYER;
@@ -217,24 +224,26 @@ public class GameWorldCreator {
         entity.add(collisionComponent);
         entity.add(cntrlInComp);
 
+        InputManagerSystem inputManagerSystem = this.pooledEngine.getSystem(InputManagerSystem.class);
         if(isLocalPlayer)
         {
-            inputTypeForPlayerComponent = pooledEngine.createComponent(LocalInputComponent.class);
+            inputTypeForPlayerComponent = this.pooledEngine.createComponent(LocalInputComponent.class);
+            playerComponent.cam = this.orthographicCamera;
+            inputManagerSystem.assignPlayerToInputProcessor(playerComponent.playerID, isLocalPlayer);
         }
         else
         {
-            inputTypeForPlayerComponent = pooledEngine.createComponent(RemoteInputComponent.class);
+            inputTypeForPlayerComponent = this.pooledEngine.createComponent(RemoteInputComponent.class);
         }
         entity.add(inputTypeForPlayerComponent);
 
-        gameWorld.setPlayer(entity);
-        pooledEngine.addEntity(entity);
+        this.gameWorld.setPlayer(entity);
+        this.pooledEngine.addEntity(entity);
     }
 
-    public void createEnemies(GameWorld gameWorld,
-                              PooledEngine pooledEngine)
+    public void createEnemies()
     {
-        TiledMap map = gameWorld.getTiledMap();
+        TiledMap map = this.gameWorld.getTiledMap();
         map.getLayers().get(GameWorld.TM_LAYER_PLATFORM).getObjects();
         //Create Enemies
         for(EllipseMapObject object : map.getLayers().
@@ -242,31 +251,31 @@ public class GameWorldCreator {
                 getObjects().
                 getByType(EllipseMapObject.class))
         {
-            createEnemy(object, gameWorld, pooledEngine);
+            createEnemy(object);
         }
 
     }
 
-    private Entity createEnemy(MapObject object, GameWorld gameWorld, PooledEngine pooledEngine){
-        Entity entity = pooledEngine.createEntity();
-        B2dBodyComponent b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
-        TransformComponent transformComponent = pooledEngine.createComponent(TransformComponent.class);
-        EnemyComponent enemyComponent = pooledEngine.createComponent(EnemyComponent.class);
-        TypeComponent typeComponent = pooledEngine.createComponent(TypeComponent.class);
-        CollisionComponent colComp = pooledEngine.createComponent(CollisionComponent.class);
+    private Entity createEnemy(MapObject object){
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        EnemyComponent enemyComponent = this.pooledEngine.createComponent(EnemyComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        CollisionComponent colComp = this.pooledEngine.createComponent(CollisionComponent.class);
         Rectangle rectangle = getRectangle(object);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
-                gameWorld.getWorldSingleton().getWorld(),
+                this.gameWorld.getWorldSingleton().getWorld(),
                 true);
 
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
         entity.add(b2dBodyComponent);
 
-        transformComponent.position.set(rectangle.getX(), rectangle.getY(),0);
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
         entity.add(transformComponent);
 
         enemyComponent.xPosCenter = rectangle.getX();
@@ -286,7 +295,7 @@ public class GameWorldCreator {
         entity.add(enemyComponent);
         entity.add(typeComponent);
 
-        pooledEngine.addEntity(entity);
+        this.pooledEngine.addEntity(entity);
 
 
         return entity;
@@ -310,7 +319,7 @@ public class GameWorldCreator {
                 BodyDef.BodyType.DynamicBody,world, true);
         b2dbody.body.setBullet(true); // increase physics computation to limit body travelling through other objects
         bodyCreator.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
-        position.position.set(x,y,0);
+        position.position.set(x,y);
 
         type.type = TypeComponent.BULLET;
         b2dbody.body.setUserData(entity);
@@ -345,4 +354,28 @@ public class GameWorldCreator {
         return new Rectangle(xPos, yPos, width, height);
     }
 
+    private Rectangle getRectangle(Vector2 position)
+    {
+        return new Rectangle(
+                position.x - GameConfig.DEFAULT_PLAYER_WIDTH/2,
+                position.y - GameConfig.DEFAULT_PLAYER_HEIGHT/2,
+                GameConfig.DEFAULT_PLAYER_WIDTH,
+                GameConfig.DEFAULT_PLAYER_HEIGHT);
+    }
+
+    public void setGameWorld(GameWorld gameWorld) {
+        this.gameWorld = gameWorld;
+    }
+
+    public void setPooledEngine(PooledEngine pooledEngine) {
+        this.pooledEngine = pooledEngine;
+    }
+
+    public void setOrthographicCamera(OrthographicCamera orthographicCamera) {
+        this.orthographicCamera = orthographicCamera;
+    }
+
+    public PooledEngine getPooledEngine() {
+        return pooledEngine;
+    }
 }

@@ -13,6 +13,7 @@ public class PlayerComponent implements Component, Poolable{
 	public boolean isDead = false;
 	public boolean onSpring = false;
 	public Direction direction = Direction.LEFT;
+	public boolean alreadyFired;
 
 	@Override
 	public void reset() {

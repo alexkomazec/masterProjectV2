@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.brashmonkey.spriter.Player;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -18,8 +19,10 @@ import com.mygdx.game.client.ConnectScreen;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import io.socket.client.Manager;
 import io.socket.client.Socket;
 import io.socket.emitter.Emitter;
+import io.socket.engineio.client.EngineIOException;
 
 public class LoginForm extends VisWindow
 {
@@ -109,36 +112,72 @@ public class LoginForm extends VisWindow
 
 	public void configSocketEvents()
 	{
-		final ConnectScreen connectScreen = this.connectScreen;
+		/* Triggers when the connection has been established */
+		this.game.getClientHandler().getSocket().on(Socket.EVENT_CONNECT,new Emitter.Listener()
+		{
+			@Override
+			public void call(Object... args) {
+				connected(args);
+			}
+		});
+
+		/* Connection Error, Try to reconnect again (ReconnectionAttempts times) */
 		this.game.getClientHandler().getSocket().on(Socket.EVENT_CONNECT_ERROR, new Emitter.Listener()
 		{
 			@Override
 			public void call(Object... args)
 			{
-				JSONObject message = (JSONObject) args[0];
-				if(stage == null)
-				{
-					stage = getStage();
+				if(args[0] instanceof JSONObject) {
+					JSONObject message = (JSONObject) args[0];
+					connectionError(message);
 				}
-
-				try {
-					Dialogs.showErrorDialog(stage,message.getString("message"));
-				} catch (JSONException e) {
-					e.printStackTrace();
+				else
+				{
+					System.out.println("xhr poll error, EVENT CONNECT ERROR");
 				}
 			}
 		});
 
-		this.game.getClientHandler().getSocket().on(Socket.EVENT_CONNECT,new Emitter.Listener()
-		{
+		/* Maximum ReconnectionAttempts has been reached, Server is offline*/
+		this.game.getClientHandler().getSocket().io().on(Manager.EVENT_RECONNECT_FAILED, new Emitter.Listener() {
+
 			@Override
 			public void call(Object... args) {
-				//game.player = new Player();
-				//game.creator.createEntity(game.player,-1.0f,-1.0f);
-				connectScreen.setReadyToChangeScreen(true);
-				Gdx.app.log("SocketIO", "Connected");
+				Gdx.app.log("SocketIo", "Server is offline");
+				maxRecconectionAttemptsReached();
 			}
 		});
+	}
+
+	/* ================ Callbacks ================ */
+
+	private void connected(Object... args)
+	{
+		connectScreen.setReadyToChangeScreen(true);
+		Gdx.app.log("SocketIO", "Connected");
+	}
+
+	private void connectionError(JSONObject message)
+	{
+		if(stage == null)
+		{
+			stage = getStage();
+		}
+
+		try {
+			Dialogs.showErrorDialog(stage,message.getString("message"));
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
+	}
+
+	private void maxRecconectionAttemptsReached()
+	{
+		if(stage == null)
+		{
+			stage = getStage();
+		}
+		Dialogs.showErrorDialog(stage,"Server is offline");
 	}
 
 }

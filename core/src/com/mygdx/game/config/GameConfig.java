@@ -7,6 +7,9 @@ public class GameConfig {
     */
     public static final float WORLD_BOX_SIZE = 16f;
 
+    public static final float DEFAULT_PLAYER_WIDTH = 32f;
+    public static final float DEFAULT_PLAYER_HEIGHT = 32f;
+
     // == Box2d Scalling ==
 
     //INFO: Creating a body with width 16 and height 16, in box2D world it is represented as 16 meters x 16 meters body

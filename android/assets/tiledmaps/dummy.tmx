@@ -51,7 +51,7 @@
   <object id="715" gid="1" x="448" y="3200" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="18" name="PlayersSpawnSpots">
-  <object id="705" x="194.5" y="3103" width="32" height="32">
+  <object id="705" x="192" y="3104" width="32" height="32">
    <ellipse/>
   </object>
  </objectgroup>

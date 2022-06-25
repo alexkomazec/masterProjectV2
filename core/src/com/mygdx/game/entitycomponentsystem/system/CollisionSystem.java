@@ -43,24 +43,24 @@ public class CollisionSystem extends IteratingSystem {
 					switch(type.type){
 					case TypeComponent.ENEMY:
 						//do player hit enemy thing
-						System.out.println("player hit enemy");
+						//System.out.println("player hit enemy");
 						pl.isDead = true;
 						int score = (int) pl.cam.position.y;
-						System.out.println("Score = "+ score);
+						//System.out.println("Score = "+ score);
 						break;
 					case TypeComponent.SCENERY:
 						//do player hit scenery thing
 						pm.get(entity).onPlatform = true;
-						System.out.println("player hit scenery");
+						//System.out.println("player hit scenery");
 						break;
 					case TypeComponent.SPRING:
 						//do player hit other thing
 						pm.get(entity).onSpring = true;
-						System.out.println("player hit spring: bounce up");
+						//System.out.println("player hit spring: bounce up");
 						break;
 					case TypeComponent.OTHER:
 						//do player hit other thing
-						System.out.println("player hit other");
+						//System.out.println("player hit other");
 						break; 
 					case TypeComponent.BULLET:
 						// TODO add mask so player can't hit themselves
@@ -68,10 +68,10 @@ public class CollisionSystem extends IteratingSystem {
 						if(bullet.owner != BulletComponent.Owner.PLAYER){ // can't shoot own team
 							pl.isDead = true;
 						}
-						System.out.println("Player just shot. bullet in player atm");
+						//System.out.println("Player just shot. bullet in player atm");
 						break;
 					default:
-						System.out.println("No matching type found");
+						//System.out.println("No matching type found");
 					}
 					cc.collisionEntity = null; // collision handled reset component
 				}else{
@@ -85,19 +85,19 @@ public class CollisionSystem extends IteratingSystem {
 				if(type != null){
 					switch(type.type){
 					case TypeComponent.PLAYER:
-						System.out.println("enemy hit player");
+						//System.out.println("enemy hit player");
 						break;
 					case TypeComponent.ENEMY:
-						System.out.println("enemy hit enemy");
+						//System.out.println("enemy hit enemy");
 						break;
 					case TypeComponent.SCENERY:
-						System.out.println("enemy hit scenery");
+						//System.out.println("enemy hit scenery");
 						break;
 					case TypeComponent.SPRING:
-						System.out.println("enemy hit spring");
+						//System.out.println("enemy hit spring");
 						break;	
 					case TypeComponent.OTHER:
-						System.out.println("enemy hit other");
+						//System.out.println("enemy hit other");
 						break; 
 					case TypeComponent.BULLET:
 						EnemyComponent enemy = Mapper.enemyCom.get(entity);
@@ -105,11 +105,11 @@ public class CollisionSystem extends IteratingSystem {
 						if(bullet.owner != BulletComponent.Owner.ENEMY){ // can't shoot own team
 							bullet.isDead = true;
 							enemy.isDead = true;
-							System.out.println("enemy got shot");
+							//System.out.println("enemy got shot");
 						}
 						break;
 					default:
-						System.out.println("No matching type found");
+						//System.out.println("No matching type found");
 					}
 					cc.collisionEntity = null; // collision handled reset component
 				}else{
@@ -171,7 +171,7 @@ public class CollisionSystem extends IteratingSystem {
 							System.out.println("bullet hit other");
 							break;
 						default:
-							System.out.println("No matching type found");
+							//System.out.println("No matching type found");
 					}
 					cc.collisionEntity = null; // collision handled reset component
 				}

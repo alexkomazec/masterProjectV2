@@ -78,9 +78,12 @@ public class MyGdxGame extends Game {
 
 		this.batch = new SpriteBatch();
 		this.assetManagmentHandler = new AssetManagmentHandler();
-		this.gameWorldCreator = GameWorldCreator.getInstance();
 
 		this.pooledEngine = new PooledEngine();
+		this.gameWorldCreator = GameWorldCreator.getInstance();
+		this.gameWorldCreator.setGameWorld(this.gameWorld);
+		this.gameWorldCreator.setPooledEngine(this.pooledEngine);
+
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);
 	}
 
@@ -153,12 +156,12 @@ public class MyGdxGame extends Game {
 		this.clientHandler = ClientHandler.getInstance(pooledEngine);
 	}
 
-	public boolean getConnectionType() {
-		return connectionType;
-	}
-
 	public void setConnectionType(boolean connectionType) {
 		this.connectionType = connectionType;
+	}
+
+	public GameWorldCreator getGameWorldCreator() {
+		return gameWorldCreator;
 	}
 
 	@Override

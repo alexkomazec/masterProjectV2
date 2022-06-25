@@ -13,8 +13,6 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 
 import java.util.HashMap;
 
-import javax.naming.ldap.Control;
-
 public class InputManagerSystem extends IteratingSystem {
 
     /*There will be stored all needed input processors like keyboard, controller...*/
@@ -40,7 +38,6 @@ public class InputManagerSystem extends IteratingSystem {
         for (HashMap.Entry<InputAdapterWrapper, Integer> tempEntry : hmpInputprocessor.entrySet())
         {
             Integer value = tempEntry.getValue();
-
             if(value == playerID)
             {
                 localEntry = tempEntry;
@@ -70,16 +67,31 @@ public class InputManagerSystem extends IteratingSystem {
     /* TODO: Take a note that there is a potential problem with input processor when a few input
     *   processors come (Not only the keyboard)
     * */
-    public void assignPlayerToInputProcessor(int playerID)
+    public void assignPlayerToInputProcessor(int playerID, boolean isLocalPlayer)
     {
+        /* This sh...ty code will reside here for a while
+        *  Problem: Iteration through all HashMap elements, and assiging the same id to all of them
+        *           will cause Overwritting value field of all Hashmap elements.
+        *           So far, this is just a keyboard, the only one element in a hashmap
+        *  TODO:    In the future, there will be more input processors (Keyboard, Joypad, ...)
+        *           so the method should be expanded with input parameter that represents the input
+        *           processor.
+        * */
         boolean isPlayerAssigend = false;
-        for (HashMap.Entry<InputAdapterWrapper, Integer> entry : hmpInputprocessor.entrySet()) {
-            Integer value = entry.getValue();
-            if(value == UNASSIGNED_INPUT_PROCESSOR)
+
+        if(isLocalPlayer)
+        {
+            for (HashMap.Entry<InputAdapterWrapper, Integer> entry : hmpInputprocessor.entrySet())
             {
+                Integer value = entry.getValue();
                 entry.setValue(playerID);
-                InputProcessor key = entry.getKey();
-                Gdx.input.setInputProcessor(key);
+                InputAdapterWrapper key = entry.getKey();
+
+                if(!key.isInputProcesorSet())
+                {
+                    Gdx.input.setInputProcessor(key);
+                    key.setInputProcesorSet(true);
+                }
                 isPlayerAssigend = true;
             }
         }

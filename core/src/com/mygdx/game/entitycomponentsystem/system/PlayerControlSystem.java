@@ -13,6 +13,7 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
+import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
@@ -28,7 +29,6 @@ public class PlayerControlSystem extends IteratingSystem{
 	GameWorldCreator gameWorldCreator;
 	PooledEngine pooledEngine;
 	World world;
-	boolean alreadyFired;
 	
 	
 	@SuppressWarnings("unchecked")
@@ -52,9 +52,16 @@ public class PlayerControlSystem extends IteratingSystem{
 		StateComponent stateComponent = sm.get(entity);
 		PlayerComponent playerComponent = pm.get(entity);
 		ControlledInputComponent cntrlComponent = cp.get(entity);
+		LocalInputComponent localInputComponent = null;
 
-		playerComponent.cam.position.x = b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM;
-		playerComponent.cam.position.y = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+		localInputComponent = entity.getComponent(LocalInputComponent.class);
+
+		/* Move Camera only for the player that has localInputComponent (aka local player) */
+		if(localInputComponent!= null)
+		{
+			playerComponent.cam.position.x = b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM;
+			playerComponent.cam.position.y = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+		}
 
 		ViewPortConfiguration.calculateViewport(10, 10);
 
@@ -108,7 +115,7 @@ public class PlayerControlSystem extends IteratingSystem{
 			b2dbodyComponent.body.applyLinearImpulse(0, -5f, b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
 		}
 
-		if (isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && (!alreadyFired))
+		if (isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && (!playerComponent.alreadyFired))
 		{
 			float startBulletPositionX;
 			float startBulletPositionY;
@@ -131,13 +138,15 @@ public class PlayerControlSystem extends IteratingSystem{
 											xVel,0,
 											BulletComponent.Owner.PLAYER, this.pooledEngine,
 											world);
-			alreadyFired = true;
+			playerComponent.alreadyFired = true;
+			System.out.println("alreadyFired = true");
 		}
 
 		/* Space has been unpressed, and magic has been already fired, need reset*/
-		if(!isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && alreadyFired)
+		if(!isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && playerComponent.alreadyFired)
 		{
-			alreadyFired = false;
+			playerComponent.alreadyFired = false;
+			System.out.println("alreadyFired = false");
 		}
 	}
 
