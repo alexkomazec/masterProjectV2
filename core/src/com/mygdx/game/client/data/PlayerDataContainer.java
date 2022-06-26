@@ -10,6 +10,14 @@ public class PlayerDataContainer {
     private Vector2 position       = new Vector2();
     private int playerID;
 
+    public PlayerDataContainer() {}
+
+    public PlayerDataContainer(boolean[] abInputCommandList, int playerID)
+    {
+        this.abInputCommandList = abInputCommandList;
+        this.playerID = playerID;
+    }
+
     public boolean[] getAbInputCommandList() {
         return abInputCommandList;
     }

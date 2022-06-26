@@ -16,6 +16,7 @@ import io.socket.client.Socket;
 public class DataTransmittingSystem extends IteratingSystem {
 
     private ClientHandler clientHandler;
+    private Message message;
 
     public DataTransmittingSystem(ClientHandler clientHandler) {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class).get());
@@ -29,28 +30,29 @@ public class DataTransmittingSystem extends IteratingSystem {
         /* Optimization: Go through all entities only if there is some new data */
         if(!this.clientHandler.isTransMessageArrayEmpty())
         {
-            if(this.clientHandler.peekAtFirstTrans().doesActionDependsOnEntity())
+            this.message = this.clientHandler.getTransmittingMessage();
+            if(this.message.doesActionDependsOnEntity())
             {
                 super.update(deltaTime);
             }
-            else {
-                Message message = this.clientHandler.getTransmittingMessage();
-                for (int index = 0; index < message.getPlayerDataContainerArray().size;)
+            else
+            {
+                for (int index = 0; index < this.message.getPlayerDataContainerArray().size; index++)
                 {
-                    processData(message.getPlayerDataContainer(), message.getActionType());
+                    processData(this.message.getPlayerDataContainerByIndex(index), this.message.getActionType());
                 }
             }
-
         }
+        /* The message has been processed in one of conditions above */
+        this.message = null;
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
 
-        Message message = this.clientHandler.getTransmittingMessage();
-
-        for (int index = 0; index < message.getPlayerDataContainerArray().size;) {
-            processData(message.getPlayerDataContainer(), message.getActionType(), entity);
+        for (int index = 0; index < this.message.getPlayerDataContainerArray().size; index++)
+        {
+            processData(this.message.getPlayerDataContainer(), this.message.getActionType(), entity);
         }
     }
 

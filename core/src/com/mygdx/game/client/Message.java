@@ -22,6 +22,16 @@ public class Message {
 
     public PlayerDataContainer getPlayerDataContainer()
     {
+        return playerDataContainerArray.get(0);
+    }
+
+    public PlayerDataContainer getPlayerDataContainerByIndex(int index)
+    {
+        return playerDataContainerArray.get(index);
+    }
+
+    public PlayerDataContainer getAndRemovePlayerDataContainer()
+    {
         return playerDataContainerArray.removeIndex(0);
     }
 

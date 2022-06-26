@@ -160,22 +160,22 @@ public class GameWorldCreator {
         this.pooledEngine.addEntity(entity);
     }
 
-    public void createPlayer(boolean isLocalPlayer, Vector2 position)
+    public Entity createPlayer(boolean isLocalPlayer, Vector2 position)
     {
         TiledMap map = this.gameWorld.getTiledMap();
-
+        Entity entity = null;
         //Create Players
         for(EllipseMapObject object : map.getLayers().
                 get(GameWorld.TM_LAYER_PLAYERS_SPAWN_SPOTS).
                 getObjects().
                 getByType(EllipseMapObject.class))
         {
-            createPlayer(object, position, isLocalPlayer);
+            entity = createPlayer(object, position, isLocalPlayer);
         }
-
+        return entity;
     }
 
-    private void createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer)
+    private Entity createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer)
     {
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
@@ -239,6 +239,8 @@ public class GameWorldCreator {
 
         this.gameWorld.setPlayer(entity);
         this.pooledEngine.addEntity(entity);
+
+        return entity;
     }
 
     public void createEnemies()

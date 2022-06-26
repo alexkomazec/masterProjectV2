@@ -4,7 +4,6 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
-import com.badlogic.gdx.InputProcessor;
 import com.mygdx.game.KeyboardController;
 import com.mygdx.game.common.InputAdapterWrapper;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
@@ -13,6 +12,10 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 
 import java.util.HashMap;
 
+/** This system is reliable for tracking any changes made on active Input Processor
+ * (Keyboard, mouse, joypad, ...) and forwards these changes into ControlledInputComponent
+ * of the current player
+ *  */
 public class InputManagerSystem extends IteratingSystem {
 
     /*There will be stored all needed input processors like keyboard, controller...*/
@@ -45,7 +48,7 @@ public class InputManagerSystem extends IteratingSystem {
             }
         }
 
-        /* if there is non-null localEntry it means , that playerID has been found in hash Map*/
+        /* if there is non-null localEntry it means that playerID has been found in hash Map*/
         if(localEntry != null)
         {
             InputAdapterWrapper key = localEntry.getKey();

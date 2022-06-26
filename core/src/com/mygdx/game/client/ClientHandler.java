@@ -5,14 +5,17 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.client.data.PlayerDataContainer;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 import com.mygdx.game.entitycomponentsystem.system.DataTransmittingSystem;
+import com.mygdx.game.entitycomponentsystem.system.InputManagerTransmittingSystem;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 import io.socket.client.IO;
@@ -39,13 +42,7 @@ public class ClientHandler {
     private Array<Message> transmitingMessageArray;
 
     /* Receiving Actions */
-    public static final int UPDATE_MOVEMENT_REQ = 0;
-    public static final int PLAYER_DISCONNECTED_REQ = 1;
-    public static final int PLAYER_DIED_REQ = 2;
-    public static final int UPDATE_PLAYER_POS_REQ = 3;
-
-    public static final int REMOTE_PLAYER_CONNECTED_REQ = 5;
-    public static final int CONNECTION_ESTABLISHED_REQ = 6;     /* Connection Established, create player */
+    public static final int REMOTE_PLAYER_MOVED = 0;
     public static final int ASSIGN_ID_TO_PLAYER = 7;            /* Assign ID to a newly created player */
     public static final int UPDATE_PLAYER_TABLE = 9;            /* Get info of all players already connected */
 
@@ -59,6 +56,7 @@ public class ClientHandler {
         this.transmitingMessageArray = new Array<>();
         pooledEngine.addSystem(new DataReceivingSystem(this));
         pooledEngine.addSystem(new DataTransmittingSystem(this));
+        pooledEngine.addSystem(new InputManagerTransmittingSystem(this));
     }
 
     public boolean isRecMessageArrayEmpty() {
@@ -145,6 +143,20 @@ public class ClientHandler {
                 }
             }
         });
+
+        this.socket.on("playerMoved", new Emitter.Listener()
+        {
+
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    playerMoved(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
     }
 
     //===============Callbacks for event listener ==========================//
@@ -203,6 +215,25 @@ public class ClientHandler {
         transmitingMessageArray.add(message);
     }
 
+    private void playerMoved(Object... args) throws JSONException {
+
+        System.out.println("playerMoved");
+        JSONArray jsonArray = (JSONArray) args[0];
+        int playerId = (int)jsonArray.get(0);
+        JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
+        boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+
+        for (int index = 0; index < inputCommandList.length(); index++)
+        {
+            abInputCommandList[index] = inputCommandList.getBoolean(index);
+        }
+
+        Message message = new Message(REMOTE_PLAYER_MOVED, true);
+        message.addPlayerDataContainer(new PlayerDataContainer(abInputCommandList, playerId));
+        receivedMessageArray.add(message);
+
+    }
+
     /*private void playerDisconnected(Object... args)
     {
         JSONObject data = (JSONObject) args[0];
@@ -216,41 +247,7 @@ public class ClientHandler {
         }
     }
 
-    private void playerMoved(Object... args)
-    {
-        JSONArray objects = (JSONArray) args[0];
-        Integer playerId = 0;
-        String moveType  = "";
-        playerId = objects.optInt(0);
-        moveType = objects.optString(1);
 
-        System.out.println("playerId " + playerId);
-        System.out.println("moveType " + moveType);
-
-
-        //System.out.println("Player " + playerId);
-        //otherPlayers.get(playerId).b2body.setTransform(convertToFloat(pos_x), convertToFloat(pos_y),convertToFloat(0));
-        //otherPlayers.get(playerId).b2body.setTransform(convertToFloat(pos_x), convertToFloat(pos_y),convertToFloat(0));
-
-        if(moveType.equals("LEFT"))
-        {
-            //otherPlayers.get(playerId).turnLeft();
-            //otherPlayers.get(playerId).direction = Direction.LEFT;
-        }
-        else if(moveType.equals("RIGHT"))
-        {
-            //otherPlayers.get(playerId).turnRight();
-            //otherPlayers.get(playerId).direction = Direction.RIGHT;
-        }
-        else if(moveType.equals("JUMP"))
-        {
-            //otherPlayers.get(playerId).jump();
-        }
-        else
-        {
-            System.out.println("Wrong move type");
-        }
-    }
 
     private void playerFiredMagic(Object... args)
     {
