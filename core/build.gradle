@@ -8,4 +8,7 @@ dependencies {
 	api "com.badlogicgames.gdx:gdx-ai:$aiVersion"
 	api "com.badlogicgames.gdx:gdx-box2d:$gdxVersion"
 	api "com.badlogicgames.gdx:gdx:$gdxVersion"
+	implementation 'io.socket:socket.io-client:2.0.1'
+	implementation 'io.socket:engine.io-client:2.0.0'
+	implementation "com.kotcrab.vis:vis-ui:$visuiVersion"
 }

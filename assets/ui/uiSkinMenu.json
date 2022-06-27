@@ -1,0 +1,60 @@
+{
+  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+    "default-font": {
+      "file": "fonts/ui_font_32.fnt"
+    }
+  },
+  "com.badlogic.gdx.graphics.Color": {
+    "white": {
+      "a": 1,
+      "b": 1,
+      "g": 1,
+      "r": 1
+    },
+    "black": {
+      "a": 1,
+      "b": 0,
+      "g": 0,
+      "r": 0
+    },
+    "gray": {
+      "a": 1,
+      "b": 0.5,
+      "g": 0.5,
+      "r": 0.5
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+    "default": {
+      "down": "yellow_button01",
+      "up": "yellow_button00",
+      "font": "default-font",
+      "fontColor": "black",
+      "downFontColor": "white",
+      "overFontColor": "gray"
+    }
+    "readOnly": {
+      "up": "yellow_button00",
+      "font": "default-font",
+      "fontColor": "black",
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+    "default": {
+      "font": "default-font",
+      "fontColor": "black"
+    }
+  },
+  "com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle": {
+    "default": {
+      "down": "yellow_button00",
+      "up": "yellow_button00",
+      "checkboxOn": "yellow_boxTick",
+      "checkboxOff": "grey_circle",
+      "font": "default-font",
+      "fontColor": "white",
+      "downFontColor": "black",
+      "overFontColor": "gray"
+    }
+  }
+}
