@@ -11,7 +11,7 @@ public class KeyboardController extends InputAdapterWrapper {
 
 	public KeyboardController()
 	{
-		abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+		this.abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
 	}
 
 	@Override

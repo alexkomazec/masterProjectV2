@@ -4,8 +4,11 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.ConnectScreen;
+import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.gameworld.GameWorld;
@@ -43,7 +46,7 @@ public class MyGdxGame extends Game {
 	/*Class Members*/
 	private SpriteBatch				batch;
 	private AssetManagmentHandler 	assetManagmentHandler;
-
+	private Viewport 				viewport;
 	private TileMapHandler			tileMapHandler;
 	private GameWorldCreator 		gameWorldCreator;
 	private GameWorld				gameWorld;
@@ -75,7 +78,7 @@ public class MyGdxGame extends Game {
 
 		this.tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
 		this.gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
-
+		this.viewport	= new StretchViewport(com.mygdx.game.common.ViewPortConfiguration.getPhysicalWidth(), ViewPortConfiguration.getPhysicalHeight());
 		this.batch = new SpriteBatch();
 		this.assetManagmentHandler = new AssetManagmentHandler();
 
@@ -162,6 +165,10 @@ public class MyGdxGame extends Game {
 
 	public GameWorldCreator getGameWorldCreator() {
 		return gameWorldCreator;
+	}
+
+	public Viewport getViewport() {
+		return viewport;
 	}
 
 	@Override
