@@ -44,4 +44,7 @@ public class GameWorld {
         this.aplayers.add(player);
     }
 
+    public WorldSingleton getBox2dWorldSingleton() {
+        return box2dWorldSingleton;
+    }
 }

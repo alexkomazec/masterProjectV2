@@ -20,12 +20,13 @@ public class InputManagerSystem extends IteratingSystem {
 
     /*There will be stored all needed input processors like keyboard, controller...*/
     private final HashMap<InputAdapterWrapper, Integer> hmpInputprocessor;
-
+    private boolean isOnlineConnection = false;
     private static final int UNASSIGNED_INPUT_PROCESSOR = 999;
-    public InputManagerSystem() {
+
+    public InputManagerSystem(boolean isOnlineConnection) {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class).get());
         hmpInputprocessor = new HashMap<>();
-
+        this.isOnlineConnection = isOnlineConnection;
         hmpInputprocessor.put(new KeyboardController(),UNASSIGNED_INPUT_PROCESSOR);
     }
 

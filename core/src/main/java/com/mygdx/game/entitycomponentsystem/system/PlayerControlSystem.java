@@ -53,6 +53,7 @@ public class PlayerControlSystem extends IteratingSystem{
 		PlayerComponent playerComponent = pm.get(entity);
 		ControlledInputComponent cntrlComponent = cp.get(entity);
 		LocalInputComponent localInputComponent = null;
+		boolean isMoving = false;
 
 		localInputComponent = entity.getComponent(LocalInputComponent.class);
 
@@ -65,15 +66,21 @@ public class PlayerControlSystem extends IteratingSystem{
 
 		ViewPortConfiguration.calculateViewport(10, 10);
 
-		if (b2dbodyComponent.body.getLinearVelocity().y > 0 && stateComponent.get() != StateComponent.STATE_FALLING) {
-			stateComponent.set(StateComponent.STATE_FALLING);
-			System.out.println("setting to Falling");
+		if (!playerComponent.onPlatform) {
+			if(stateComponent.get() != StateComponent.STATE_FALLING)
+			{
+				stateComponent.set(StateComponent.STATE_FALLING);
+				System.out.println("setting to Falling");
+			}
 		}
 
 		if (b2dbodyComponent.body.getLinearVelocity().y == 0) {
-			if (stateComponent.get() == StateComponent.STATE_FALLING) {
-				stateComponent.set(StateComponent.STATE_NORMAL);
-				System.out.println("setting to normal");
+			if (stateComponent.get() == StateComponent.STATE_FALLING || b2dbodyComponent.body.getLinearVelocity().x == 0) {
+				if(stateComponent.get() != StateComponent.STATE_NORMAL)
+				{
+					stateComponent.set(StateComponent.STATE_NORMAL);
+					System.out.println("setting to normal");
+				}
 			}
 			if (b2dbodyComponent.body.getLinearVelocity().x != 0 && stateComponent.get() != StateComponent.STATE_MOVING) {
 				stateComponent.set(StateComponent.STATE_MOVING);
@@ -83,14 +90,16 @@ public class PlayerControlSystem extends IteratingSystem{
 
 		if (isInputCommandTrue(GameConfig.LEFT, cntrlComponent))
 		{
-			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
+ 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			playerComponent.direction = Direction.LEFT;
+			isMoving = true;
 		}
 
 		if (isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			playerComponent.direction = Direction.RIGHT;
+			isMoving = true;
 		}
 
 		/*
@@ -148,6 +157,7 @@ public class PlayerControlSystem extends IteratingSystem{
 			playerComponent.alreadyFired = false;
 			System.out.println("alreadyFired = false");
 		}
+
 	}
 
 	private boolean isInputCommandTrue(int inputCommandID, ControlledInputComponent cntrlInCom)

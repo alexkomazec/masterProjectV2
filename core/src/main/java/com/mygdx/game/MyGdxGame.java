@@ -8,7 +8,6 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.ConnectScreen;
-import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.gameworld.GameWorld;
@@ -20,6 +19,7 @@ import com.mygdx.game.screens.menuScreens.DifficultyScreen;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
 import com.mygdx.game.screens.menuScreens.ModeSelectionScreen;
 import com.mygdx.game.screens.menuScreens.OptionsScreen;
+import com.mygdx.game.utils.ScreenOrientation;
 
 public class MyGdxGame extends Game {
 
@@ -42,7 +42,6 @@ public class MyGdxGame extends Game {
 	private ModeSelectionScreen modeSelectionScreen;
 	private ConnectScreen		connectScreen;
 
-
 	/*Class Members*/
 	private SpriteBatch				batch;
 	private AssetManagmentHandler 	assetManagmentHandler;
@@ -56,6 +55,7 @@ public class MyGdxGame extends Game {
 
 	private ClientHandler clientHandler = null;
 	private boolean connectionType;
+	private ScreenOrientation screenOrientation;
 	/*Class Methods*/
 
 	private MyGdxGame()
@@ -73,12 +73,15 @@ public class MyGdxGame extends Game {
 		return instance;
 	}
 
+
+
 	@Override
 	public void create() {
 
 		this.tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
 		this.gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
-		this.viewport	= new StretchViewport(ViewPortConfiguration.getPhysicalWidth(), ViewPortConfiguration.getPhysicalHeight());
+		//this.viewport	= new StretchViewport(GameConfig.VIRTUAL_WIDTH ,GameConfig.VIRTUAL_HEIGHT);
+		this.viewport	= new StretchViewport(566,566);
 		this.batch = new SpriteBatch();
 		this.assetManagmentHandler = new AssetManagmentHandler();
 
@@ -163,12 +166,24 @@ public class MyGdxGame extends Game {
 		this.connectionType = connectionType;
 	}
 
+	public boolean getConnectionType() {
+		return connectionType;
+	}
+
 	public GameWorldCreator getGameWorldCreator() {
 		return gameWorldCreator;
 	}
 
 	public Viewport getViewport() {
 		return viewport;
+	}
+
+	public ScreenOrientation getScreenOrientation() {
+		return screenOrientation;
+	}
+
+	public void setScreenOrientation(ScreenOrientation screenOrientation) {
+		this.screenOrientation = screenOrientation;
 	}
 
 	@Override

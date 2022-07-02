@@ -5,6 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.client.data.PlayerDataContainer;
+import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 import com.mygdx.game.entitycomponentsystem.system.DataTransmittingSystem;
@@ -34,8 +35,9 @@ public class ClientHandler {
 
     private Socket socket;
     private IO.Options options;
-    //public static String url = "http://138.68.160.152:5000";
-    public static String url = "http://localhost:8080";
+    public static String url = "http://138.68.160.152:5000";
+    //public static String url = "http://localhost:8080";
+    //public static String url = "http://192.168.0.12:8080";
 
     private Array<Message> receivedMessageArray;
     private Array<Message> transmitingMessageArray;
@@ -44,6 +46,10 @@ public class ClientHandler {
     public static final int REMOTE_PLAYER_MOVED = 0;
     public static final int ASSIGN_ID_TO_PLAYER = 7;            /* Assign ID to a newly created player */
     public static final int UPDATE_PLAYER_TABLE = 9;            /* Get info of all players already connected */
+    public static final int UPDATE_PLAYER_POS = 1;              /* Update position of a player that has been moved */
+    public static final int PLAYER_FIRED = 2;                   /* Some Player fired a magic spell */
+    public static final int PLAYER_CHANGED_DIR = 3;             /* Some Player changed direction*/
+    public static final int PLAYER_DISCONNECTED = 5;            /* Some Player Disconnected */
 
     /* Transmitting Actions */
     public static final int SEND_PLAYER_TO_SERVER = 8;          /* Send Player data of a newly created player */
@@ -69,7 +75,7 @@ public class ClientHandler {
 
     private void createSocket() {
         this.options = IO.Options.builder()
-                .setReconnectionAttempts(3)
+                .setReconnectionAttempts(10)
                 .setReconnectionDelay(10)
                 .setTimeout(50)
                 .setAuth(new HashMap<String, String>())
@@ -143,27 +149,154 @@ public class ClientHandler {
             }
         });
 
-        this.socket.on("playerMoved", new Emitter.Listener()
-        {
+        this.socket.on("updatePlayerInputPositionResp", new Emitter.Listener() {
 
             @Override
             public void call(Object... args)
             {
                 try {
-                    playerMoved(args);
+                    updatePlayerPos(args);
                 } catch (JSONException e) {
                     e.printStackTrace();
                 }
             }
         });
+
+        this.socket.on("playerFiredMagic", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    playerFiredMagic(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        this.socket.on("playerChangedDirResp", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    playerChangedDir(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        this.socket.on("playerDisconnected", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    playerDisconnected(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+
     }
 
     //===============Callbacks for event listener ==========================//
 
+    public void playerDisconnected(Object... args) throws JSONException {
+        System.out.println("playerChangedDir");
+        int playerId = (int) args[0];
+
+        Message message = new Message(PLAYER_DISCONNECTED, false);
+        message.addPlayerDataContainer(new PlayerDataContainer(new boolean[GameConfig.LIST_COMMANDS_MAX], playerId));
+        receivedMessageArray.add(message);
+    }
+
+    private void playerChangedDir(Object... args) throws JSONException
+    {
+        System.out.println("playerChangedDir");
+        JSONArray jsonArray = (JSONArray) args[0];
+        int playerId = (int)jsonArray.get(0);
+
+        Message message = new Message(PLAYER_CHANGED_DIR, true);
+        message.addPlayerDataContainer(new PlayerDataContainer(new boolean[GameConfig.LIST_COMMANDS_MAX], playerId));
+        receivedMessageArray.add(message);
+    }
     private void updatePlayerTable(Object... args) throws JSONException {
         System.out.println("updatePlayerTable");
         JSONArray arrPlayers = (JSONArray)args[0];
         Message message = new Message(UPDATE_PLAYER_TABLE, false);
+        fillMessage(arrPlayers, message);
+    }
+
+    private void updatePlayerPos(Object... args) throws JSONException {
+        System.out.println("updatePlayerPos");
+        JSONArray arrPlayers = new JSONArray ();
+        arrPlayers.put(args[0]);
+        Message message = new Message(UPDATE_PLAYER_POS, true);
+        fillMessage(arrPlayers, message);
+    }
+
+    private void playerIdReceivedOnCon(Object... args)
+    {
+        System.out.println("playerIdReceivedOnCon has been called");
+        PlayerDataContainer playerDataContainer = new PlayerDataContainer();
+        playerDataContainer.setPlayerID((int)args[0]);
+        Message message = new Message(ASSIGN_ID_TO_PLAYER, true);
+        message.addPlayerDataContainer(playerDataContainer);
+        receivedMessageArray.add(message);
+    }
+
+    private void getUpdatedPosition(Object... args)
+    {
+        System.out.println("getUpdatedPosition");
+        Message message = new Message(UPLOAD_CURRENT_PLAYER_POS_REQ, true);
+        message.addPlayerDataContainer(new PlayerDataContainer());
+        transmitingMessageArray.add(message);
+    }
+
+    /* CLARIFICATION: REMOTE_PLAYER_MOVED is deprecated so far, UPDATE_PLAYER_POS is used instead*/
+    /*private void playerMoved(Object... args) throws JSONException {
+
+        System.out.println("playerMoved");
+        JSONArray jsonArray = (JSONArray) args[0];
+        int playerId = (int)jsonArray.get(0);
+        JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
+        boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+
+        for (int index = 0; index < inputCommandList.length(); index++)
+        {
+            abInputCommandList[index] = inputCommandList.getBoolean(index);
+        }
+
+        Message message = new Message(REMOTE_PLAYER_MOVED, true);
+        message.addPlayerDataContainer(new PlayerDataContainer(abInputCommandList, playerId));
+        receivedMessageArray.add(message);
+    }*/
+
+    private void playerFiredMagic(Object... args) throws JSONException {
+
+        System.out.println("playerFiredMagic");
+        JSONArray jsonArray = (JSONArray) args[0];
+        int playerId = (int)jsonArray.get(0);
+        JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
+        boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+
+        for (int index = 0; index < inputCommandList.length(); index++)
+        {
+            abInputCommandList[index] = inputCommandList.getBoolean(index);
+        }
+
+        Message message = new Message(PLAYER_FIRED, true);
+        message.addPlayerDataContainer(new PlayerDataContainer(abInputCommandList, playerId));
+        receivedMessageArray.add(message);
+
+    }
+
+    public void fillMessage(JSONArray arrPlayers, Message message) throws JSONException {
 
         /* Parse one by one player data, and put it into playerDataContainerArray */
         for(int index = 0; index < arrPlayers.length(); index++)
@@ -187,7 +320,7 @@ public class ClientHandler {
                 playerDataContainer.setPlayerID(jsonObjectCurPlayer.getInt("playerID"));
 
                 Vector2 playerPos = new Vector2((float)jsonObjectCurPlayer.getDouble("x_pos"),
-                                                (float)jsonObjectCurPlayer.getDouble("y_pos"));
+                        (float)jsonObjectCurPlayer.getDouble("y_pos"));
                 playerDataContainer.setPosition(playerPos);
                 message.addPlayerDataContainer(playerDataContainer);
             }
@@ -196,64 +329,7 @@ public class ClientHandler {
         receivedMessageArray.add(message);
     }
 
-    private void playerIdReceivedOnCon(Object... args)
-    {
-        System.out.println("playerIdReceivedOnCon has been called");
-        PlayerDataContainer playerDataContainer = new PlayerDataContainer();
-        playerDataContainer.setPlayerID((int)args[0]);
-        Message message = new Message(ASSIGN_ID_TO_PLAYER, true);
-        message.addPlayerDataContainer(playerDataContainer);
-        receivedMessageArray.add(message);
-    }
-
-    private void getUpdatedPosition(Object... args)
-    {
-        System.out.println("getUpdatedPosition");
-        Message message = new Message(UPLOAD_CURRENT_PLAYER_POS_REQ, true);
-        message.addPlayerDataContainer(new PlayerDataContainer());
-        transmitingMessageArray.add(message);
-    }
-
-    private void playerMoved(Object... args) throws JSONException {
-
-        System.out.println("playerMoved");
-        JSONArray jsonArray = (JSONArray) args[0];
-        int playerId = (int)jsonArray.get(0);
-        JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
-        boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
-
-        for (int index = 0; index < inputCommandList.length(); index++)
-        {
-            abInputCommandList[index] = inputCommandList.getBoolean(index);
-        }
-
-        Message message = new Message(REMOTE_PLAYER_MOVED, true);
-        message.addPlayerDataContainer(new PlayerDataContainer(abInputCommandList, playerId));
-        receivedMessageArray.add(message);
-
-    }
-
-    /*private void playerDisconnected(Object... args)
-    {
-        JSONObject data = (JSONObject) args[0];
-
-        try {
-            this.socketID = data.getString("id");
-            Gdx.app.log("SocketIO", "Player with id" + this.socketID + " has been disconnected");
-            //otherPlayers.remove(id);
-        }catch(JSONException e){
-            Gdx.app.log("SocketIO", "Error getting disconnected PlayerID");
-        }
-    }
-
-
-
-    private void playerFiredMagic(Object... args)
-    {
-        int clientID = (int)args[0];
-        otherPlayers.get(clientID).fireMagicBall();
-    }
-
+    /*
     private void connectionError(Object... args)
     {
         JSONObject message = (JSONObject) args[0];

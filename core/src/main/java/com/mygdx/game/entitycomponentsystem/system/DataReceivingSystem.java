@@ -8,6 +8,10 @@ import com.badlogic.ashley.utils.ImmutableArray;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.Message;
 import com.mygdx.game.client.data.PlayerDataContainer;
+import com.mygdx.game.common.Direction;
+import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
+import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -93,15 +97,14 @@ public class DataReceivingSystem extends IteratingSystem {
                     System.out.println("Player ID has been added to a local player");
                     PooledEngine pooledEngine = this.gameWorldCreator.getPooledEngine();
                     InputManagerSystem inputManagerSystem = pooledEngine.getSystem(InputManagerSystem.class);
-                    inputManagerSystem.assignPlayerToInputProcessor(playerComponent.playerID, true);
+                    if(inputManagerSystem!=null)
+                        inputManagerSystem.assignPlayerToInputProcessor(playerComponent.playerID, true);
 
 
                     /* Fill message */
                     PlayerDataContainer playerDataContainerTmp = new PlayerDataContainer();
                     playerDataContainerTmp.setPlayerID(playerComponent.playerID);
                     playerDataContainerTmp.setAbInputCommandList(controlledInputComponent.abInputCommandList);
-                    //transformComponent.position.x = transformComponent.position.x * GameConfig.MULTIPLY_BY_PPM;
-                    //transformComponent.position.y = transformComponent.position.y * GameConfig.MULTIPLY_BY_PPM;
                     playerDataContainerTmp.setPosition(transformComponent.position);
                     Message message = new Message(ClientHandler.SEND_PLAYER_TO_SERVER, false);
                     message.addPlayerDataContainer(playerDataContainerTmp);
@@ -111,13 +114,53 @@ public class DataReceivingSystem extends IteratingSystem {
                 }
             break;
 
-            case ClientHandler.REMOTE_PLAYER_MOVED:
+            /* CLARIFICATION: REMOTE_PLAYER_MOVED is deprecated so far, UPDATE_PLAYER_POS is used instead*/
+            /*case ClientHandler.REMOTE_PLAYER_MOVED:
                 System.out.println("DataReceivingSystem: REMOTE_PLAYER_MOVED");
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
                     controlledInputComponent.abInputCommandList = playerDataContainer.getAbInputCommandList();
                 }
+            break;*/
+
+            case ClientHandler.UPDATE_PLAYER_POS:
+                System.out.println("DataReceivingSystem: UPDATE_PLAYER_POS");
+                B2dBodyComponent b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
+
+                System.out.println("GetLinearVelocity" + b2dBodyComponent.body.getLinearVelocity());
+                if(playerComponent.playerID == playerDataContainer.getPlayerID())
+                {
+                    b2dBodyComponent.body.setTransform(
+                            playerDataContainer.getPosition().x * GameConfig.DIVIDE_BY_PPM,
+                            playerDataContainer.getPosition().y * GameConfig.DIVIDE_BY_PPM,
+                            0);
+                }
             break;
+
+            case ClientHandler.PLAYER_FIRED:
+                System.out.println("DataReceivingSystem: PLAYER_FIRED");
+
+                if(playerComponent.playerID == playerDataContainer.getPlayerID())
+                {
+                    controlledInputComponent.abInputCommandList = playerDataContainer.getAbInputCommandList();
+                }
+            break;
+
+            case ClientHandler.PLAYER_CHANGED_DIR:
+                System.out.println("DataReceivingSystem: PLAYER_CHANGED_DIR");
+
+                if(playerComponent.playerID == playerDataContainer.getPlayerID())
+                {
+                    if(playerComponent.direction == Direction.LEFT)
+                    {
+                        playerComponent.direction = Direction.RIGHT;
+                    }
+                    else
+                    {
+                        playerComponent.direction = Direction.LEFT;
+                    }
+                }
+                break;
 
             default:
                 System.out.println("Wrong action type" + actionType);
@@ -134,7 +177,6 @@ public class DataReceivingSystem extends IteratingSystem {
         switch(actionType)
         {
             case ClientHandler.UPDATE_PLAYER_TABLE:
-
                 System.out.println("DataReceivingSystem: UPDATE_PLAYER_TABLE");
 
                 for (Entity entityPlayer: entityPlayers)
@@ -147,6 +189,33 @@ public class DataReceivingSystem extends IteratingSystem {
                         System.out.println("Player " + playerComponent.playerID + " has been created ");
                         break;
                     }
+                }
+            break;
+
+            case ClientHandler.PLAYER_DISCONNECTED:
+                System.out.println("DataReceivingSystem: PLAYER_DISCONNECTED");
+
+                Entity tempEntity = null;
+                for (Entity entityPlayer: entityPlayers)
+                {
+                    PlayerComponent playerComponent = entityPlayer.getComponent(PlayerComponent.class);
+                    if(playerComponent.playerID == playerDataContainer.getPlayerID())
+                    {
+                        tempEntity = entityPlayer;
+                        break;
+                    }
+                }
+
+                /* Delete Entity that contains player component that has been disconected*/
+                if(tempEntity!= null)
+                {
+                    /* Set Box2d Body to be dead, and Physics system will handle it */
+                    B2dBodyComponent bodyComponent = tempEntity.getComponent(B2dBodyComponent.class);
+                    bodyComponent.isDead = true;
+                }
+                else
+                {
+                    System.out.println("Error: tempEntity is empty");
                 }
 
             break;

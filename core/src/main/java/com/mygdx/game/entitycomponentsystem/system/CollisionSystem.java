@@ -11,11 +11,13 @@ import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
+import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
 
 public class CollisionSystem extends IteratingSystem {
 	 ComponentMapper<CollisionComponent> cm;
 	 ComponentMapper<PlayerComponent> pm;
+	 ComponentMapper<StateComponent> sm;
 
 	@SuppressWarnings("unchecked")
 	public CollisionSystem() {
@@ -23,6 +25,7 @@ public class CollisionSystem extends IteratingSystem {
 		
 		 cm = ComponentMapper.getFor(CollisionComponent.class);
 		 pm = ComponentMapper.getFor(PlayerComponent.class);
+		 sm = ComponentMapper.getFor(StateComponent.class);
 	}
 
 	@Override
@@ -31,6 +34,7 @@ public class CollisionSystem extends IteratingSystem {
 		CollisionComponent cc = cm.get(entity);
 		//get collided entity
 		Entity collidedEntity = cc.collisionEntity;
+		StateComponent stateComponent = sm.get(entity);
 		
 		TypeComponent thisType = entity.getComponent(TypeComponent.class);
 		

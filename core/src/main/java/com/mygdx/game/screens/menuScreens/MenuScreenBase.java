@@ -9,6 +9,7 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.GameManager;
+import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.utils.GdxUtils;
@@ -45,6 +46,7 @@ public abstract class MenuScreenBase extends ScreenAdapter {
     public void show() {
         this.viewport = game.getViewport();
         stage = new Stage(viewport, game.getBatch());
+        //stage.setDebugAll(true);
         Gdx.input.setInputProcessor(stage);
 
         stage.addActor(createUi());

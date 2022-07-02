@@ -6,11 +6,15 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.kotcrab.vis.ui.VisUI;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.client.forms.LoginForm;
 import com.mygdx.game.client.forms.RegisterForm;
+import com.mygdx.game.utils.ScreenOrientation;
 
 public class ConnectScreen extends ScreenAdapter
 {
@@ -23,12 +27,17 @@ public class ConnectScreen extends ScreenAdapter
     public ConnectScreen(MyGdxGame game)
     {
         this.game = game;
+        ScreenOrientation screenOrientation = this.game.getScreenOrientation();
+        if(screenOrientation != null)
+        {
+            this.game.getScreenOrientation().setScreenToLandscape();
+        }
     }
     
     @Override
     public void show() 
     {
-        this.stage = new Stage(new ScreenViewport());
+        this.stage = new Stage(new StretchViewport(450,200));
         VisUI.load(VisUI.SkinScale.X1);
         Gdx.input.setInputProcessor(stage);
         loginScreenForm = new LoginForm(this.game, this);
@@ -48,6 +57,11 @@ public class ConnectScreen extends ScreenAdapter
         }
     }
 
+    @Override
+    public void resize (int width, int height) {
+        this.stage.getViewport().update(width,height,true);
+    }
+
     public RegisterForm getRegisterForm() {
         return registerForm;
     }
@@ -59,4 +73,5 @@ public class ConnectScreen extends ScreenAdapter
     public void setReadyToChangeScreen(boolean readyToChangeScreen) {
         this.readyToChangeScreen = readyToChangeScreen;
     }
+
 }

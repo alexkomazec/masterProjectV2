@@ -8,6 +8,8 @@ import com.badlogic.gdx.scenes.scene2d.InputListener;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Image;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.config.GameConfig;
 
@@ -23,6 +25,7 @@ public class AndroidController {
     {
         this.abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
         inputProcesorSet = false;
+
         stage = new Stage(viewport, batch);
         Gdx.input.setInputProcessor(stage);
         Table table = new Table();
@@ -32,8 +35,8 @@ public class AndroidController {
         table1.left();
 
 
-        Image upImg = new Image(new Texture("/ui/AndroidController/flatDark25.png"));
-        upImg.setSize(50, 50);
+        Image upImg = new Image(new Texture("flatDark25.png"));
+        upImg.setSize(100, 100);
         upImg.addListener(new InputListener() {
 
             @Override
@@ -50,8 +53,8 @@ public class AndroidController {
             }
         });
 
-        Image downImg = new Image(new Texture("/ui/AndroidController/flatDark26.png"));
-        downImg.setSize(50, 50);
+        Image downImg = new Image(new Texture("flatDark26.png"));
+        downImg.setSize(100, 100);
         downImg.addListener(new InputListener() {
 
             @Override
@@ -66,8 +69,8 @@ public class AndroidController {
             }
         });
 
-        Image rightImg = new Image(new Texture("/ui/AndroidController/flatDark24.png"));
-        rightImg.setSize(50, 50);
+        Image rightImg = new Image(new Texture("flatDark24.png"));
+        rightImg.setSize(100, 100);
         rightImg.addListener(new InputListener() {
 
             @Override
@@ -82,8 +85,8 @@ public class AndroidController {
             }
         });
 
-        Image leftImg = new Image(new Texture("/ui/AndroidController/flatDark23.png"));
-        leftImg.setSize(50, 50);
+        Image leftImg = new Image(new Texture("flatDark23.png"));
+        leftImg.setSize(100, 100);
         leftImg.addListener(new InputListener() {
 
             @Override
@@ -98,8 +101,8 @@ public class AndroidController {
             }
         });
 
-        Image fireImg = new Image(new Texture("/ui/AndroidController/flatDark27.png"));
-        fireImg.setSize(50, 50);
+        Image fireImg = new Image(new Texture("flatDark27.png"));
+        fireImg.setSize(100, 100);
         fireImg.addListener(new InputListener()
         {
 
@@ -115,20 +118,19 @@ public class AndroidController {
             }
         });
 
-        table.add();
-        table.add(upImg).size(upImg.getWidth(), upImg.getHeight());
-        table.add();
-        table.row().pad(5, 5, 5, 5);
         table.add(leftImg).size(leftImg.getWidth(), leftImg.getHeight());
-        table.add();
         table.add(rightImg).size(rightImg.getWidth(), rightImg.getHeight());
-        table.row().padBottom(5);
-        table.add();
-        table.add(downImg).size(downImg.getWidth(), downImg.getHeight());
+        table.row();
+        table.add().size(upImg.getWidth(), upImg.getHeight());
 
         table1.row().padBottom(110);
-        table1.add().padRight(480);
+        table1.add().size(upImg.getWidth(), upImg.getHeight());
+        table1.add().size(upImg.getWidth(), upImg.getHeight());
+        table1.add().size(upImg.getWidth(), upImg.getHeight());
+        table1.add().size(upImg.getWidth(), upImg.getHeight());
+        table1.add(upImg).size(upImg.getWidth(), upImg.getHeight());
         table1.add(fireImg).size(fireImg.getWidth(), fireImg.getHeight());
+
 
         stage.addActor(table1);
         stage.addActor(table);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="23" nextobjectid="729">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="23" nextobjectid="779">
  <tileset firstgid="1" name="Ground" tilewidth="32" tileheight="32" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -49,9 +49,59 @@
   <object id="713" gid="1" x="384" y="3200" width="32" height="32"/>
   <object id="714" gid="1" x="416" y="3200" width="32" height="32"/>
   <object id="715" gid="1" x="448" y="3200" width="32" height="32"/>
+  <object id="729" gid="1" x="544" y="3136" width="32" height="32"/>
+  <object id="730" gid="1" x="576" y="3136" width="32" height="32"/>
+  <object id="731" gid="1" x="608" y="3136" width="32" height="32"/>
+  <object id="732" gid="1" x="672" y="3136" width="32" height="32"/>
+  <object id="733" gid="1" x="640" y="3136" width="32" height="32"/>
+  <object id="734" gid="1" x="704" y="3136" width="32" height="32"/>
+  <object id="735" gid="1" x="736" y="3136" width="32" height="32"/>
+  <object id="736" gid="1" x="768" y="3136" width="32" height="32"/>
+  <object id="737" gid="1" x="800" y="3136" width="32" height="32"/>
+  <object id="738" gid="1" x="832" y="3136" width="32" height="32"/>
+  <object id="739" gid="1" x="896" y="3136" width="32" height="32"/>
+  <object id="740" gid="1" x="864" y="3136" width="32" height="32"/>
+  <object id="741" gid="1" x="928" y="3136" width="32" height="32"/>
+  <object id="742" gid="1" x="960" y="3136" width="32" height="32"/>
+  <object id="743" gid="1" x="1024" y="3136" width="32" height="32"/>
+  <object id="744" gid="1" x="992" y="3136" width="32" height="32"/>
+  <object id="745" gid="1" x="1056" y="3136" width="32" height="32"/>
+  <object id="746" gid="1" x="1088" y="3136" width="32" height="32"/>
+  <object id="747" gid="1" x="1120" y="3136" width="32" height="32"/>
+  <object id="748" gid="1" x="1152" y="3136" width="32" height="32"/>
+  <object id="749" gid="1" x="1184" y="3136" width="32" height="32"/>
+  <object id="750" gid="1" x="1248" y="3136" width="32" height="32"/>
+  <object id="751" gid="1" x="1216" y="3136" width="32" height="32"/>
+  <object id="752" gid="1" x="1280" y="3136" width="32" height="32"/>
+  <object id="753" gid="1" x="1312" y="3136" width="32" height="32"/>
+  <object id="754" gid="1" x="544" y="3104" width="32" height="32"/>
+  <object id="755" gid="1" x="1312" y="3104" width="32" height="32"/>
+  <object id="756" gid="1" x="605" y="2945" width="32" height="32"/>
+  <object id="757" gid="1" x="637" y="2945" width="32" height="32"/>
+  <object id="758" gid="1" x="701" y="2945" width="32" height="32"/>
+  <object id="759" gid="1" x="669" y="2945" width="32" height="32"/>
+  <object id="760" gid="1" x="733" y="2945" width="32" height="32"/>
+  <object id="761" gid="1" x="765" y="2945" width="32" height="32"/>
+  <object id="762" gid="1" x="797" y="2945" width="32" height="32"/>
+  <object id="763" gid="1" x="829" y="2945" width="32" height="32"/>
+  <object id="764" gid="1" x="861" y="2945" width="32" height="32"/>
+  <object id="765" gid="1" x="925" y="2945" width="32" height="32"/>
+  <object id="766" gid="1" x="893" y="2945" width="32" height="32"/>
+  <object id="767" gid="1" x="957" y="2945" width="32" height="32"/>
+  <object id="768" gid="1" x="989" y="2945" width="32" height="32"/>
+  <object id="769" gid="1" x="1053" y="2945" width="32" height="32"/>
+  <object id="770" gid="1" x="1021" y="2945" width="32" height="32"/>
+  <object id="771" gid="1" x="1085" y="2945" width="32" height="32"/>
+  <object id="772" gid="1" x="1117" y="2945" width="32" height="32"/>
+  <object id="773" gid="1" x="1149" y="2945" width="32" height="32"/>
+  <object id="774" gid="1" x="1181" y="2945" width="32" height="32"/>
+  <object id="775" gid="1" x="1213" y="2945" width="32" height="32"/>
+  <object id="776" gid="1" x="1277" y="2945" width="32" height="32"/>
+  <object id="777" gid="1" x="1245" y="2945" width="32" height="32"/>
+  <object id="778" gid="1" x="1309" y="2945" width="32" height="32"/>
  </objectgroup>
  <objectgroup id="18" name="PlayersSpawnSpots">
-  <object id="705" x="192" y="3104" width="32" height="32">
+  <object id="705" x="576" y="3072" width="32" height="32">
    <ellipse/>
   </object>
  </objectgroup>
@@ -60,11 +110,7 @@
   <object id="658" gid="2" x="320" y="3168" width="32" height="32"/>
   <object id="659" gid="2" x="256" y="2688" width="32" height="32"/>
  </objectgroup>
- <objectgroup id="22" name="CloudEnemies">
-  <object id="728" x="360" y="2595" width="32" height="32">
-   <ellipse/>
-  </object>
- </objectgroup>
+ <objectgroup id="22" name="CloudEnemies"/>
  <objectgroup id="20" name="BasicEnemies">
   <object id="709" x="384" y="3136" width="32" height="32">
    <properties>

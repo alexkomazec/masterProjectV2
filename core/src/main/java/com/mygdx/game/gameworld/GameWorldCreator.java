@@ -19,6 +19,7 @@ import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
+import com.mygdx.game.entitycomponentsystem.components.ControlledInputRemoteComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -35,6 +36,7 @@ public class GameWorldCreator {
     private BodyCreator bodyCreator;
     private static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
+    public boolean connectionType;
 
     GameWorld gameWorld;
     PooledEngine pooledEngine;
@@ -187,6 +189,7 @@ public class GameWorldCreator {
         SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
         Component inputTypeForPlayerComponent;
         Rectangle rectangle;
+        //ControlledInputRemoteComponent controlledInputRemoteComponent = this.pooledEngine.createComponent(ControlledInputRemoteComponent.class);
 
         rectangle = (isLocalPlayer) ? getRectangle(object) : getRectangle(position);
         playerComponent.playerID = currentAvailablePlayerID;
@@ -220,6 +223,7 @@ public class GameWorldCreator {
         steeringComponent.body = b2dBodyComponent.body;
         entity.add(steeringComponent);
 
+        //entity.add(controlledInputRemoteComponent);
         entity.add(collisionComponent);
         entity.add(cntrlInComp);
 
@@ -228,7 +232,9 @@ public class GameWorldCreator {
         {
             inputTypeForPlayerComponent = this.pooledEngine.createComponent(LocalInputComponent.class);
             playerComponent.cam = this.orthographicCamera;
-            inputManagerSystem.assignPlayerToInputProcessor(playerComponent.playerID, isLocalPlayer);
+
+            if(inputManagerSystem != null)
+                inputManagerSystem.assignPlayerToInputProcessor(playerComponent.playerID, isLocalPlayer);
         }
         else
         {
@@ -378,5 +384,13 @@ public class GameWorldCreator {
 
     public PooledEngine getPooledEngine() {
         return pooledEngine;
+    }
+
+    public void setConnectionType(boolean online) {
+        this.connectionType = online;
+    }
+
+    public GameWorld getGameWorld() {
+        return gameWorld;
     }
 }

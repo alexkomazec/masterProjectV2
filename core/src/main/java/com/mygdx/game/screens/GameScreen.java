@@ -7,8 +7,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.viewport.FillViewport;
+import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.badlogic.gdx.utils.viewport.StretchViewport;
+import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.ViewPortConfiguration;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
@@ -21,6 +26,7 @@ import com.mygdx.game.entitycomponentsystem.system.RenderAndroidSystem;
 import com.mygdx.game.entitycomponentsystem.system.RenderTiledMapSystem;
 import com.mygdx.game.entitycomponentsystem.system.SteeringSystem;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
+import com.mygdx.game.utils.ScreenOrientation;
 
 public class GameScreen implements Screen {
 
@@ -29,32 +35,23 @@ public class GameScreen implements Screen {
 
     private final MyGdxGame game;
     private final OrthographicCamera camera;
+    private Viewport viewport;
+    private Viewport hudViewport;
 
     public GameScreen()
     {
         this.game = MyGdxGame.getInstance();
+
+        ScreenOrientation screenOrientation = this.game.getScreenOrientation();
+        if(screenOrientation != null)
+        {
+            this.game.getScreenOrientation().setScreenToLandscape();
+        }
+
         this.camera = new OrthographicCamera();
         this.game.getGameWorldCreator().setOrthographicCamera(this.camera);
-
-        if(Gdx.app.getType() == Application.ApplicationType.Android)
-        {
-            /* Running application is on android device*/
-            InputManagerAndroidSystem inManAndroidSys =
-                    new InputManagerAndroidSystem(this.game.getBatch(), this.game.getViewport());
-            RenderAndroidSystem renderASys =
-                    new RenderAndroidSystem(inManAndroidSys.getAndroidController());
-
-            this.game.getPooledEngine().addSystem(inManAndroidSys);
-            this.game.getPooledEngine().addSystem(renderASys);
-        }
-        else
-        {
-            /* Running application is on desktop device*/
-            this.game.getPooledEngine().addSystem(
-                    new InputManagerSystem()
-            );
-
-        }
+        viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
+        hudViewport = new StretchViewport(700,700);
 
         this.game.getPooledEngine().addSystem(
                 new PlayerControlSystem(
@@ -80,6 +77,25 @@ public class GameScreen implements Screen {
                 new BulletSystem(game.getGameWorld()));
         this.game.getPooledEngine().addSystem(
                 new SteeringSystem());
+
+        if(Gdx.app.getType() == Application.ApplicationType.Android)
+        {
+            /* Running application is on android device*/
+            InputManagerAndroidSystem inManAndroidSys =
+                    new InputManagerAndroidSystem(this.game.getBatch(), hudViewport);
+            RenderAndroidSystem renderASys =
+                    new RenderAndroidSystem(inManAndroidSys.getAndroidController());
+
+            this.game.getPooledEngine().addSystem(inManAndroidSys);
+            this.game.getPooledEngine().addSystem(renderASys);
+        }
+        else
+        {
+            /* Running application is on desktop device*/
+            this.game.getPooledEngine().addSystem(
+                    new InputManagerSystem(this.game.getConnectionType())
+            );
+        }
     }
     @Override
     public void show()
@@ -91,6 +107,7 @@ public class GameScreen implements Screen {
         this.camera.update();
 
         this.game.getWorldCreator().createPlatforms();
+        this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
         this.game.getWorldCreator().createPlayer(true,null);
         this.game.getWorldCreator().createEnemies();
         this.game.getWorldCreator().createClouds();
@@ -108,6 +125,9 @@ public class GameScreen implements Screen {
 
     @Override
     public void resize(int width, int height) {
+        viewport.update(width, height, true);
+        this.game.getViewport().update(width,height,true);
+        this.hudViewport.update(width, height, true);
     }
 
     @Override

@@ -91,7 +91,7 @@ public class MenuScreen extends  MenuScreenBase {
         buttonTable.add(optionsButton).row();
         buttonTable.add(quitButton);
 
-        buttonTable.center();
+        //buttonTable.center();
 
         table.add(buttonTable);
         table.center();

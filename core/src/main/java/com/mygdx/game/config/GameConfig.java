@@ -10,6 +10,13 @@ public class GameConfig {
     public static final float DEFAULT_PLAYER_WIDTH = 32f;
     public static final float DEFAULT_PLAYER_HEIGHT = 32f;
 
+    public static final float WORLD_WIDTH = 500;
+    public static final float WORLD_HEIGHT = 500;
+
+    public static final float VIRTUAL_WIDTH = 720;
+    public static final float VIRTUAL_HEIGHT = 1280;
+
+
     // == Box2d Scalling ==
 
     //INFO: Creating a body with width 16 and height 16, in box2D world it is represented as 16 meters x 16 meters body
@@ -23,15 +30,12 @@ public class GameConfig {
 
     /* Physical dimensions of the screen */
     public static final float PHYSICAL_WIDTH = 640; //pixels
-    public static final float PHYSICAL_HEIGHT = 480; //pixels
+    public static final float PHYSICAL_HEIGHT = 640; //pixels
 
     //== Gameplay Size ==
     public static final  float GAME_WIDTH = 800f; //pixels
     public static final  float GAME_HEIGHT  = PHYSICAL_HEIGHT /2; //pixels
 
-    // == World Size ==
-    public static final float WORLD_WIDTH = PHYSICAL_WIDTH /WORLD_BOX_SIZE; // world units
-    public static final float WORLD_HEIGHT = PHYSICAL_HEIGHT /WORLD_BOX_SIZE; // world units
 
     /*--------------------------------------------------------------------------------------------*/
 

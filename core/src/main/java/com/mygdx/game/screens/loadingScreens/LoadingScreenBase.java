@@ -12,6 +12,8 @@ import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.utils.GdxUtils;
 
+import javax.swing.text.View;
+
 
 public class LoadingScreenBase extends ScreenAdapter {
 
@@ -19,7 +21,7 @@ public class LoadingScreenBase extends ScreenAdapter {
     // == constants ==
     protected static final Logger log = new Logger(LoadingIntroScreen.class.getSimpleName(), Logger.DEBUG);
 
-    protected static final float PROGRESS_BAR_WIDTH = GameConfig.PHYSICAL_WIDTH / 2f; // world units
+    protected static final float PROGRESS_BAR_WIDTH = ViewPortConfiguration.getPhysicalWidth() / 2f; // world units
     protected static final float PROGRESS_BAR_HEIGHT = 60; // world units
 
     // == attributes ==
@@ -105,8 +107,8 @@ public class LoadingScreenBase extends ScreenAdapter {
     }
 
     private void draw() {
-        float progressBarX = (GameConfig.PHYSICAL_WIDTH - PROGRESS_BAR_WIDTH) / 2f;
-        float progressBarY = (GameConfig.PHYSICAL_HEIGHT - PROGRESS_BAR_HEIGHT) / 2f;
+        float progressBarX = (ViewPortConfiguration.getPhysicalWidth() - PROGRESS_BAR_WIDTH) / 2f;
+        float progressBarY = (ViewPortConfiguration.getPhysicalWidth() - PROGRESS_BAR_HEIGHT) / 2f;
 
         this.renderer.rect(progressBarX, progressBarY,
                 this.progress * PROGRESS_BAR_WIDTH, PROGRESS_BAR_HEIGHT

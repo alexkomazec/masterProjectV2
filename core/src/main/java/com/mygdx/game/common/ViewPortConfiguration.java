@@ -11,10 +11,6 @@ public class ViewPortConfiguration {
     public static  float viewportWidth;
     public static  float viewportHeight;
     
-    //Virtual Measures => Measure
-    public static float virtualWidth;
-    public static float virtualHeight;
-    
     //Physical Measures
     public static float physicalWidth;
     public static float physicalHeight;
@@ -24,6 +20,9 @@ public class ViewPortConfiguration {
 
     //Set
     public static void calculateViewport(int worldWidth, int worldHeight){
+
+        float virtualWidth;
+        float virtualHeight;
 
         //Make the viewport a percentage of the total display area
         virtualWidth = worldWidth;
@@ -70,5 +69,13 @@ public class ViewPortConfiguration {
     }
     public static float getPhysicalHeight(){
         return physicalHeight = Gdx.graphics.getHeight();
+    }
+
+    public static float getViewportWidth() {
+        return viewportWidth;
+    }
+
+    public static float getViewportHeight() {
+        return viewportHeight;
     }
 }
