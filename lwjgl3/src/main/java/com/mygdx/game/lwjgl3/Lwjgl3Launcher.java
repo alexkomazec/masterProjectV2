@@ -4,6 +4,7 @@ import com.badlogic.gdx.backends.lwjgl3.Lwjgl3Application;
 import com.badlogic.gdx.backends.lwjgl3.Lwjgl3ApplicationConfiguration;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.utils.ScreenOrientation;
 
 /** Launches the desktop (LWJGL3) application. */
 public class Lwjgl3Launcher {
@@ -12,6 +13,22 @@ public class Lwjgl3Launcher {
 	}
 
 	private static Lwjgl3Application createApplication() {
+
+		/* Hint: Temp ScreenOrientation is just a placeholder, because somwhere in the code
+		* is expected that ScreenOrientation is not null
+		* */
+		MyGdxGame myGdxGame = MyGdxGame.getInstance();
+		myGdxGame.setScreenOrientation(new ScreenOrientation() {
+			@Override
+			public void setScreenToPortrait() {
+
+			}
+
+			@Override
+			public void setScreenToLandscape() {
+
+			}
+		});
 		return new Lwjgl3Application(MyGdxGame.getInstance(), getDefaultConfiguration());
 	}
 
@@ -29,4 +46,5 @@ public class Lwjgl3Launcher {
 		configuration.setWindowIcon("libgdx128.png", "libgdx64.png", "libgdx32.png", "libgdx16.png");
 		return configuration;
 	}
+
 }

@@ -1,5 +1,7 @@
 package com.mygdx.game.client.forms;
 
+import static com.mygdx.game.MyGdxGame.MENU_SCREEN;
+
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
@@ -88,8 +90,8 @@ public class LoginForm extends VisWindow
 				{
 					stage = getStage();
 				}
+				game.changeScreen(MENU_SCREEN);
 
-				Dialogs.showOKDialog(stage, "message", "you can't escape this!");
 			}
 		});
 

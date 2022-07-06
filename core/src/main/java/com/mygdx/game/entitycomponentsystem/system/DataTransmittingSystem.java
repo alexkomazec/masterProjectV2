@@ -3,6 +3,7 @@ package com.mygdx.game.entitycomponentsystem.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.Message;
 import com.mygdx.game.client.data.PlayerDataContainer;
@@ -14,6 +15,7 @@ import io.socket.client.Socket;
 
 public class DataTransmittingSystem extends IteratingSystem {
 
+    protected static final Logger logger = new Logger(DataTransmittingSystem.class.getSimpleName(), Logger.DEBUG);
     private ClientHandler clientHandler;
     private Message message;
 
@@ -58,26 +60,37 @@ public class DataTransmittingSystem extends IteratingSystem {
     private void processData(PlayerDataContainer playerDataContainer, int actionType, Entity entity)
     {
         Socket socket = this.clientHandler.getSocket();
+        PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
+
         switch(actionType)
         {
             case ClientHandler.UPLOAD_CURRENT_PLAYER_POS_REQ:
 
-                System.out.println("DataTransmittingSystem: emit refreshPlayersPosition");
-
-                PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
-                TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
+                logger.debug("UPLOAD_CURRENT_PLAYER_POS_REQ");
 
                 playerDataContainer.setPlayerID(playerComponent.playerID);
                 playerDataContainer.setPosition(transformComponent.position);
 
+                logger.debug("refreshPlayersPosition: Player with ID " + playerDataContainer.getPlayerID() + " sent x,y");
                 socket.emit("refreshPlayersPosition",
                         playerDataContainer.getPosition().x,
                         playerDataContainer.getPosition().y,
                         playerDataContainer.getPlayerID());
             break;
 
+            case ClientHandler.PLAYER_TABLE_UPDATED:
+
+                logger.debug("PLAYER_TABLE_UPDATED");
+                playerDataContainer.setPlayerID(playerComponent.playerID);
+
+                logger.debug("playerTableUpdated: Player with ID " + playerComponent.playerID + " updated Player Table");
+                socket.emit("playerTableUpdated",
+                        playerComponent.playerID);
+            break;
+
             default:
-                System.out.println("Wrong action type" + actionType);
+                logger.error("processData entity: Wrong action type" + actionType);
         }
     }
 
@@ -89,13 +102,17 @@ public class DataTransmittingSystem extends IteratingSystem {
             /* NOTE: Be careful, this case does not depend on entity*/
             case ClientHandler.SEND_PLAYER_TO_SERVER:
 
-                System.out.println("DataTransmittingSystem: emit addPlayer");
+                logger.debug("SEND_PLAYER_TO_SERVER");
 
+                logger.debug("addPlayer: Please add Player with ID " + playerDataContainer.getPlayerID());
                 socket.emit("addPlayer",
                         playerDataContainer.getPosition().x,
                         playerDataContainer.getPosition().y,
                         playerDataContainer.getPlayerID());
-                break;
+            break;
+
+            default:
+                logger.error("processData no entity: Wrong action type" + actionType);
         }
     }
 

@@ -31,6 +31,7 @@ public class ConnectScreen extends ScreenAdapter
         if(screenOrientation != null)
         {
             this.game.getScreenOrientation().setScreenToLandscape();
+            VisUI.load(VisUI.SkinScale.X1);
         }
     }
     
@@ -38,10 +39,9 @@ public class ConnectScreen extends ScreenAdapter
     public void show() 
     {
         this.stage = new Stage(new StretchViewport(450,200));
-        VisUI.load(VisUI.SkinScale.X1);
-        Gdx.input.setInputProcessor(stage);
         loginScreenForm = new LoginForm(this.game, this);
         stage.addActor(loginScreenForm);
+        Gdx.input.setInputProcessor(stage);
     }
 
     @Override

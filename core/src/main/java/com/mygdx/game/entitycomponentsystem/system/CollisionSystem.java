@@ -34,7 +34,6 @@ public class CollisionSystem extends IteratingSystem {
 		CollisionComponent cc = cm.get(entity);
 		//get collided entity
 		Entity collidedEntity = cc.collisionEntity;
-		StateComponent stateComponent = sm.get(entity);
 		
 		TypeComponent thisType = entity.getComponent(TypeComponent.class);
 		
@@ -49,7 +48,6 @@ public class CollisionSystem extends IteratingSystem {
 						//do player hit enemy thing
 						//System.out.println("player hit enemy");
 						pl.isDead = true;
-						int score = (int) pl.cam.position.y;
 						//System.out.println("Score = "+ score);
 						break;
 					case TypeComponent.SCENERY:

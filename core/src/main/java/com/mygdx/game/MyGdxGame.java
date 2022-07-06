@@ -1,7 +1,9 @@
 package com.mygdx.game;
 
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
+import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
@@ -73,11 +75,10 @@ public class MyGdxGame extends Game {
 		return instance;
 	}
 
-
-
 	@Override
 	public void create() {
 
+		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		this.tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
 		this.gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
 		//this.viewport	= new StretchViewport(GameConfig.VIRTUAL_WIDTH ,GameConfig.VIRTUAL_HEIGHT);

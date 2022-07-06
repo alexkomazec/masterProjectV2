@@ -4,18 +4,22 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 import com.mygdx.game.entitycomponentsystem.system.DataTransmittingSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerTransmittingSystem;
+import com.mygdx.game.screens.loadingScreens.LoadingIntroScreen;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.Date;
 import java.util.HashMap;
 
 import io.socket.client.IO;
@@ -24,6 +28,7 @@ import io.socket.emitter.Emitter;
 
 public class ClientHandler {
 
+    protected static final Logger logger = new Logger(ClientHandler.class.getSimpleName(), Logger.DEBUG);
     public static ClientHandler instance;
 
     public static ClientHandler getInstance(PooledEngine pooledEngine) {
@@ -35,7 +40,7 @@ public class ClientHandler {
 
     private Socket socket;
     private IO.Options options;
-    public static String url = "http://138.68.160.152:5000";
+    public static String url = "http://138.68.160.152:8080";
     //public static String url = "http://localhost:8080";
     //public static String url = "http://192.168.0.12:8080";
 
@@ -44,16 +49,18 @@ public class ClientHandler {
 
     /* Receiving Actions */
     public static final int REMOTE_PLAYER_MOVED = 0;
-    public static final int ASSIGN_ID_TO_PLAYER = 7;            /* Assign ID to a newly created player */
-    public static final int UPDATE_PLAYER_TABLE = 9;            /* Get info of all players already connected */
-    public static final int UPDATE_PLAYER_POS = 1;              /* Update position of a player that has been moved */
-    public static final int PLAYER_FIRED = 2;                   /* Some Player fired a magic spell */
-    public static final int PLAYER_CHANGED_DIR = 3;             /* Some Player changed direction*/
-    public static final int PLAYER_DISCONNECTED = 5;            /* Some Player Disconnected */
+    public static final int ASSIGN_ID_TO_PLAYER = 1;            /* Assign ID to a newly created player */
+    public static final int UPDATE_PLAYER_TABLE = 2;            /* Get info of all players already connected */
+    public static final int UPDATE_PLAYER_POS = 3;              /* Update position of a player that has been moved */
+    public static final int PLAYER_FIRED = 4;                   /* Some Player fired a magic spell */
+    public static final int PLAYER_CHANGED_DIR = 5;             /* Some Player changed direction*/
+    public static final int PLAYER_DISCONNECTED = 6;            /* Some Player Disconnected */
+    public static final int CREATE_ALL_ENEMIES = 7;             /* Create All enemies */
 
     /* Transmitting Actions */
     public static final int SEND_PLAYER_TO_SERVER = 8;          /* Send Player data of a newly created player */
-    public static final int UPLOAD_CURRENT_PLAYER_POS_REQ = 4;  /* Upload Current Player Position upon a request */
+    public static final int UPLOAD_CURRENT_PLAYER_POS_REQ = 9;  /* Upload Current Player Position upon a request */
+    public static final int PLAYER_TABLE_UPDATED = 10;          /* Inform server that player table has been updated */
 
     private ClientHandler(PooledEngine pooledEngine) {
         createSocket();
@@ -84,10 +91,10 @@ public class ClientHandler {
 
         try {
             this.socket = IO.socket(url, options);
-            Gdx.app.log("SocketIO", "Socket set");
+            logger.debug("Socket set");
             configSocketEvents();
         } catch (URISyntaxException e) {
-            Gdx.app.log("SocketIO", "Wrong URL");
+            logger.error("Wrong URL");
             e.printStackTrace();
         }
     }
@@ -175,6 +182,19 @@ public class ClientHandler {
             }
         });
 
+        this.socket.on("createAllEnemies", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    createAllEnemies(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
         this.socket.on("playerChangedDirResp", new Emitter.Listener()
         {
             @Override
@@ -206,8 +226,18 @@ public class ClientHandler {
 
     //===============Callbacks for event listener ==========================//
 
+    public void createAllEnemies(Object... args) throws JSONException
+    {
+        logger.debug("CREATE_ALL_ENEMIES");
+        logger.debug("createAllEnemies received, Current time:" + TimeUtils.millis());
+        Message message = new Message(CREATE_ALL_ENEMIES, false);
+        message.addPlayerDataContainer(new PlayerDataContainer());
+        receivedMessageArray.add(message);
+
+    }
     public void playerDisconnected(Object... args) throws JSONException {
-        System.out.println("playerChangedDir");
+
+        logger.debug("PLAYER_DISCONNECTED");
         int playerId = (int) args[0];
 
         Message message = new Message(PLAYER_DISCONNECTED, false);
@@ -217,7 +247,7 @@ public class ClientHandler {
 
     private void playerChangedDir(Object... args) throws JSONException
     {
-        System.out.println("playerChangedDir");
+        logger.debug("PLAYER_CHANGED_DIR");
         JSONArray jsonArray = (JSONArray) args[0];
         int playerId = (int)jsonArray.get(0);
 
@@ -225,15 +255,18 @@ public class ClientHandler {
         message.addPlayerDataContainer(new PlayerDataContainer(new boolean[GameConfig.LIST_COMMANDS_MAX], playerId));
         receivedMessageArray.add(message);
     }
-    private void updatePlayerTable(Object... args) throws JSONException {
-        System.out.println("updatePlayerTable");
+    private void updatePlayerTable(Object... args) throws JSONException
+    {
+        logger.debug("UPDATE_PLAYER_TABLE");
         JSONArray arrPlayers = (JSONArray)args[0];
+
         Message message = new Message(UPDATE_PLAYER_TABLE, false);
         fillMessage(arrPlayers, message);
     }
 
     private void updatePlayerPos(Object... args) throws JSONException {
-        System.out.println("updatePlayerPos");
+
+        logger.debug("UPDATE_PLAYER_POS");
         JSONArray arrPlayers = new JSONArray ();
         arrPlayers.put(args[0]);
         Message message = new Message(UPDATE_PLAYER_POS, true);
@@ -242,7 +275,7 @@ public class ClientHandler {
 
     private void playerIdReceivedOnCon(Object... args)
     {
-        System.out.println("playerIdReceivedOnCon has been called");
+        logger.debug("ASSIGN_ID_TO_PLAYER");
         PlayerDataContainer playerDataContainer = new PlayerDataContainer();
         playerDataContainer.setPlayerID((int)args[0]);
         Message message = new Message(ASSIGN_ID_TO_PLAYER, true);
@@ -252,7 +285,7 @@ public class ClientHandler {
 
     private void getUpdatedPosition(Object... args)
     {
-        System.out.println("getUpdatedPosition");
+        logger.debug("UPLOAD_CURRENT_PLAYER_POS_REQ");
         Message message = new Message(UPLOAD_CURRENT_PLAYER_POS_REQ, true);
         message.addPlayerDataContainer(new PlayerDataContainer());
         transmitingMessageArray.add(message);
@@ -277,9 +310,10 @@ public class ClientHandler {
         receivedMessageArray.add(message);
     }*/
 
-    private void playerFiredMagic(Object... args) throws JSONException {
+    private void playerFiredMagic(Object... args) throws JSONException
+    {
 
-        System.out.println("playerFiredMagic");
+        logger.debug("PLAYER_FIRED");
         JSONArray jsonArray = (JSONArray) args[0];
         int playerId = (int)jsonArray.get(0);
         JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
@@ -296,6 +330,7 @@ public class ClientHandler {
 
     }
 
+
     public void fillMessage(JSONArray arrPlayers, Message message) throws JSONException {
 
         /* Parse one by one player data, and put it into playerDataContainerArray */
@@ -307,7 +342,7 @@ public class ClientHandler {
             try
             {
                 jsonObjectCurPlayer = (JSONObject)arrPlayers.get(index);
-                System.out.println(jsonObjectCurPlayer);
+                logger.debug(jsonObjectCurPlayer.toString());
             }
             catch (JSONException e)
             {

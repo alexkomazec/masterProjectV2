@@ -109,8 +109,8 @@ public class GameScreen implements Screen {
         this.game.getWorldCreator().createPlatforms();
         this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
         this.game.getWorldCreator().createPlayer(true,null);
-        this.game.getWorldCreator().createEnemies();
-        this.game.getWorldCreator().createClouds();
+        //this.game.getWorldCreator().createEnemies();
+        //this.game.getWorldCreator().createClouds();
     }
 
     @Override

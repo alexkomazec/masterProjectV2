@@ -1,10 +1,16 @@
 package com.mygdx.game.entitycomponentsystem.system;
 
+import static com.mygdx.game.client.ClientHandler.CREATE_ALL_ENEMIES;
+import static com.mygdx.game.client.ClientHandler.PLAYER_TABLE_UPDATED;
+
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.Message;
 import com.mygdx.game.client.data.PlayerDataContainer;
@@ -12,6 +18,7 @@ import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
+import com.mygdx.game.entitycomponentsystem.components.Controllable;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -20,6 +27,7 @@ import com.mygdx.game.gameworld.GameWorldCreator;
 
 public class DataReceivingSystem extends IteratingSystem {
 
+    protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.DEBUG);
     private ClientHandler clientHandler;
     private GameWorldCreator gameWorldCreator;
     private Message message;
@@ -86,7 +94,7 @@ public class DataReceivingSystem extends IteratingSystem {
         {
             case ClientHandler.ASSIGN_ID_TO_PLAYER:
 
-                System.out.println("DataReceivingSystem: ASSIGN_ID_TO_PLAYER");
+                logger.debug("ASSIGN_ID_TO_PLAYER");
                 LocalInputComponent localInputComponent = entity.getComponent(LocalInputComponent.class);
                 TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
 
@@ -94,7 +102,8 @@ public class DataReceivingSystem extends IteratingSystem {
                 {
                     /* Set received ID to a main player */
                     playerComponent.playerID = playerDataContainer.getPlayerID();
-                    System.out.println("Player ID has been added to a local player");
+                    logger.debug("Player ID " + playerComponent.playerID+ " has been added to a local player");
+
                     PooledEngine pooledEngine = this.gameWorldCreator.getPooledEngine();
                     InputManagerSystem inputManagerSystem = pooledEngine.getSystem(InputManagerSystem.class);
                     if(inputManagerSystem!=null)
@@ -124,10 +133,11 @@ public class DataReceivingSystem extends IteratingSystem {
             break;*/
 
             case ClientHandler.UPDATE_PLAYER_POS:
-                System.out.println("DataReceivingSystem: UPDATE_PLAYER_POS");
-                B2dBodyComponent b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
 
-                System.out.println("GetLinearVelocity" + b2dBodyComponent.body.getLinearVelocity());
+                logger.debug("UPDATE_PLAYER_POS");
+                B2dBodyComponent b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
+                //logger.debug("GetLinearVelocity" + b2dBodyComponent.body.getLinearVelocity());
+
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
                     b2dBodyComponent.body.setTransform(
@@ -138,7 +148,8 @@ public class DataReceivingSystem extends IteratingSystem {
             break;
 
             case ClientHandler.PLAYER_FIRED:
-                System.out.println("DataReceivingSystem: PLAYER_FIRED");
+
+                logger.debug("PLAYER_FIRED");
 
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
@@ -147,7 +158,8 @@ public class DataReceivingSystem extends IteratingSystem {
             break;
 
             case ClientHandler.PLAYER_CHANGED_DIR:
-                System.out.println("DataReceivingSystem: PLAYER_CHANGED_DIR");
+
+                logger.debug("PLAYER_CHANGED_DIR");
 
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
@@ -163,7 +175,7 @@ public class DataReceivingSystem extends IteratingSystem {
                 break;
 
             default:
-                System.out.println("Wrong action type" + actionType);
+                logger.error("processData entity: Wrong action type" + actionType);
         }
     }
 
@@ -174,28 +186,44 @@ public class DataReceivingSystem extends IteratingSystem {
                 getEntitiesFor(Family.all(PlayerComponent.class, ControlledInputComponent.class).
                         get());
 
+        Entity tempEntity = null;
+
         switch(actionType)
         {
             case ClientHandler.UPDATE_PLAYER_TABLE:
-                System.out.println("DataReceivingSystem: UPDATE_PLAYER_TABLE");
 
+                logger.debug("UPDATE_PLAYER_TABLE");
+
+                boolean isIdFound = false;
+
+                /* Find player searching by Player Id */
                 for (Entity entityPlayer: entityPlayers)
                 {
                     PlayerComponent playerComponent = entityPlayer.getComponent(PlayerComponent.class);
-                    if(playerComponent.playerID != playerDataContainer.getPlayerID())
+                    if(playerComponent.playerID == playerDataContainer.getPlayerID())
                     {
-                        Entity entity = this.gameWorldCreator.createPlayer(false, playerDataContainer.getPosition());
-                        entity.getComponent(PlayerComponent.class).playerID = playerDataContainer.getPlayerID();
-                        System.out.println("Player " + playerComponent.playerID + " has been created ");
+                        isIdFound = true;
                         break;
                     }
+                }
+
+                if(!isIdFound)
+                {
+                    Entity entity = this.gameWorldCreator.createPlayer(false, playerDataContainer.getPosition());
+                    entity.getComponent(PlayerComponent.class).playerID = playerDataContainer.getPlayerID();
+
+                    logger.debug("Player with ID" + playerDataContainer.getPlayerID() + " has been created ");
+
+                    Message message = new Message(PLAYER_TABLE_UPDATED, true);
+                    message.addPlayerDataContainer(new PlayerDataContainer());
+                    this.clientHandler.addTransmitingMessage(message);
                 }
             break;
 
             case ClientHandler.PLAYER_DISCONNECTED:
-                System.out.println("DataReceivingSystem: PLAYER_DISCONNECTED");
 
-                Entity tempEntity = null;
+                logger.debug("PLAYER_DISCONNECTED");
+
                 for (Entity entityPlayer: entityPlayers)
                 {
                     PlayerComponent playerComponent = entityPlayer.getComponent(PlayerComponent.class);
@@ -215,13 +243,28 @@ public class DataReceivingSystem extends IteratingSystem {
                 }
                 else
                 {
-                    System.out.println("Error: tempEntity is empty");
+                    logger.error("tempEntity is empty");
+                }
+
+            break;
+
+            case ClientHandler.CREATE_ALL_ENEMIES:
+
+                logger.debug("CREATE_ALL_ENEMIES");
+                logger.debug("createAllEnemies started, Current time:" + TimeUtils.millis());
+                this.gameWorldCreator.createEnemies();
+                this.gameWorldCreator.createClouds();
+                logger.debug("createAllEnemies finished, Current time:" + TimeUtils.millis());
+
+                for (Entity entityPlayer: entityPlayers)
+                {
+                    entityPlayer.add(new Controllable());
                 }
 
             break;
 
             default:
-                System.out.println("Wrong action type" + actionType);
+                logger.error("processData no entity: Wrong action type" + actionType);
         }
     }
 

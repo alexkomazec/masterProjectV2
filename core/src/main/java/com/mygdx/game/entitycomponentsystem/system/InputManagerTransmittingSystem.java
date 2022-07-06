@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
@@ -22,6 +23,7 @@ import org.json.JSONArray;
  *  */
 public class InputManagerTransmittingSystem extends IteratingSystem {
 
+    protected static final Logger logger = new Logger(InputManagerTransmittingSystem.class.getSimpleName(), Logger.DEBUG);
     private ClientHandler clientHandler;
     private Vector2 lastStoredPosition;
     boolean isMagicFired = false;
@@ -38,9 +40,24 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
         ControlledInputComponent cntrlInComp    = entity.getComponent(ControlledInputComponent.class);
         TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        boolean posTheSame = false;
 
-        if(!lastStoredPosition.equals(transformComponent.position))
+        /* Hint: Cast to int because there is no reason to bother others with the different
+        *        in fifth decimal of the float number. Comparing floats causes a big stream of
+        *        emitting data.
+        * */
+        int x = (int)lastStoredPosition.x;
+        int y = (int)lastStoredPosition.y;
+        int x1 = (int)transformComponent.position.x;
+        int y1 = (int)transformComponent.position.y;
+
+        if(x == x1 && y == y1)
         {
+            posTheSame = true;
+        }
+        if(!posTheSame)
+        {
+            logger.debug("updatePlayerInputPosition: Player with ID " + playerComponent.playerID + " changed position");
             this.clientHandler.getSocket().emit("updatePlayerInputPosition",
                     transformComponent.position.x,
                     transformComponent.position.y,
@@ -50,6 +67,7 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
 
         if(currentDirection!= playerComponent.direction)
         {
+            logger.debug("playerChangedDirReq: Player with ID " + playerComponent.playerID + " changed direction");
             this.clientHandler.getSocket().emit("playerChangedDirReq", playerComponent.playerID);
             currentDirection = playerComponent.direction;
         }
@@ -69,6 +87,7 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
                     jAInputCommandList.put(false);
                 }
                 jAInputCommandList.put(cntrlInComp.abInputCommandList[GameConfig.SPACE]);
+                logger.debug("magicFired: Player with ID " + playerComponent.playerID + " fire Magic");
                 this.clientHandler.getSocket().emit("magicFired",
                         playerComponent.playerID,
                         jAInputCommandList

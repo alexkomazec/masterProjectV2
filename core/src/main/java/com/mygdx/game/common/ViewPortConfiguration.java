@@ -44,18 +44,18 @@ public class ViewPortConfiguration {
             //Letterbox left and right
             viewportWidth = viewportHeight * (physicalWidth/physicalHeight);
             viewportHeight = virtualHeight;
-            Gdx.app.debug(CLASS_NAME, "WorldRenderer: Physical Measure ratio is bigger than aspect ratio" );
+            //Gdx.app.debug(CLASS_NAME, "WorldRenderer: Physical Measure ratio is bigger than aspect ratio" );
         }else{
             //letterbox above and below
             viewportWidth = virtualWidth;
             viewportHeight = viewportWidth * (physicalHeight/physicalWidth);
-            Gdx.app.debug(CLASS_NAME, "WorldRenderer: Physical Measure ratio is smaller than aspect ratio" );
+            //Gdx.app.debug(CLASS_NAME, "WorldRenderer: Physical Measure ratio is smaller than aspect ratio" );
         }
 
         //Display information
-        Gdx.app.debug(CLASS_NAME, " Virtual measure: (" + virtualWidth + "," + virtualHeight + ")" );
-        Gdx.app.debug(CLASS_NAME, " Viewport measure: (" + viewportWidth + "," + viewportHeight + ")" );
-        Gdx.app.debug(CLASS_NAME, " Physical measure: (" + physicalWidth + "," + physicalHeight + ")" );
+        //Gdx.app.debug(CLASS_NAME, " Virtual measure: (" + virtualWidth + "," + virtualHeight + ")" );
+        //Gdx.app.debug(CLASS_NAME, " Viewport measure: (" + viewportWidth + "," + viewportHeight + ")" );
+        //Gdx.app.debug(CLASS_NAME, " Physical measure: (" + physicalWidth + "," + physicalHeight + ")" );
     }
 
     public static void setupPhysicalSize(){

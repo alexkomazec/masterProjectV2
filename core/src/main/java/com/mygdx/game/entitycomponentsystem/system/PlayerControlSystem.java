@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.config.GameConfig;
@@ -21,6 +22,7 @@ import com.mygdx.game.gameworld.GameWorldCreator;
 
 public class PlayerControlSystem extends IteratingSystem{
 
+	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.DEBUG);
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
@@ -70,7 +72,7 @@ public class PlayerControlSystem extends IteratingSystem{
 			if(stateComponent.get() != StateComponent.STATE_FALLING)
 			{
 				stateComponent.set(StateComponent.STATE_FALLING);
-				System.out.println("setting to Falling");
+				logger.debug("setting to Falling");
 			}
 		}
 
@@ -79,12 +81,12 @@ public class PlayerControlSystem extends IteratingSystem{
 				if(stateComponent.get() != StateComponent.STATE_NORMAL)
 				{
 					stateComponent.set(StateComponent.STATE_NORMAL);
-					System.out.println("setting to normal");
+					logger.debug("setting to Normal");
 				}
 			}
 			if (b2dbodyComponent.body.getLinearVelocity().x != 0 && stateComponent.get() != StateComponent.STATE_MOVING) {
 				stateComponent.set(StateComponent.STATE_MOVING);
-				System.out.println("setting to moving");
+				logger.debug("setting to Moving");
 			}
 		}
 
@@ -115,7 +117,7 @@ public class PlayerControlSystem extends IteratingSystem{
 				(stateComponent.get() == StateComponent.STATE_NORMAL || stateComponent.get() == StateComponent.STATE_MOVING)) {
 			b2dbodyComponent.body.applyLinearImpulse(0, 10f * b2dbodyComponent.body.getMass(), b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
 			stateComponent.set(StateComponent.STATE_JUMPING);
-			System.out.println("setting to jumping");
+			logger.debug("setting to Jumping");
 			playerComponent.onPlatform = false;
 		}
 
@@ -148,14 +150,12 @@ public class PlayerControlSystem extends IteratingSystem{
 											BulletComponent.Owner.PLAYER, this.pooledEngine,
 											world);
 			playerComponent.alreadyFired = true;
-			System.out.println("alreadyFired = true");
 		}
 
 		/* Space has been unpressed, and magic has been already fired, need reset*/
 		if(!isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && playerComponent.alreadyFired)
 		{
 			playerComponent.alreadyFired = false;
-			System.out.println("alreadyFired = false");
 		}
 
 	}
