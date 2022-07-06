@@ -23,7 +23,7 @@ import org.json.JSONArray;
  *  */
 public class InputManagerTransmittingSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(InputManagerTransmittingSystem.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(InputManagerTransmittingSystem.class.getSimpleName(), Logger.INFO);
     private ClientHandler clientHandler;
     private Vector2 lastStoredPosition;
     boolean isMagicFired = false;

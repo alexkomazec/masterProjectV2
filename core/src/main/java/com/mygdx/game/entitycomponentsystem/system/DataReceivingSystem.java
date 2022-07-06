@@ -27,7 +27,7 @@ import com.mygdx.game.gameworld.GameWorldCreator;
 
 public class DataReceivingSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.INFO);
     private ClientHandler clientHandler;
     private GameWorldCreator gameWorldCreator;
     private Message message;
@@ -125,7 +125,6 @@ public class DataReceivingSystem extends IteratingSystem {
 
             /* CLARIFICATION: REMOTE_PLAYER_MOVED is deprecated so far, UPDATE_PLAYER_POS is used instead*/
             /*case ClientHandler.REMOTE_PLAYER_MOVED:
-                System.out.println("DataReceivingSystem: REMOTE_PLAYER_MOVED");
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
                     controlledInputComponent.abInputCommandList = playerDataContainer.getAbInputCommandList();

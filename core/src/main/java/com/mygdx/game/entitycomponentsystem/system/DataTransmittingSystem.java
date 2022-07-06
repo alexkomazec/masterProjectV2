@@ -15,7 +15,7 @@ import io.socket.client.Socket;
 
 public class DataTransmittingSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(DataTransmittingSystem.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(DataTransmittingSystem.class.getSimpleName(), Logger.INFO);
     private ClientHandler clientHandler;
     private Message message;
 

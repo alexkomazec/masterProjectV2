@@ -1,11 +1,13 @@
 package com.mygdx.game.common;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 
 public class ViewPortConfiguration {
 
-    private static final String CLASS_NAME = Viewport.class.getSimpleName();
+    protected static final Logger logger = new Logger(ViewPortConfiguration.class.getSimpleName(), Logger.INFO);
 
     //Viewport measures => Visible area
     public static  float viewportWidth;
@@ -44,18 +46,18 @@ public class ViewPortConfiguration {
             //Letterbox left and right
             viewportWidth = viewportHeight * (physicalWidth/physicalHeight);
             viewportHeight = virtualHeight;
-            //Gdx.app.debug(CLASS_NAME, "WorldRenderer: Physical Measure ratio is bigger than aspect ratio" );
+            logger.debug("Physical Measure ratio is bigger than aspect ratio");
         }else{
             //letterbox above and below
             viewportWidth = virtualWidth;
             viewportHeight = viewportWidth * (physicalHeight/physicalWidth);
-            //Gdx.app.debug(CLASS_NAME, "WorldRenderer: Physical Measure ratio is smaller than aspect ratio" );
+            logger.debug("WorldRenderer: Physical Measure ratio is smaller than aspect ratio");
         }
 
         //Display information
-        //Gdx.app.debug(CLASS_NAME, " Virtual measure: (" + virtualWidth + "," + virtualHeight + ")" );
-        //Gdx.app.debug(CLASS_NAME, " Viewport measure: (" + viewportWidth + "," + viewportHeight + ")" );
-        //Gdx.app.debug(CLASS_NAME, " Physical measure: (" + physicalWidth + "," + physicalHeight + ")" );
+        logger.debug(" Virtual measure: (" + virtualWidth + "," + virtualHeight + ")" );
+        logger.debug(" Viewport measure: (" + viewportWidth + "," + viewportHeight + ")" );
+        logger.debug(" Physical measure: (" + physicalWidth + "," + physicalHeight + ")" );
     }
 
     public static void setupPhysicalSize(){

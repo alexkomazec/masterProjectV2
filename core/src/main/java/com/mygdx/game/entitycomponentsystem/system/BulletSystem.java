@@ -5,6 +5,7 @@ import static com.mygdx.game.entitycomponentsystem.components.BulletComponent.MA
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
@@ -12,6 +13,8 @@ import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.gameworld.GameWorld;
 
 public class BulletSystem extends IteratingSystem{
+
+	protected static final Logger logger = new Logger(BulletSystem.class.getSimpleName(), Logger.INFO);
 	private GameWorld gameWorld;
 	
 	@SuppressWarnings("unchecked")
@@ -40,7 +43,7 @@ public class BulletSystem extends IteratingSystem{
 		
 		//check if bullet is dead
 		if(bullet.isDead){
-			System.out.println("Bullet died");
+			logger.debug("Bullet died");
 			b2body.isDead = true;
 		}
 	}

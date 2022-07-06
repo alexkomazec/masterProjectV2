@@ -5,12 +5,12 @@ import com.badlogic.gdx.assets.AssetDescriptor;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 
 public class AssetManagmentHandler {
 
     /*Class Members*/
-    private static final String CLASS_NAME = AssetManagmentHandler.class.getSimpleName();
-    private static final Logger log = new Logger(CLASS_NAME, Logger.DEBUG);
+    protected static final Logger logger = new Logger(AssetManagmentHandler.class.getSimpleName(), Logger.INFO);
     private InternalFileHandleResolver filePathResolver =  new InternalFileHandleResolver();
     private AssetManager assetManager;
 
@@ -41,11 +41,11 @@ public class AssetManagmentHandler {
             if( filePathResolver.resolve(assetDescriptor.fileName).exists() )
             {
                 assetManager.load(assetDescriptor);
-                Gdx.app.debug(CLASS_NAME, "Loaded: " + assetDescriptor.fileName);
+                logger.debug("Loaded" + assetDescriptor.fileName);
             }
             else
             {
-                Gdx.app.debug(CLASS_NAME, "This asset has not been found: " + assetDescriptor.fileName);
+                logger.debug("This asset has not been found: " + assetDescriptor.fileName);
             }
         }
 
@@ -63,11 +63,11 @@ public class AssetManagmentHandler {
             if (assetManager.isLoaded(assetDescriptor.fileName))
             {
                 assetManager.unload(assetDescriptor.fileName);
-                Gdx.app.debug(CLASS_NAME, "This resourse has been unloaded " + assetDescriptor.fileName);
+                logger.debug("This resourse has been unloaded " + assetDescriptor.fileName);
             }
             else
             {
-                Gdx.app.debug(CLASS_NAME, "This resourse has not been loaded " + assetDescriptor.fileName);
+                logger.debug("This resourse has not been loaded " + assetDescriptor.fileName);
             }
         }
     }
@@ -85,7 +85,7 @@ public class AssetManagmentHandler {
             }
             else
             {
-                Gdx.app.debug(CLASS_NAME, "This asset has not been loaded: " + assetDescriptor.fileName);
+                logger.debug("This asset has not been loaded: " + assetDescriptor.fileName);
             }
         }
         return null;

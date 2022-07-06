@@ -12,6 +12,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
@@ -28,11 +29,13 @@ import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
+import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 
 
 public class GameWorldCreator {
 
+    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.INFO);
     private BodyCreator bodyCreator;
     private static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
@@ -341,7 +344,7 @@ public class GameWorldCreator {
         entity.add(type);
 
         pooledEngine.addEntity(entity);
-        System.out.println("Bullet Created");
+        logger.debug("Bullet Created");
 
         return entity;
     }

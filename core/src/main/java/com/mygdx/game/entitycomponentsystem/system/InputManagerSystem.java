@@ -4,6 +4,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.KeyboardController;
 import com.mygdx.game.common.InputAdapterWrapper;
 import com.mygdx.game.entitycomponentsystem.components.Controllable;
@@ -18,6 +19,8 @@ import java.util.HashMap;
  * of the current player
  *  */
 public class InputManagerSystem extends IteratingSystem {
+
+    protected static final Logger logger = new Logger(InputManagerSystem.class.getSimpleName(), Logger.INFO);
 
     /*There will be stored all needed input processors like keyboard, controller...*/
     private final HashMap<InputAdapterWrapper, Integer> hmpInputprocessor;
@@ -103,7 +106,7 @@ public class InputManagerSystem extends IteratingSystem {
 
         if(!isPlayerAssigend)
         {
-            System.out.println("Error: Player is not assigned");
+            logger.error("Player is not assigned");
         }
     }
 }

@@ -28,7 +28,7 @@ import io.socket.emitter.Emitter;
 
 public class ClientHandler {
 
-    protected static final Logger logger = new Logger(ClientHandler.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(ClientHandler.class.getSimpleName(), Logger.INFO);
     public static ClientHandler instance;
 
     public static ClientHandler getInstance(PooledEngine pooledEngine) {
@@ -294,7 +294,6 @@ public class ClientHandler {
     /* CLARIFICATION: REMOTE_PLAYER_MOVED is deprecated so far, UPDATE_PLAYER_POS is used instead*/
     /*private void playerMoved(Object... args) throws JSONException {
 
-        System.out.println("playerMoved");
         JSONArray jsonArray = (JSONArray) args[0];
         int playerId = (int)jsonArray.get(0);
         JSONArray inputCommandList = (JSONArray) jsonArray.get(1);

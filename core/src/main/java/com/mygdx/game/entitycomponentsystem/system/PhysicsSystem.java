@@ -7,6 +7,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
@@ -14,6 +15,7 @@ import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
 public class PhysicsSystem extends IteratingSystem {
 
+    protected static final Logger logger = new Logger(PhysicsSystem.class.getSimpleName(), Logger.INFO);
     private static final float MAX_STEP_TIME = 1/60f;
     private static float accumulator = 0f;
 
@@ -48,7 +50,7 @@ public class PhysicsSystem extends IteratingSystem {
                 tfm.position.y = position.y * GameConfig.MULTIPLY_BY_PPM;
                 //TODO check this works
                 if(bodyComp.isDead){
-                	System.out.println("Removing a body and entity");
+                    logger.debug("Removing a body and entity");
                 	world.destroyBody(bodyComp.body);
                 	getEngine().removeEntity(entity);
                 }

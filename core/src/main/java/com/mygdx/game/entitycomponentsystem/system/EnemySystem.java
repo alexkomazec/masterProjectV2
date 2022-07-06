@@ -8,6 +8,7 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
@@ -21,6 +22,7 @@ import com.mygdx.game.utils.GdxUtils;
 
 public class EnemySystem extends IteratingSystem{
 
+	protected static final Logger logger = new Logger(EnemySystem.class.getSimpleName(), Logger.INFO);
 	private ComponentMapper<EnemyComponent> em;
 	private ComponentMapper<B2dBodyComponent> bodm;
 	private GameWorldCreator gameWorldCreator;
@@ -63,7 +65,7 @@ public class EnemySystem extends IteratingSystem{
 				}
 				else
 				{
-					System.out.println("Impossible combination");
+					logger.error("Impossible combination");
 				}
 			}
 			
@@ -76,7 +78,6 @@ public class EnemySystem extends IteratingSystem{
 			B2dBodyComponent b2Enemy = Mapper.b2dCom.get(entity);
 			
 			float distance = b2Player.body.getPosition().dst(b2Enemy.body.getPosition());
-			//System.out.println(distance);
 			SteeringComponent scom = Mapper.sCom.get(entity);
 			if(distance < 3 && scom.currentMode != SteeringComponent.SteeringState.FLEE){
 				scom.steeringBehavior = SteeringPresets.getFlee(Mapper.sCom.get(entity),Mapper.sCom.get(this.gameWorld.getPlayer(0)));

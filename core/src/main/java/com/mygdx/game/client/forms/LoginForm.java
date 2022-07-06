@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.utils.Logger;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -16,6 +17,7 @@ import com.kotcrab.vis.ui.widget.VisValidatableTextField;
 import com.kotcrab.vis.ui.widget.VisWindow;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.client.ConnectScreen;
+import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -26,6 +28,7 @@ import io.socket.emitter.Emitter;
 
 public class LoginForm extends VisWindow
 {
+	protected static final Logger logger = new Logger(LoginForm.class.getSimpleName(), Logger.INFO);
 	private MyGdxGame game;
 	private Stage stage;
 	private ConnectScreen connectScreen;
@@ -133,7 +136,7 @@ public class LoginForm extends VisWindow
 				}
 				else
 				{
-					System.out.println("xhr poll error, EVENT CONNECT ERROR");
+					logger.info("xhr poll error, EVENT CONNECT ERROR");
 				}
 			}
 		});

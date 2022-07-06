@@ -22,7 +22,7 @@ import com.mygdx.game.gameworld.GameWorldCreator;
 
 public class PlayerControlSystem extends IteratingSystem{
 
-	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.DEBUG);
+	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.INFO);
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
