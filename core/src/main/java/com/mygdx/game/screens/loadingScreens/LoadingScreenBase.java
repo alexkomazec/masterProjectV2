@@ -19,7 +19,7 @@ public class LoadingScreenBase extends ScreenAdapter {
 
 
     // == constants ==
-    protected static final Logger log = new Logger(LoadingIntroScreen.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(LoadingIntroScreen.class.getSimpleName(), Logger.INFO);
 
     protected static final float PROGRESS_BAR_WIDTH = ViewPortConfiguration.getPhysicalWidth() / 2f; // world units
     protected static final float PROGRESS_BAR_HEIGHT = 60; // world units

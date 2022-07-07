@@ -19,8 +19,8 @@ import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
+import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
-import com.mygdx.game.entitycomponentsystem.components.ControlledInputRemoteComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -29,7 +29,7 @@ import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
-import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
+import com.mygdx.game.entitycomponentsystem.system.HealthManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 
 
@@ -43,6 +43,7 @@ public class GameWorldCreator {
 
     GameWorld gameWorld;
     PooledEngine pooledEngine;
+    HealthManagerSystem healthManagerSystem;
     OrthographicCamera orthographicCamera;
 
 
@@ -105,6 +106,7 @@ public class GameWorldCreator {
         //scom.setIndependentFacing(true); // stop clouds rotating
         steeringComponent.currentMode = SteeringComponent.SteeringState.WANDER;
 
+        this.healthManagerSystem.initializeHealth(entity);
         entity.add(b2dBodyComponent);
         entity.add(transformComponent);
         entity.add(collisionComponent);
@@ -229,6 +231,8 @@ public class GameWorldCreator {
         //entity.add(controlledInputRemoteComponent);
         entity.add(collisionComponent);
         entity.add(cntrlInComp);
+        //entity.add(new ControllableComponent());
+        this.healthManagerSystem.initializeHealth(entity);
 
         InputManagerSystem inputManagerSystem = this.pooledEngine.getSystem(InputManagerSystem.class);
         if(isLocalPlayer)
@@ -304,7 +308,7 @@ public class GameWorldCreator {
         entity.add(transformComponent);
         entity.add(enemyComponent);
         entity.add(typeComponent);
-
+        this.healthManagerSystem.initializeHealth(entity);
         this.pooledEngine.addEntity(entity);
 
 
@@ -373,12 +377,18 @@ public class GameWorldCreator {
                 GameConfig.DEFAULT_PLAYER_HEIGHT);
     }
 
+    private void setHealthManagerSystem(HealthManagerSystem healthManagerSystem)
+    {
+        this.healthManagerSystem = healthManagerSystem;
+    }
+
     public void setGameWorld(GameWorld gameWorld) {
         this.gameWorld = gameWorld;
     }
 
     public void setPooledEngine(PooledEngine pooledEngine) {
         this.pooledEngine = pooledEngine;
+        setHealthManagerSystem(this.pooledEngine.getSystem(HealthManagerSystem.class));
     }
 
     public void setOrthographicCamera(OrthographicCamera orthographicCamera) {
@@ -396,4 +406,5 @@ public class GameWorldCreator {
     public GameWorld getGameWorld() {
         return gameWorld;
     }
+
 }

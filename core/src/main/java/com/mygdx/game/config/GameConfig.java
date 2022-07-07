@@ -169,5 +169,11 @@ public class GameConfig {
     public static final boolean LOCAL_CONNECTION = false;
     public static final boolean ONLINE_CONNECTION = true;
 
+    /* Max Init Health*/
+    public static final int MAX_PLAYER_LIVES = 3;
+    public static final int MAX_BASIC_ENEMY_LIVES = 2;
+    public static final int MAX_CLOUD = 4;
+    public static final int ERROR = -1;
+
     private GameConfig(){}
 }

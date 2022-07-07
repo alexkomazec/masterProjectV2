@@ -25,7 +25,7 @@ import com.mygdx.game.utils.ScreenOrientation;
 
 public class MyGdxGame extends Game {
 
-	private static final Logger log = new Logger(MyGdxGame.class.getName(), Logger.DEBUG);
+	private static final Logger logger = new Logger(MyGdxGame.class.getName(), Logger.INFO);
 
 	public final static int MENU_SCREEN 			= 0;
 	public final static int GAME_SCREEN 			= 1;
@@ -89,7 +89,6 @@ public class MyGdxGame extends Game {
 		this.pooledEngine = new PooledEngine();
 		this.gameWorldCreator = GameWorldCreator.getInstance();
 		this.gameWorldCreator.setGameWorld(this.gameWorld);
-		this.gameWorldCreator.setPooledEngine(this.pooledEngine);
 
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);
 	}

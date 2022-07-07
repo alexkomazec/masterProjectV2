@@ -40,9 +40,9 @@ public class ClientHandler {
 
     private Socket socket;
     private IO.Options options;
-    public static String url = "http://138.68.160.152:8080";
+    //public static String url = "http://138.68.160.152:8080";
     //public static String url = "http://localhost:8080";
-    //public static String url = "http://192.168.0.12:8080";
+    public static String url = "http://192.168.0.12:8080";
 
     private Array<Message> receivedMessageArray;
     private Array<Message> transmitingMessageArray;

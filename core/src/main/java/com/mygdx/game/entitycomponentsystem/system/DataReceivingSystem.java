@@ -1,6 +1,5 @@
 package com.mygdx.game.entitycomponentsystem.system;
 
-import static com.mygdx.game.client.ClientHandler.CREATE_ALL_ENEMIES;
 import static com.mygdx.game.client.ClientHandler.PLAYER_TABLE_UPDATED;
 
 import com.badlogic.ashley.core.Entity;
@@ -8,7 +7,6 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
-import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.client.ClientHandler;
@@ -17,8 +15,7 @@ import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
-import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
-import com.mygdx.game.entitycomponentsystem.components.Controllable;
+import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -257,7 +254,7 @@ public class DataReceivingSystem extends IteratingSystem {
 
                 for (Entity entityPlayer: entityPlayers)
                 {
-                    entityPlayer.add(new Controllable());
+                    entityPlayer.add(new ControllableComponent());
                 }
 
             break;

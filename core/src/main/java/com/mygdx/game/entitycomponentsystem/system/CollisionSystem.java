@@ -42,14 +42,13 @@ public class CollisionSystem extends IteratingSystem {
 		
 		// Do Player Collisions
 		if(thisType.type == TypeComponent.PLAYER){
-			PlayerComponent pl = pm.get(entity);
 			if(collidedEntity != null){
 				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
 				if(type != null){
 					switch(type.type){
 					case TypeComponent.ENEMY:
 						logger.debug("player hit enemy");
-						pl.isDead = true;
+						cc.isHit = true;
 						break;
 					case TypeComponent.SCENERY:
 						pm.get(entity).onPlatform = true;
@@ -64,10 +63,9 @@ public class CollisionSystem extends IteratingSystem {
 						logger.debug("player hit other");
 						break; 
 					case TypeComponent.BULLET:
-						// TODO add mask so player can't hit themselves
 						BulletComponent bullet = Mapper.bulletCom.get(collidedEntity);
 						if(bullet.owner != BulletComponent.Owner.PLAYER){ // can't shoot own team
-							pl.isDead = true;
+							cc.isHit = true;
 						}
 						logger.debug("Player just shot. bullet in player atm");
 						break;
@@ -83,9 +81,11 @@ public class CollisionSystem extends IteratingSystem {
 		{  	// Do enemy collisions
 			if(collidedEntity != null){
 				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+				CollisionComponent ccColided = collidedEntity.getComponent(CollisionComponent.class);
 				if(type != null){
 					switch(type.type){
 					case TypeComponent.PLAYER:
+						ccColided.isHit = true;
 						logger.debug("enemy hit player");
 						break;
 					case TypeComponent.ENEMY:
@@ -101,11 +101,10 @@ public class CollisionSystem extends IteratingSystem {
 						logger.debug("enemy hit other");
 						break; 
 					case TypeComponent.BULLET:
-						EnemyComponent enemy = Mapper.enemyCom.get(entity);
 						BulletComponent bullet = Mapper.bulletCom.get(collidedEntity);
 						if(bullet.owner != BulletComponent.Owner.ENEMY){ // can't shoot own team
 							bullet.isDead = true;
-							enemy.isDead = true;
+							cc.isHit = true;
 							logger.debug("enemy got shot");
 						}
 						break;
@@ -122,19 +121,19 @@ public class CollisionSystem extends IteratingSystem {
 		{
 			if(collidedEntity != null) {
 				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+				CollisionComponent ccColided = collidedEntity.getComponent(CollisionComponent.class);
+
 				if(type != null)
 				{
 					BulletComponent bullet =  Mapper.bulletCom.get(entity);
-
 					switch(type.type)
 					{
 						case TypeComponent.PLAYER:
 							logger.debug("bullet hit player");
-							PlayerComponent pl = pm.get(collidedEntity);
 							if(bullet.owner != BulletComponent.Owner.PLAYER) { // It is not a friendly bullet
 								bullet.isDead = true;
-								pl.isDead = true;
-								logger.debug("player got shot");
+								ccColided.isHit = true;
+								logger.debug("player hit by the enemy's hit");
 							}
 							break;
 						case TypeComponent.ENEMY:
@@ -144,7 +143,7 @@ public class CollisionSystem extends IteratingSystem {
 								bullet.isDead = true;
 
 								if(enemy != null){
-									enemy.isDead = true;
+									ccColided.isHit = true;
 								}
 								else
 								{
@@ -180,9 +179,7 @@ public class CollisionSystem extends IteratingSystem {
 				{
 					logger.error("Bullet: collidedEntity.type == null");
 				}
-
 			}
-
 		}
 		else{
 			cc.collisionEntity = null;

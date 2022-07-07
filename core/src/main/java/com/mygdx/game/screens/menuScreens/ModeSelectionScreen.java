@@ -19,7 +19,7 @@ import com.mygdx.game.config.GameConfig;
 public class ModeSelectionScreen extends  MenuScreenBase {
 
     private static final String CLASS_NAME  = ModeSelectionScreen.class.getSimpleName();
-    private static final Logger log         = new Logger(CLASS_NAME, Logger.DEBUG);
+    private static final Logger logger         = new Logger(CLASS_NAME, Logger.INFO);
 
     public ModeSelectionScreen(MyGdxGame game) {
         super(game);

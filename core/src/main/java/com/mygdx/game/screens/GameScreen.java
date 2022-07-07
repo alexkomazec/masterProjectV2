@@ -17,6 +17,7 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
+import com.mygdx.game.entitycomponentsystem.system.HealthManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerAndroidSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.PhysicsDebugSystem;
@@ -31,7 +32,7 @@ import com.mygdx.game.utils.ScreenOrientation;
 public class GameScreen implements Screen {
 
     private static final String CLASS_NAME  = MenuScreen.class.getSimpleName();
-    private static final Logger log         = new Logger(CLASS_NAME, Logger.DEBUG);
+    private static final Logger logger         = new Logger(CLASS_NAME, Logger.INFO);
 
     private final MyGdxGame game;
     private final OrthographicCamera camera;
@@ -53,6 +54,8 @@ public class GameScreen implements Screen {
         viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
         hudViewport = new StretchViewport(700,700);
 
+        this.game.getPooledEngine().addSystem(new HealthManagerSystem());
+        this.game.getWorldCreator().setPooledEngine(this.game.getPooledEngine());
         this.game.getPooledEngine().addSystem(
                 new PlayerControlSystem(
                         game.getWorldCreator(),

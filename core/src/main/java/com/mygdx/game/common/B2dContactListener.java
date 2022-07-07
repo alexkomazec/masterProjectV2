@@ -6,10 +6,14 @@ import com.badlogic.gdx.physics.box2d.ContactImpulse;
 import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
+import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 
 
 public class B2dContactListener implements ContactListener {
+
+	protected static final Logger logger = new Logger(B2dContactListener.class.getSimpleName(), Logger.INFO);
 
 	@Override
 	public void beginContact(Contact contact) {
@@ -18,9 +22,11 @@ public class B2dContactListener implements ContactListener {
 		
 		if(fa.getBody().getUserData() instanceof Entity){
 			Entity ent = (Entity) fa.getBody().getUserData();
+			logger.debug("fa.getBody() = entity");
 			entityCollision(ent,fb);
 		}else if(fb.getBody().getUserData() instanceof Entity){
 			Entity ent = (Entity) fb.getBody().getUserData();
+			logger.debug("fb.getBody() = entity");
 			entityCollision(ent,fa);
 		}
 	}

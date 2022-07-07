@@ -48,7 +48,7 @@ public class PhysicsSystem extends IteratingSystem {
                 Vector2 position = bodyComp.body.getPosition();
                 tfm.position.x = position.x * GameConfig.MULTIPLY_BY_PPM;
                 tfm.position.y = position.y * GameConfig.MULTIPLY_BY_PPM;
-                //TODO check this works
+
                 if(bodyComp.isDead){
                     logger.debug("Removing a body and entity");
                 	world.destroyBody(bodyComp.body);
