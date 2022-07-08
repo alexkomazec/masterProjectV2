@@ -13,6 +13,7 @@ public class TypeComponent implements Component, Poolable {
 	public static final int OTHER = 4;
 	public static final int SPRING = 5;
 	public static final int BULLET = 6;
+	public static final int BASIC_COLLECTIBLE = 7;
 	
 	public int type = OTHER;
 

@@ -14,15 +14,17 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
+import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
+import com.mygdx.game.utils.GdxUtils;
 
 
 public class PlayerControlSystem extends IteratingSystem{
 
-	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.INFO);
+	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.DEBUG);
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
@@ -31,8 +33,7 @@ public class PlayerControlSystem extends IteratingSystem{
 	GameWorldCreator gameWorldCreator;
 	PooledEngine pooledEngine;
 	World world;
-	
-	
+
 	@SuppressWarnings("unchecked")
 	public PlayerControlSystem(GameWorldCreator gameWorldCreator,
 							   PooledEngine pooledEngine,
@@ -55,6 +56,8 @@ public class PlayerControlSystem extends IteratingSystem{
 		PlayerComponent playerComponent = pm.get(entity);
 		ControlledInputComponent cntrlComponent = cp.get(entity);
 		LocalInputComponent localInputComponent = null;
+		CoolDownComponent coolDownComponent = entity.getComponent(CoolDownComponent.class);
+		coolDownComponent.elapsedTimeInSeconds += deltaTime;
 		boolean isMoving = false;
 
 		localInputComponent = entity.getComponent(LocalInputComponent.class);
@@ -90,14 +93,14 @@ public class PlayerControlSystem extends IteratingSystem{
 			}
 		}
 
-		if (isInputCommandTrue(GameConfig.LEFT, cntrlComponent))
+		if (GdxUtils.isInputCommandTrue(GameConfig.LEFT, cntrlComponent))
 		{
  			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			playerComponent.direction = Direction.LEFT;
 			isMoving = true;
 		}
 
-		if (isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
+		if (GdxUtils.isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			playerComponent.direction = Direction.RIGHT;
@@ -108,12 +111,12 @@ public class PlayerControlSystem extends IteratingSystem{
 		Clarification: If left, and right are not in state "pressed" linear velocity to x axis
 		should be 0. Wanted to avoid "sliding on ice" effect
 		*/
-		if (!isInputCommandTrue(GameConfig.LEFT, cntrlComponent) && !isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
+		if (!GdxUtils.isInputCommandTrue(GameConfig.LEFT, cntrlComponent) && !GdxUtils.isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 0, 0.1f), b2dbodyComponent.body.getLinearVelocity().y);
 		}
 
-		if (isInputCommandTrue(GameConfig.UP, cntrlComponent) &&
+		if (GdxUtils.isInputCommandTrue(GameConfig.UP, cntrlComponent) &&
 				(stateComponent.get() == StateComponent.STATE_NORMAL || stateComponent.get() == StateComponent.STATE_MOVING)) {
 			b2dbodyComponent.body.applyLinearImpulse(0, 10f * b2dbodyComponent.body.getMass(), b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
 			stateComponent.set(StateComponent.STATE_JUMPING);
@@ -121,47 +124,39 @@ public class PlayerControlSystem extends IteratingSystem{
 			playerComponent.onPlatform = false;
 		}
 
-		if (isInputCommandTrue(GameConfig.DOWN, cntrlComponent))
-		{
-			b2dbodyComponent.body.applyLinearImpulse(0, -5f, b2dbodyComponent.body.getWorldCenter().x, b2dbodyComponent.body.getWorldCenter().y, true);
-		}
-
-		if (isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && (!playerComponent.alreadyFired))
+		boolean condition = GdxUtils.isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && !playerComponent.alreadyFired;
+		if (condition)
 		{
 			float startBulletPositionX;
 			float startBulletPositionY;
 			float xVel;
 
-			if(playerComponent.direction == Direction.LEFT)
-			{
-				startBulletPositionX = (b2dbodyComponent.body.getPosition().x* GameConfig.MULTIPLY_BY_PPM) - 16f*3;
-				xVel = -7;
-			}
-			else
-			{
-				startBulletPositionX = (b2dbodyComponent.body.getPosition().x* GameConfig.MULTIPLY_BY_PPM) + 16f;
-				xVel = 7;
-			}
+			if(coolDownComponent.elapsedTimeInSeconds >= coolDownComponent.COOLDOWN) {
+				coolDownComponent.elapsedTimeInSeconds = 0;
 
-			startBulletPositionY = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+				if (playerComponent.direction == Direction.LEFT) {
+					startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) - 16f * 3;
+					xVel = -7;
+				} else {
+					startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) + 16f;
+					xVel = 7;
+				}
 
-			this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
-											xVel,0,
-											BulletComponent.Owner.PLAYER, this.pooledEngine,
-											world);
-			playerComponent.alreadyFired = true;
+				startBulletPositionY = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+
+				this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
+						xVel, 0,
+						BulletComponent.Owner.PLAYER, this.pooledEngine,
+						world);
+				playerComponent.alreadyFired = true;
+				playerComponent.fired = true;
+			}
 		}
 
 		/* Space has been unpressed, and magic has been already fired, need reset*/
-		if(!isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && playerComponent.alreadyFired)
+		if(!GdxUtils.isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && playerComponent.alreadyFired)
 		{
 			playerComponent.alreadyFired = false;
 		}
-
-	}
-
-	private boolean isInputCommandTrue(int inputCommandID, ControlledInputComponent cntrlInCom)
-	{
-		return cntrlInCom.abInputCommandList[inputCommandID];
 	}
 }

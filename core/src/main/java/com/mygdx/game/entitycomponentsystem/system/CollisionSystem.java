@@ -8,6 +8,8 @@ import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
+import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicArrayComponent;
+import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
@@ -68,6 +70,29 @@ public class CollisionSystem extends IteratingSystem {
 							cc.isHit = true;
 						}
 						logger.debug("Player just shot. bullet in player atm");
+						break;
+
+					case TypeComponent.BASIC_COLLECTIBLE:
+						CollectibleBasicArrayComponent cbac = entity.getComponent(CollectibleBasicArrayComponent.class);
+						CollectibleBasicComponent cbc = collidedEntity.getComponent(CollectibleBasicComponent.class);
+						B2dBodyComponent b2bcColided = collidedEntity.getComponent(B2dBodyComponent.class);
+						if(cbac == null)
+						{
+							/* This is player's first time to collect some basic collectibles
+							*  Prepare array that will store the existence of basic collectibles
+							*/
+							cbac = new CollectibleBasicArrayComponent();
+							entity.add(cbac);
+						}
+
+						/* Store Basic Collectible to a player's array */
+						int collectibleBasicType = cbc.type;
+						cbac.collectibleBasicArray[collectibleBasicType] = true;
+
+						/* Delete already picked up basic collectible*/
+						b2bcColided.isDead = true;
+						cbc.isDead = true;
+
 						break;
 					default:
 						logger.error("No matching type found");

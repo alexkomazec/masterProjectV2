@@ -175,5 +175,12 @@ public class GameConfig {
     public static final int MAX_CLOUD = 4;
     public static final int ERROR = -1;
 
+    /* Collectibles basic */
+    public static final int DEFAULT_TYPE = -1;
+    public static final int DOUBLE_JUMP = 0;
+    public static final int DOUBLE_SHOOT = 1;
+    public static final int STOMP = 2;
+    public static final int COLLECTABLE_BASIC_MAX = 3;
+
     private GameConfig(){}
 }

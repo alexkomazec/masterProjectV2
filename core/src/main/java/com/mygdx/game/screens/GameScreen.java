@@ -15,6 +15,7 @@ import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
+import com.mygdx.game.entitycomponentsystem.system.CollectibleBasicManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 import com.mygdx.game.entitycomponentsystem.system.EnemySystem;
 import com.mygdx.game.entitycomponentsystem.system.HealthManagerSystem;
@@ -61,6 +62,11 @@ public class GameScreen implements Screen {
                         game.getWorldCreator(),
                         game.getPooledEngine(),
                         game.getGameWorld().getWorldSingleton().getWorld())
+        );
+        this.game.getPooledEngine().addSystem(
+                new CollectibleBasicManagerSystem(game.getWorldCreator(),
+                                                  game.getGameWorld().getWorldSingleton().getWorld(),
+                                                  game.getPooledEngine())
         );
         this.game.getPooledEngine().addSystem(
                 new EnemySystem(game.getWorldCreator(), game.getGameWorld(), game.getPooledEngine())
@@ -112,6 +118,8 @@ public class GameScreen implements Screen {
         this.game.getWorldCreator().createPlatforms();
         this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
         this.game.getWorldCreator().createPlayer(true,null);
+        this.game.getWorldCreator().createBasicCollectibles();
+
         //this.game.getWorldCreator().createEnemies();
         //this.game.getWorldCreator().createClouds();
     }

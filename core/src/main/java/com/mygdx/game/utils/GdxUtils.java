@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.math.Vector3;
+import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 
 public class GdxUtils {
 
@@ -40,22 +41,8 @@ public class GdxUtils {
         return aim;
     }
 
-    /** Takes Vector 3 as argument here for mouse location(unproject etc)
-     * @param shooter Vector 2 for shooter position
-     * @param target Vector 3 for target location
-     * @return
-     */
-    public static Vector2 aimTo(Vector2 shooter, Vector3 target){
-        return aimTo(shooter, new Vector2(target.x,target.y));
-    }
-
-    public static Boolean[] convPrimArr2ObjArr(boolean[] ab)
+    public static boolean isInputCommandTrue(int inputCommandID, ControlledInputComponent cntrlInCom)
     {
-        Boolean[] aB = new Boolean[ab.length];
-
-        for (int index = 0; index < ab.length; index++) {
-            aB[index] = ab[index];
-        }
-        return aB;
+        return cntrlInCom.abInputCommandList[inputCommandID];
     }
 }

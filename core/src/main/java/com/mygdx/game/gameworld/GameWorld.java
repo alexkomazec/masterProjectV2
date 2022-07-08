@@ -9,7 +9,6 @@ public class GameWorld {
 
     /* box2d world represents all bodies in the game world as 2d body with regular physics*/
     private final WorldSingleton box2dWorldSingleton;
-    private Entity player;
     private Array<Entity> aplayers;
 
     /* tiledMap is a game world composed of layers, and each layer is composed of tiled objects*/
@@ -19,6 +18,8 @@ public class GameWorld {
 
     public static final String TM_LAYER_BASIC_ENEMIES = "BasicEnemies";
     public static final String TM_LAYER_CLOUD_ENEMIES = "CloudEnemies";
+
+    public static final String TM_LAYER_BASIC_COLLECTIBLES = "CollectiblesBasic";
 
     public GameWorld(TiledMap tiledMap)
     {

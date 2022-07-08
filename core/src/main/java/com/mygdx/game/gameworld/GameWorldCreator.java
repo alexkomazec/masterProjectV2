@@ -18,9 +18,11 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
+import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
+import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -231,7 +233,8 @@ public class GameWorldCreator {
         //entity.add(controlledInputRemoteComponent);
         entity.add(collisionComponent);
         entity.add(cntrlInComp);
-        //entity.add(new ControllableComponent());
+        entity.add(new ControllableComponent());
+        entity.add(new CoolDownComponent());
         this.healthManagerSystem.initializeHealth(entity);
 
         InputManagerSystem inputManagerSystem = this.pooledEngine.getSystem(InputManagerSystem.class);
@@ -258,7 +261,6 @@ public class GameWorldCreator {
     public void createEnemies()
     {
         TiledMap map = this.gameWorld.getTiledMap();
-        map.getLayers().get(GameWorld.TM_LAYER_PLATFORM).getObjects();
         //Create Enemies
         for(EllipseMapObject object : map.getLayers().
                 get(GameWorld.TM_LAYER_BASIC_ENEMIES).
@@ -267,7 +269,6 @@ public class GameWorldCreator {
         {
             createEnemy(object);
         }
-
     }
 
     private Entity createEnemy(MapObject object){
@@ -314,6 +315,65 @@ public class GameWorldCreator {
 
         return entity;
     }
+
+    public void createBasicCollectibles()
+    {
+        TiledMap map = this.gameWorld.getTiledMap();
+        //Create basic collectibles
+        for(TextureMapObject object : map.getLayers().
+                get(GameWorld.TM_LAYER_BASIC_COLLECTIBLES).
+                getObjects().
+                getByType(TextureMapObject.class))
+        {
+            createBasicCollectible(object);
+        }
+    }
+
+    private Entity createBasicCollectible(TextureMapObject object){
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        CollisionComponent colComp = this.pooledEngine.createComponent(CollisionComponent.class);
+        CollectibleBasicComponent collectibleBasicComponent = this.pooledEngine.createComponent(CollectibleBasicComponent.class);
+        Rectangle rectangle = getRectangle(object);
+        int collectibleBasicType;
+
+        b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.StaticBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true);
+
+        b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.body.setSleepingAllowed(false);
+        bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body);
+        entity.add(b2dBodyComponent);
+
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
+        entity.add(transformComponent);
+
+        collectibleBasicType = (int)object.getProperties().get("CollectibleType");
+        if(collectibleBasicType < GameConfig.DOUBLE_JUMP || collectibleBasicType > GameConfig.STOMP)
+        {
+            logger.error("Error: Wrong Collectible basic type!");
+        }
+        collectibleBasicComponent.type = collectibleBasicType;
+        collectibleBasicComponent.textureMapObject = object;
+        entity.add(collectibleBasicComponent);
+
+        typeComponent.type = TypeComponent.BASIC_COLLECTIBLE;
+        entity.add(typeComponent);
+
+        entity.add(colComp);
+        entity.add(b2dBodyComponent);
+        entity.add(transformComponent);
+        entity.add(typeComponent);
+        this.pooledEngine.addEntity(entity);
+
+        return entity;
+    }
+
     public Entity createBullet(float x, float y,
                                float xVel, float yVel,
                                BulletComponent.Owner own, PooledEngine pooledEngine, World world)
@@ -329,8 +389,10 @@ public class GameWorldCreator {
         bul.owner = own;
 
         Rectangle rectangle = new Rectangle(x,y, 32,32);
-        b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle, BodyCreator.STONE,
-                BodyDef.BodyType.DynamicBody,world, true);
+        b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.DynamicBody,world,
+                true);
         b2dbody.body.setBullet(true); // increase physics computation to limit body travelling through other objects
         bodyCreator.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
         position.position.set(x,y);

@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="23" nextobjectid="779">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="100" height="100" tilewidth="32" tileheight="32" infinite="0" nextlayerid="23" nextobjectid="780">
  <tileset firstgid="1" name="Ground" tilewidth="32" tileheight="32" tilecount="1" columns="0">
   <grid orientation="orthogonal" width="1" height="1"/>
   <tile id="0">
@@ -105,10 +105,22 @@
    <ellipse/>
   </object>
  </objectgroup>
- <objectgroup id="19" name="Collectible">
-  <object id="657" gid="2" x="96" y="2912" width="32" height="32"/>
-  <object id="658" gid="2" x="320" y="3168" width="32" height="32"/>
-  <object id="659" gid="2" x="256" y="2688" width="32" height="32"/>
+ <objectgroup id="19" name="CollectiblesBasic">
+  <object id="657" name="DOUBLE_SHOOT" gid="2" x="352" y="3168" width="32" height="32">
+   <properties>
+    <property name="CollectibleType" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="658" name="DOUBLE_JUMP" gid="2" x="320" y="3168" width="32" height="32" rotation="-2">
+   <properties>
+    <property name="CollectibleType" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="659" name="STOMP" gid="2" x="416" y="3168" width="32" height="32">
+   <properties>
+    <property name="CollectibleType" type="int" value="2"/>
+   </properties>
+  </object>
  </objectgroup>
  <objectgroup id="22" name="CloudEnemies"/>
  <objectgroup id="20" name="BasicEnemies">

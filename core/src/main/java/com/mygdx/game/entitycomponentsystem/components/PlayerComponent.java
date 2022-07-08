@@ -15,6 +15,10 @@ public class PlayerComponent implements Component, Poolable{
 	public Direction direction = Direction.LEFT;
 	public boolean alreadyFired;
 
+	/* !Warning! WorkAround that is a bridge between PlayerControlSystem, and CollectibleBasicManagerSystem*/
+	public boolean fired = false;
+	public boolean justJumped = false;
+
 	@Override
 	public void reset() {
 		cam = null;
