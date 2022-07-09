@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.Game;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
@@ -17,7 +18,7 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 
 public class HealthManagerSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(HealthManagerSystem.class.getSimpleName(), Logger.INFO);
+    protected static final Logger logger = new Logger(HealthManagerSystem.class.getSimpleName(), Logger.DEBUG);
     HealthComponent healthComponent;
     CollisionComponent collisionComponent;
     B2dBodyComponent b2dBodyComponent;
@@ -33,9 +34,9 @@ public class HealthManagerSystem extends IteratingSystem {
         this.collisionComponent = entity.getComponent(CollisionComponent.class);
         this.b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
 
-        if(this.collisionComponent.isHit)
+        if(this.collisionComponent.healthAction[GameConfig.DECREASE_HP])
         {
-            this.collisionComponent.isHit = false;
+            this.collisionComponent.healthAction[GameConfig.DECREASE_HP] = false;
             int remainNoOfLives;
             remainNoOfLives = removeLife();
 
@@ -45,6 +46,12 @@ public class HealthManagerSystem extends IteratingSystem {
                 isEntityRemoved(this.healthComponent);
                 this.b2dBodyComponent.isDead = true;
             }
+        }
+
+        if(this.collisionComponent.healthAction[GameConfig.INCREASE_HP])
+        {
+            collisionComponent.healthAction[GameConfig.INCREASE_HP] = false;
+            addLife();
         }
     }
 
@@ -91,6 +98,12 @@ public class HealthManagerSystem extends IteratingSystem {
     {
         logger.debug("Remove life");
         return --this.healthComponent.hpPoints;
+    }
+
+    private void addLife()
+    {
+        logger.debug("Add life");
+        this.healthComponent.hpPoints++;
     }
 
     private boolean isGameObjectDead(int remainNoOfLives)

@@ -174,6 +174,10 @@ public class GameConfig {
     public static final int MAX_BASIC_ENEMY_LIVES = 2;
     public static final int MAX_CLOUD = 4;
     public static final int ERROR = -1;
+    public static final int MAX_SIZE = 2;
+    public static final int INCREASE_HP = 0;
+    public static final int DECREASE_HP = 1;
+
 
     /* Collectibles basic */
     public static final int DEFAULT_TYPE = -1;

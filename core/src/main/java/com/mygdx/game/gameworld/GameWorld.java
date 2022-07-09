@@ -20,6 +20,7 @@ public class GameWorld {
     public static final String TM_LAYER_CLOUD_ENEMIES = "CloudEnemies";
 
     public static final String TM_LAYER_BASIC_COLLECTIBLES = "CollectiblesBasic";
+    public static final String TM_LAYER_POTIONS = "Potions";
 
     public GameWorld(TiledMap tiledMap)
     {

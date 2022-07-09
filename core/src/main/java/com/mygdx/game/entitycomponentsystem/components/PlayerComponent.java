@@ -17,7 +17,6 @@ public class PlayerComponent implements Component, Poolable{
 
 	/* !Warning! WorkAround that is a bridge between PlayerControlSystem, and CollectibleBasicManagerSystem*/
 	public boolean fired = false;
-	public boolean justJumped = false;
 
 	@Override
 	public void reset() {

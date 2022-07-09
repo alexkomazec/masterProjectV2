@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
@@ -14,6 +15,7 @@ import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
+import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
 
@@ -41,16 +43,17 @@ public class CollisionSystem extends IteratingSystem {
 		Entity collidedEntity = cc.collisionEntity;
 		
 		TypeComponent thisType = entity.getComponent(TypeComponent.class);
-		
+
 		// Do Player Collisions
 		if(thisType.type == TypeComponent.PLAYER){
 			if(collidedEntity != null){
 				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+				B2dBodyComponent b2bcColided = collidedEntity.getComponent(B2dBodyComponent.class);
 				if(type != null){
 					switch(type.type){
 					case TypeComponent.ENEMY:
 						logger.debug("player hit enemy");
-						cc.isHit = true;
+						cc.healthAction[GameConfig.DECREASE_HP] = true;
 						break;
 					case TypeComponent.SCENERY:
 						pm.get(entity).onPlatform = true;
@@ -67,7 +70,7 @@ public class CollisionSystem extends IteratingSystem {
 					case TypeComponent.BULLET:
 						BulletComponent bullet = Mapper.bulletCom.get(collidedEntity);
 						if(bullet.owner != BulletComponent.Owner.PLAYER){ // can't shoot own team
-							cc.isHit = true;
+							cc.healthAction[GameConfig.DECREASE_HP] = true;
 						}
 						logger.debug("Player just shot. bullet in player atm");
 						break;
@@ -75,7 +78,6 @@ public class CollisionSystem extends IteratingSystem {
 					case TypeComponent.BASIC_COLLECTIBLE:
 						CollectibleBasicArrayComponent cbac = entity.getComponent(CollectibleBasicArrayComponent.class);
 						CollectibleBasicComponent cbc = collidedEntity.getComponent(CollectibleBasicComponent.class);
-						B2dBodyComponent b2bcColided = collidedEntity.getComponent(B2dBodyComponent.class);
 						if(cbac == null)
 						{
 							/* This is player's first time to collect some basic collectibles
@@ -94,6 +96,14 @@ public class CollisionSystem extends IteratingSystem {
 						cbc.isDead = true;
 
 						break;
+					case TypeComponent.POTIONS:
+						PotionComponent potionComponent = collidedEntity.getComponent(PotionComponent.class);
+						CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
+
+						potionComponent.isDead = true;
+						b2bcColided.isDead = true;
+						collisionComponent.healthAction[GameConfig.INCREASE_HP] = true;
+						break;
 					default:
 						logger.error("No matching type found");
 					}
@@ -110,7 +120,7 @@ public class CollisionSystem extends IteratingSystem {
 				if(type != null){
 					switch(type.type){
 					case TypeComponent.PLAYER:
-						ccColided.isHit = true;
+						ccColided.healthAction[GameConfig.DECREASE_HP] = true;
 						logger.debug("enemy hit player");
 						break;
 					case TypeComponent.ENEMY:
@@ -129,7 +139,7 @@ public class CollisionSystem extends IteratingSystem {
 						BulletComponent bullet = Mapper.bulletCom.get(collidedEntity);
 						if(bullet.owner != BulletComponent.Owner.ENEMY){ // can't shoot own team
 							bullet.isDead = true;
-							cc.isHit = true;
+							cc.healthAction[GameConfig.DECREASE_HP] = true;
 							logger.debug("enemy got shot");
 						}
 						break;
@@ -157,7 +167,7 @@ public class CollisionSystem extends IteratingSystem {
 							logger.debug("bullet hit player");
 							if(bullet.owner != BulletComponent.Owner.PLAYER) { // It is not a friendly bullet
 								bullet.isDead = true;
-								ccColided.isHit = true;
+								ccColided.healthAction[GameConfig.DECREASE_HP] = true;
 								logger.debug("player hit by the enemy's hit");
 							}
 							break;
@@ -168,7 +178,7 @@ public class CollisionSystem extends IteratingSystem {
 								bullet.isDead = true;
 
 								if(enemy != null){
-									ccColided.isHit = true;
+									ccColided.healthAction[GameConfig.DECREASE_HP] = true;
 								}
 								else
 								{

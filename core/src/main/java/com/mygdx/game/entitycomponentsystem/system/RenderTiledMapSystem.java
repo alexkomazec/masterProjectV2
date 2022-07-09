@@ -8,6 +8,7 @@ import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicComponent;
+import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.TiledMapComponent;
 import com.mygdx.game.gameworld.OrthogonalTiledMapRendererWithSprites;
 
@@ -22,7 +23,7 @@ public class RenderTiledMapSystem extends IteratingSystem {
                                 OrthographicCamera camera,
                                 TiledMap tiledMap)
     {
-        super(Family.one(BrickComponent.class, CollectibleBasicComponent.class).get());
+        super(Family.one(BrickComponent.class, CollectibleBasicComponent.class, PotionComponent.class).get());
         this.renderer = renderer;
         this.camera = camera;
         this.tiledMap = tiledMap;
@@ -57,6 +58,10 @@ public class RenderTiledMapSystem extends IteratingSystem {
             return tiledMapComponent;
 
         tiledMapComponent = entity.getComponent(CollectibleBasicComponent.class);
+        if(tiledMapComponent!= null)
+            return tiledMapComponent;
+
+        tiledMapComponent = entity.getComponent(PotionComponent.class);
         if(tiledMapComponent!= null)
             return tiledMapComponent;
 

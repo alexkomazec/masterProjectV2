@@ -26,6 +26,7 @@ import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
+import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.RemoteInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
@@ -363,6 +364,57 @@ public class GameWorldCreator {
         entity.add(collectibleBasicComponent);
 
         typeComponent.type = TypeComponent.BASIC_COLLECTIBLE;
+        entity.add(typeComponent);
+
+        entity.add(colComp);
+        entity.add(b2dBodyComponent);
+        entity.add(transformComponent);
+        entity.add(typeComponent);
+        this.pooledEngine.addEntity(entity);
+
+        return entity;
+    }
+
+    public void createPotions()
+    {
+        TiledMap map = this.gameWorld.getTiledMap();
+        //Create basic collectibles
+        for(TextureMapObject object : map.getLayers().
+                get(GameWorld.TM_LAYER_POTIONS).
+                getObjects().
+                getByType(TextureMapObject.class))
+        {
+            createPotion(object);
+        }
+    }
+
+    private Entity createPotion(TextureMapObject object){
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        CollisionComponent colComp = this.pooledEngine.createComponent(CollisionComponent.class);
+        PotionComponent potionComponent = this.pooledEngine.createComponent(PotionComponent.class);
+        Rectangle rectangle = getRectangle(object);
+
+        b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.StaticBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true);
+
+        b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.body.setSleepingAllowed(false);
+        bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body);
+        entity.add(b2dBodyComponent);
+
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
+        entity.add(transformComponent);
+
+        potionComponent.textureMapObject = object;
+        entity.add(potionComponent);
+
+        typeComponent.type = TypeComponent.POTIONS;
         entity.add(typeComponent);
 
         entity.add(colComp);
