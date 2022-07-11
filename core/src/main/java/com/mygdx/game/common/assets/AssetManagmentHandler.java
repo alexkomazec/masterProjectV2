@@ -45,7 +45,7 @@ public class AssetManagmentHandler {
             }
             else
             {
-                logger.debug("This asset has not been found: " + assetDescriptor.fileName);
+                logger.error("This asset has not been found: " + assetDescriptor.fileName);
             }
         }
 

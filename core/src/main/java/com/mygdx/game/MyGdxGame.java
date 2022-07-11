@@ -12,6 +12,7 @@ import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.ConnectScreen;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.gameworld.TileMapHandler;
@@ -88,6 +89,7 @@ public class MyGdxGame extends Game {
 
 		this.pooledEngine = new PooledEngine();
 		this.gameWorldCreator = GameWorldCreator.getInstance();
+		this.gameWorldCreator.setAssetManagementHandler(this.assetManagmentHandler);
 		this.gameWorldCreator.setGameWorld(this.gameWorld);
 
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);

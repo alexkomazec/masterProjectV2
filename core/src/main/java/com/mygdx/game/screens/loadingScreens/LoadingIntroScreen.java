@@ -19,7 +19,8 @@ public class LoadingIntroScreen extends LoadingScreenBase {
                 AssetDescriptors.CLICK_SOUND,
                 AssetDescriptors.FONT,
                 AssetDescriptors.BACK_GROUND,
-                AssetDescriptors.UI_SKIN
+                AssetDescriptors.UI_SKIN,
+                AssetDescriptors.PLAYER_ANIMATION
         );
     }
 

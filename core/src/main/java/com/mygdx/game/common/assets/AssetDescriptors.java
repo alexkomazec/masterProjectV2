@@ -14,9 +14,12 @@ public class AssetDescriptors {
     public static final AssetDescriptor<TextureAtlas> BACK_GROUND =
             new AssetDescriptor<TextureAtlas>(AssetPaths.BACK_GROUND, TextureAtlas.class);
 
+    public static final AssetDescriptor<TextureAtlas> PLAYER_ANIMATION =
+            new AssetDescriptor<TextureAtlas>(AssetPaths.PLAYER_ANIMATION, TextureAtlas.class);
+
     /**************************Skins**************************/
     public static final AssetDescriptor<Skin> UI_SKIN =
-            new AssetDescriptor<Skin>(AssetPaths.UI_SKIN, Skin.class);
+            new AssetDescriptor<>(AssetPaths.UI_SKIN, Skin.class);
 
     /**************************Fonts**************************/
     public static final AssetDescriptor<BitmapFont> FONT =

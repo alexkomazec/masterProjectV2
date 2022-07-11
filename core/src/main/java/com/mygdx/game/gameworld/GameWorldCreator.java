@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.graphics.g2d.Animation;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
@@ -14,7 +16,10 @@ import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
+import com.mygdx.game.common.assets.AssetDescriptors;
+import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.components.AnimationComponent;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
@@ -30,6 +35,7 @@ import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.RemoteInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
+import com.mygdx.game.entitycomponentsystem.components.TextureComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
 import com.mygdx.game.entitycomponentsystem.system.HealthManagerSystem;
@@ -43,11 +49,13 @@ public class GameWorldCreator {
     private static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
     public boolean connectionType;
+    private TextureAtlas playerAtlas;
 
     GameWorld gameWorld;
     PooledEngine pooledEngine;
     HealthManagerSystem healthManagerSystem;
     OrthographicCamera orthographicCamera;
+    AssetManagmentHandler assetManagmentHandler;
 
 
     public static GameWorldCreator getInstance() {
@@ -61,6 +69,18 @@ public class GameWorldCreator {
     public GameWorldCreator()
     {
         this.bodyCreator = BodyCreator.getInstance();
+    }
+
+    public void setAssetManagementHandler(AssetManagmentHandler assetManagmentHandler) {
+        this.assetManagmentHandler = assetManagmentHandler;
+    }
+
+    public void getRequiredResources()
+    {
+        if(this.assetManagmentHandler != null)
+        {
+            this.playerAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.PLAYER_ANIMATION);
+        }
     }
 
     public void createClouds()
@@ -195,6 +215,8 @@ public class GameWorldCreator {
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
         StateComponent stateComponent = this.pooledEngine.createComponent(StateComponent.class);
         SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
+        AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
+        TextureComponent texture = this.pooledEngine.createComponent(TextureComponent.class);
         Component inputTypeForPlayerComponent;
         Rectangle rectangle;
         //ControlledInputRemoteComponent controlledInputRemoteComponent = this.pooledEngine.createComponent(ControlledInputRemoteComponent.class);
@@ -221,6 +243,19 @@ public class GameWorldCreator {
                                         * GameConfig.MULTIPLY_BY_PPM);
 
         entity.add(transformComponent);
+
+        Animation anim = new Animation(0.1f,playerAtlas.findRegions("flame_a"));
+        anim.setPlayMode(Animation.PlayMode.LOOP);
+        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
+        animationComponent.animations.put(StateComponent.STATE_MOVING, anim);
+        animationComponent.animations.put(StateComponent.STATE_JUMPING, anim);
+        animationComponent.animations.put(StateComponent.STATE_FALLING, anim);
+        animationComponent.animations.put(StateComponent.STATE_HIT, anim);
+        entity.add(animationComponent);
+
+        texture.region = playerAtlas.findRegion("flame_a");
+        texture.offsetY = 0.5f;
+        entity.add(texture);
 
         typeComponent.type = TypeComponent.PLAYER;
         entity.add(typeComponent);

@@ -23,6 +23,7 @@ public class ModeSelectionScreen extends  MenuScreenBase {
 
     public ModeSelectionScreen(MyGdxGame game) {
         super(game);
+        this.game.getWorldCreator().getRequiredResources();
         System.gc();
     }
 

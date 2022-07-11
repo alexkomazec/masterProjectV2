@@ -1,10 +1,10 @@
 {
-  "com.badlogic.gdx.graphics.g2d.BitmapFont": {
+  "BitmapFont": {
     "default-font": {
       "file": "fonts/ui_font_32.fnt"
     }
   },
-  "com.badlogic.gdx.graphics.Color": {
+  "Color": {
     "white": {
       "a": 1,
       "b": 1,
@@ -24,7 +24,7 @@
       "r": 0.5
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.TextButton$TextButtonStyle": {
+  "TextButtonStyle": {
     "default": {
       "down": "yellow_button01",
       "up": "yellow_button00",
@@ -39,13 +39,13 @@
       "fontColor": "black",
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.Label$LabelStyle": {
+  "LabelStyle": {
     "default": {
       "font": "default-font",
       "fontColor": "black"
     }
   },
-  "com.badlogic.gdx.scenes.scene2d.ui.CheckBox$CheckBoxStyle": {
+  "CheckBoxStyle": {
     "default": {
       "down": "yellow_button00",
       "up": "yellow_button00",

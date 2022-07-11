@@ -7,13 +7,13 @@ import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.utils.Logger;
-import com.badlogic.gdx.utils.viewport.FillViewport;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.system.AnimationSystem;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollectibleBasicManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
@@ -24,8 +24,9 @@ import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.PhysicsDebugSystem;
 import com.mygdx.game.entitycomponentsystem.system.PhysicsSystem;
 import com.mygdx.game.entitycomponentsystem.system.PlayerControlSystem;
-import com.mygdx.game.entitycomponentsystem.system.RenderAndroidSystem;
+import com.mygdx.game.entitycomponentsystem.system.RenderAndroidControllerSystem;
 import com.mygdx.game.entitycomponentsystem.system.RenderTiledMapSystem;
+import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
 import com.mygdx.game.entitycomponentsystem.system.SteeringSystem;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
 import com.mygdx.game.utils.ScreenOrientation;
@@ -49,12 +50,14 @@ public class GameScreen implements Screen {
         {
             this.game.getScreenOrientation().setScreenToLandscape();
         }
-
-        this.camera = new OrthographicCamera();
+        RenderingSystem renderingSystem = new RenderingSystem(this.game.getBatch());
+        this.camera = renderingSystem.getCamera();
         this.game.getGameWorldCreator().setOrthographicCamera(this.camera);
+
+        setRenderSystems(renderingSystem);
+        this.game.getPooledEngine().addSystem(new AnimationSystem());
         viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
         hudViewport = new StretchViewport(700,700);
-
         this.game.getPooledEngine().addSystem(new HealthManagerSystem());
         this.game.getWorldCreator().setPooledEngine(this.game.getPooledEngine());
         this.game.getPooledEngine().addSystem(
@@ -72,16 +75,9 @@ public class GameScreen implements Screen {
                 new EnemySystem(game.getWorldCreator(), game.getGameWorld(), game.getPooledEngine())
         );
         this.game.getPooledEngine().addSystem(
-                new RenderTiledMapSystem(game.getTileMapHandler().getOrthogonalTiledMapRenderer(),
-                        this.camera,
-                        this.game.getGameWorld().getTiledMap()));
-        this.game.getPooledEngine().addSystem(
                 new PhysicsSystem(game.getGameWorld().getWorldSingleton().getWorld()));
         this.game.getPooledEngine().addSystem(
                 new CollisionSystem());
-        this.game.getPooledEngine().addSystem(
-                new PhysicsDebugSystem(game.getGameWorld().getWorldSingleton().getWorld(),
-                        this.camera));
         this.game.getPooledEngine().addSystem(
                 new BulletSystem(game.getGameWorld()));
         this.game.getPooledEngine().addSystem(
@@ -92,8 +88,8 @@ public class GameScreen implements Screen {
             /* Running application is on android device*/
             InputManagerAndroidSystem inManAndroidSys =
                     new InputManagerAndroidSystem(this.game.getBatch(), hudViewport);
-            RenderAndroidSystem renderASys =
-                    new RenderAndroidSystem(inManAndroidSys.getAndroidController());
+            RenderAndroidControllerSystem renderASys =
+                    new RenderAndroidControllerSystem(inManAndroidSys.getAndroidController());
 
             this.game.getPooledEngine().addSystem(inManAndroidSys);
             this.game.getPooledEngine().addSystem(renderASys);
@@ -160,5 +156,18 @@ public class GameScreen implements Screen {
     @Override
     public void dispose() {
 
+    }
+
+    /* Put all systems that are responsisble for rendering */
+    void setRenderSystems(RenderingSystem renderingSystem)
+    {
+        this.game.getPooledEngine().addSystem(renderingSystem);
+        this.game.getPooledEngine().addSystem(
+                new RenderTiledMapSystem(game.getTileMapHandler().getOrthogonalTiledMapRenderer(),
+                        this.camera,
+                        this.game.getGameWorld().getTiledMap()));
+        this.game.getPooledEngine().addSystem(
+                new PhysicsDebugSystem(game.getGameWorld().getWorldSingleton().getWorld(),
+                        this.camera));
     }
 }
