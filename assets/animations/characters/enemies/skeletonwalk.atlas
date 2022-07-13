@@ -1,0 +1,27 @@
+
+skeletonwalk.png
+size: 32, 128
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+skeleWalk1
+  rotate: false
+  xy: 2, 2
+  size: 19, 31
+  orig: 19, 31
+  offset: 0, 0
+  index: -1
+skeleWalk2
+  rotate: false
+  xy: 2, 35
+  size: 19, 32
+  orig: 19, 32
+  offset: 0, 0
+  index: -1
+skeleWalk3
+  rotate: false
+  xy: 2, 69
+  size: 19, 32
+  orig: 19, 32
+  offset: 0, 0
+  index: -1

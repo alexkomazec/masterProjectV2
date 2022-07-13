@@ -17,6 +17,15 @@ public class AssetDescriptors {
     public static final AssetDescriptor<TextureAtlas> PLAYER_ANIMATION =
             new AssetDescriptor<TextureAtlas>(AssetPaths.PLAYER_ANIMATION, TextureAtlas.class);
 
+    public static final AssetDescriptor<TextureAtlas> FIRE_MAGIC_ANIMATION =
+            new AssetDescriptor<TextureAtlas>(AssetPaths.FIRE_MAGIC_ANIMATION, TextureAtlas.class);
+
+    public static final AssetDescriptor<TextureAtlas> FIRE_MAGIC_ANIMATION_LEFT =
+            new AssetDescriptor<TextureAtlas>(AssetPaths.FIRE_MAGIC_ANIMATION_LEFT, TextureAtlas.class);
+
+    public static final AssetDescriptor<TextureAtlas> ENEMY_ANIMATION =
+            new AssetDescriptor<TextureAtlas>(AssetPaths.ENEMY_ANIMATION, TextureAtlas.class);
+
     /**************************Skins**************************/
     public static final AssetDescriptor<Skin> UI_SKIN =
             new AssetDescriptor<>(AssetPaths.UI_SKIN, Skin.class);

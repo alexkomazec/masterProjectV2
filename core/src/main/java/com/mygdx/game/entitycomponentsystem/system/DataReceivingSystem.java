@@ -17,6 +17,7 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
@@ -85,6 +86,8 @@ public class DataReceivingSystem extends IteratingSystem {
     private void processData(PlayerDataContainer playerDataContainer, int actionType, Entity entity)
     {
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
+
         ControlledInputComponent controlledInputComponent = entity.getComponent(ControlledInputComponent.class);
 
         switch(actionType)
@@ -159,13 +162,13 @@ public class DataReceivingSystem extends IteratingSystem {
 
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
-                    if(playerComponent.direction == Direction.LEFT)
+                    if(directionComponent.direction == Direction.LEFT)
                     {
-                        playerComponent.direction = Direction.RIGHT;
+                        directionComponent.direction = Direction.RIGHT;
                     }
                     else
                     {
-                        playerComponent.direction = Direction.LEFT;
+                        directionComponent.direction = Direction.LEFT;
                     }
                 }
                 break;

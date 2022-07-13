@@ -10,9 +10,11 @@ import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
+import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
@@ -44,6 +46,7 @@ public class EnemySystem extends IteratingSystem{
 	protected void processEntity(Entity entity, float deltaTime) {
 		EnemyComponent enemyCom = em.get(entity);		// get EnemyComponent
 		B2dBodyComponent bodyCom = bodm.get(entity);	// get B2dBodyComponent
+		DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
 
 		Array<Fixture> fixtureArray = bodyCom.body.getFixtureList();
 
@@ -58,10 +61,12 @@ public class EnemySystem extends IteratingSystem{
 				if(enemyCom.velocity == EnemyComponent.LEFT_SPEED)
 				{
 					enemyCom.velocity = EnemyComponent.RIGHT_SPEED;
+					directionComponent.direction = Direction.RIGHT;
 				}
 				else if(enemyCom.velocity == EnemyComponent.RIGHT_SPEED)
 				{
 					enemyCom.velocity = EnemyComponent.LEFT_SPEED;
+					directionComponent.direction = Direction.LEFT;
 				}
 				else
 				{
@@ -102,6 +107,7 @@ public class EnemySystem extends IteratingSystem{
 							bodyCom.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM,
 							aim.x, 
 							aim.y,
+							directionComponent.direction,
 							BulletComponent.Owner.ENEMY,
 							this.pooledEngine,
 							this.gameWorld.getWorldSingleton().getWorld()

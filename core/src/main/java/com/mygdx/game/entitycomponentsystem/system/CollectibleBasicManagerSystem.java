@@ -16,6 +16,7 @@ import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicArrayComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.gameworld.BodyCreator;
@@ -46,6 +47,7 @@ public class CollectibleBasicManagerSystem extends IteratingSystem {
     private GameWorldCreator gameWorldCreator;
     private CollectibleBasicArrayComponent collectibleBasicComponent;
     private PlayerComponent playerComponent;
+    private DirectionComponent directionComponent;
     private ControlledInputComponent cntrlComponent;
     private B2dBodyComponent b2dbodyComponent;
     private StateComponent stateComponent;
@@ -64,6 +66,7 @@ public class CollectibleBasicManagerSystem extends IteratingSystem {
         cntrlComponent = entity.getComponent(ControlledInputComponent.class);
         b2dbodyComponent = entity.getComponent(B2dBodyComponent.class);
         stateComponent = entity.getComponent(StateComponent.class);
+        directionComponent = entity.getComponent(DirectionComponent.class);
 
         if(collectibleBasicComponent.collectibleBasicArray[GameConfig.DOUBLE_SHOOT])
         {
@@ -100,7 +103,7 @@ public class CollectibleBasicManagerSystem extends IteratingSystem {
         float startBulletPositionY;
         float xVel;
 
-        if (playerComponent.direction == Direction.LEFT) {
+        if (directionComponent.direction == Direction.LEFT) {
             startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) - 16f * 3;
             xVel = -7;
         } else {
@@ -112,6 +115,7 @@ public class CollectibleBasicManagerSystem extends IteratingSystem {
 
         this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
                 xVel, 0,
+                directionComponent.direction,
                 BulletComponent.Owner.PLAYER, this.pooledEngine,
                 world);
     }

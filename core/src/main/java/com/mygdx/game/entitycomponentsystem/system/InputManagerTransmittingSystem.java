@@ -11,6 +11,7 @@ import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputRemoteComponent;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
@@ -40,6 +41,8 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
         ControlledInputComponent cntrlInComp    = entity.getComponent(ControlledInputComponent.class);
         TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+        DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
+
         boolean posTheSame = false;
 
         /* Hint: Cast to int because there is no reason to bother others with the different
@@ -65,11 +68,11 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
             lastStoredPosition.set(transformComponent.position);
         }
 
-        if(currentDirection!= playerComponent.direction)
+        if(currentDirection!= directionComponent.direction)
         {
             logger.debug("playerChangedDirReq: Player with ID " + playerComponent.playerID + " changed direction");
             this.clientHandler.getSocket().emit("playerChangedDirReq", playerComponent.playerID);
-            currentDirection = playerComponent.direction;
+            currentDirection = directionComponent.direction;
         }
 
         if(cntrlInComp.newInputHappend)

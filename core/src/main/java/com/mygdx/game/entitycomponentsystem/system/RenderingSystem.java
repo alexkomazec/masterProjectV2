@@ -10,6 +10,8 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.common.Direction;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.TextureComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
@@ -88,22 +90,26 @@ public class RenderingSystem extends SortedIteratingSystem {
         if(shouldRender){
 	        batch.begin();
 	        for (Entity entity : renderQueue) {
-	            TextureComponent tex = textureM.get(entity);
-	            TransformComponent t = transformM.get(entity);
-	
-	            if (tex.region == null || t.isHidden) {
+	            TextureComponent textureComponent = textureM.get(entity);
+	            TransformComponent transformComponent = transformM.get(entity);
+	            DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
+
+	            if (textureComponent.region == null || transformComponent.isHidden) {
 	                continue;
 	            }
 
-	            float width = tex.region.getRegionWidth();
-	            float height = tex.region.getRegionHeight();
+	            float width = textureComponent.region.getRegionWidth();
+	            float height = textureComponent.region.getRegionHeight();
 	
 	            float originX = width/2f;
 	            float originY = height/2f;
-	
-	            batch.draw(tex.region,
-	                    t.position.x - originX + tex.offsetX, 
-	                    t.position.y - originY + tex.offsetY,
+
+	            if(directionComponent!= null)
+                    textureComponent = ifNeededLetsflipX(textureComponent,directionComponent);
+
+	            batch.draw(textureComponent.region,
+                        transformComponent.position.x - originX + textureComponent.offsetX,
+                        transformComponent.position.y - originY + textureComponent.offsetY,
 	                    width, height );
 	        }
 	        batch.end();
@@ -118,5 +124,25 @@ public class RenderingSystem extends SortedIteratingSystem {
 
     public OrthographicCamera getCamera() {
         return cam;
+    }
+
+    public TextureComponent ifNeededLetsflipX(TextureComponent textureComponent, DirectionComponent directionComponent)
+    {
+        if(directionComponent.direction == Direction.RIGHT)
+        {
+            if(textureComponent.region.isFlipX())
+            {
+                textureComponent.region.flip(true, false);
+            }
+        }
+        else
+        {
+            if(!textureComponent.region.isFlipX())
+            {
+                textureComponent.region.flip(true, false);
+            }
+        }
+
+        return textureComponent;
     }
 }

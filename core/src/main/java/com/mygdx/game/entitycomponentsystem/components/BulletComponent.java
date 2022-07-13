@@ -2,6 +2,7 @@ package com.mygdx.game.entitycomponentsystem.components;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.gdx.utils.Pool.Poolable;
+import com.mygdx.game.common.Direction;
 
 public class BulletComponent implements Component, Poolable{
 	public enum Owner { ENEMY,PLAYER,SCENERY,NONE }
@@ -14,6 +15,7 @@ public class BulletComponent implements Component, Poolable{
 	public float yVel = 0;
 	public boolean isDead = false;
 	public Owner owner = Owner.NONE;
+	public Direction direction = Direction.LEFT;
 	
 	@Override
 	public void reset() {

@@ -6,6 +6,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
@@ -14,8 +15,10 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
+import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
@@ -28,6 +31,7 @@ import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -44,12 +48,19 @@ import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 
 public class GameWorldCreator {
 
-    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.INFO);
+    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.DEBUG);
     private BodyCreator bodyCreator;
     private static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
     public boolean connectionType;
+
     private TextureAtlas playerAtlas;
+    private TextureAtlas magicSpellAtlas;
+    private TextureAtlas magicSpellLeftAtlas;
+
+    private Array<TextureRegion> magicLeftFrames;
+    private Array<TextureRegion> magicRightFrames;
+    private Array<TextureRegion> enemyAnimationFrames;
 
     GameWorld gameWorld;
     PooledEngine pooledEngine;
@@ -80,6 +91,28 @@ public class GameWorldCreator {
         if(this.assetManagmentHandler != null)
         {
             this.playerAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.PLAYER_ANIMATION);
+            this.magicSpellAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.FIRE_MAGIC_ANIMATION);
+            this.magicSpellLeftAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT);
+
+            this.magicLeftFrames = new Array<>();
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB001"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB002"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB003"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB004"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB005"));
+
+            this.magicRightFrames = new Array<>();
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB001"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB002"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB003"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB004"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB005"));
+
+            TextureAtlas enemyAnimationAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.ENEMY_ANIMATION);
+            this.enemyAnimationFrames = new Array<>();
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk1"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk2"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk3"));
         }
     }
 
@@ -210,6 +243,7 @@ public class GameWorldCreator {
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
         PlayerComponent playerComponent = this.pooledEngine.createComponent(PlayerComponent.class);
+        DirectionComponent directionComponent = this.pooledEngine.createComponent(DirectionComponent.class);
         ControlledInputComponent cntrlInComp = this.pooledEngine.createComponent(ControlledInputComponent.class);
         CollisionComponent collisionComponent = this.pooledEngine.createComponent(CollisionComponent.class);
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
@@ -256,6 +290,7 @@ public class GameWorldCreator {
         texture.region = playerAtlas.findRegion("flame_a");
         texture.offsetY = 0.5f;
         entity.add(texture);
+        entity.add(directionComponent);
 
         typeComponent.type = TypeComponent.PLAYER;
         entity.add(typeComponent);
@@ -315,12 +350,30 @@ public class GameWorldCreator {
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
         CollisionComponent colComp = this.pooledEngine.createComponent(CollisionComponent.class);
         Rectangle rectangle = getRectangle(object);
+        AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
+        TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
+        StateComponent stateCom = pooledEngine.createComponent(StateComponent.class);
+        DirectionComponent directionComponent = pooledEngine.createComponent(DirectionComponent.class);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
                 true);
+
+        stateCom.set(StateComponent.STATE_NORMAL);
+        entity.add(stateCom);
+
+        textureComponent.region = this.enemyAnimationFrames.get(0);
+        entity.add(textureComponent);
+
+        Array<TextureRegion> enemyFrames = this.enemyAnimationFrames;
+
+        Animation anim = new Animation(0.1f,enemyFrames);
+        anim.setPlayMode(Animation.PlayMode.LOOP);
+        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
+        entity.add(animationComponent);
+        entity.add(directionComponent);
 
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
@@ -463,6 +516,7 @@ public class GameWorldCreator {
 
     public Entity createBullet(float x, float y,
                                float xVel, float yVel,
+                               Direction direction,
                                BulletComponent.Owner own, PooledEngine pooledEngine, World world)
     {
         Entity entity = pooledEngine.createEntity();
@@ -472,7 +526,8 @@ public class GameWorldCreator {
         TypeComponent type = pooledEngine.createComponent(TypeComponent.class);
         CollisionComponent colComp = pooledEngine.createComponent(CollisionComponent.class);
         BulletComponent bul = pooledEngine.createComponent(BulletComponent.class);
-
+        AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
+        TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
         bul.owner = own;
 
         Rectangle rectangle = new Rectangle(x,y, 32,32);
@@ -484,6 +539,29 @@ public class GameWorldCreator {
         bodyCreator.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
         position.position.set(x,y);
 
+        textureComponent.region = this.magicRightFrames.get(0);
+        entity.add(textureComponent);
+
+        stateCom.set(StateComponent.STATE_NORMAL);
+        entity.add(stateCom);
+
+        Array<TextureRegion> magicFrames;
+
+        if(direction == Direction.RIGHT)
+        {
+            magicFrames = this.magicRightFrames;
+            textureComponent.offsetX = -15f;
+        }
+        else
+        {
+            magicFrames = this.magicLeftFrames;
+            textureComponent.offsetX = 15f;
+        }
+        Animation anim = new Animation(0.1f,magicFrames);
+        anim.setPlayMode(Animation.PlayMode.LOOP);
+        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
+        entity.add(animationComponent);
+
         type.type = TypeComponent.BULLET;
         b2dbody.body.setUserData(entity);
         bul.xVel = xVel * GameConfig.DIVIDE_BY_PPM;
@@ -493,7 +571,6 @@ public class GameWorldCreator {
         entity.add(colComp);
         entity.add(b2dbody);
         entity.add(position);
-        entity.add(stateCom);
         entity.add(type);
 
         pooledEngine.addEntity(entity);

@@ -16,7 +16,6 @@ public class EnemyComponent implements Component, Poolable{
 	public float timeSinceLastShot = 0f;
 	public Type enemyType = Type.BASIC_ENEMY;
 
-	public Direction direction = Direction.LEFT;
 	public float velocity = LEFT_SPEED;
 	public int noOfSteps = 0;
 
@@ -28,7 +27,6 @@ public class EnemyComponent implements Component, Poolable{
 		isDead = false;
 		xPosCenter = -1;
 
-		direction = Direction.LEFT;
 		velocity = LEFT_SPEED;
 		noOfSteps = 0;
 	}

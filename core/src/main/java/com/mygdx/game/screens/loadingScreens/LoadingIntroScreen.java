@@ -20,7 +20,10 @@ public class LoadingIntroScreen extends LoadingScreenBase {
                 AssetDescriptors.FONT,
                 AssetDescriptors.BACK_GROUND,
                 AssetDescriptors.UI_SKIN,
-                AssetDescriptors.PLAYER_ANIMATION
+                AssetDescriptors.PLAYER_ANIMATION,
+                AssetDescriptors.FIRE_MAGIC_ANIMATION,
+                AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT,
+                AssetDescriptors.ENEMY_ANIMATION
         );
     }
 

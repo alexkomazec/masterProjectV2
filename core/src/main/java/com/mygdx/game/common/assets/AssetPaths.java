@@ -7,6 +7,13 @@ public class AssetPaths {
 
     // == Characters ==
     public static final String PLAYER_ANIMATION = "animations/game.atlas";
+    public static final String ENEMY_ANIMATION = "animations/characters/enemies/skeletonwalk.atlas";
+
+    // == FireMagic ==
+    public static final String FIRE_MAGIC_ANIMATION = "animations/magicspells/fireball/right/fireball.atlas";
+
+    // == FireMagic ==
+    public static final String FIRE_MAGIC_ANIMATION_LEFT = "animations/magicspells/fireball/left/fireballLeft.atlas";
 
     // == gui menus ==
     public static final String UI_SKIN = "ui/uiSkinMenu.json";

@@ -11,6 +11,8 @@ public class TextureComponent implements Component, Poolable {
 
 	@Override
 	public void reset() {
+		offsetX = 0;
+		offsetY = 0;
 		region = null;
 	}
 }

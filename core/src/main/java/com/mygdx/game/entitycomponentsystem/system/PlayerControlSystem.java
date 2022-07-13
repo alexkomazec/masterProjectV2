@@ -15,6 +15,7 @@ import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
@@ -54,6 +55,7 @@ public class PlayerControlSystem extends IteratingSystem{
 		B2dBodyComponent b2dbodyComponent = bodm.get(entity);
 		StateComponent stateComponent = sm.get(entity);
 		PlayerComponent playerComponent = pm.get(entity);
+		DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
 		ControlledInputComponent cntrlComponent = cp.get(entity);
 		LocalInputComponent localInputComponent = null;
 		CoolDownComponent coolDownComponent = entity.getComponent(CoolDownComponent.class);
@@ -96,14 +98,14 @@ public class PlayerControlSystem extends IteratingSystem{
 		if (GdxUtils.isInputCommandTrue(GameConfig.LEFT, cntrlComponent))
 		{
  			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
-			playerComponent.direction = Direction.LEFT;
+			directionComponent.direction = Direction.LEFT;
 			isMoving = true;
 		}
 
 		if (GdxUtils.isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
-			playerComponent.direction = Direction.RIGHT;
+			directionComponent.direction = Direction.RIGHT;
 			isMoving = true;
 		}
 
@@ -134,7 +136,7 @@ public class PlayerControlSystem extends IteratingSystem{
 			if(coolDownComponent.elapsedTimeInSeconds >= coolDownComponent.COOLDOWN) {
 				coolDownComponent.elapsedTimeInSeconds = 0;
 
-				if (playerComponent.direction == Direction.LEFT) {
+				if (directionComponent.direction == Direction.LEFT) {
 					startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) - 16f * 3;
 					xVel = -7;
 				} else {
@@ -146,6 +148,7 @@ public class PlayerControlSystem extends IteratingSystem{
 
 				this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
 						xVel, 0,
+						directionComponent.direction,
 						BulletComponent.Owner.PLAYER, this.pooledEngine,
 						world);
 				playerComponent.alreadyFired = true;
