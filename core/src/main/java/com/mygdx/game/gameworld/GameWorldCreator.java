@@ -1,5 +1,7 @@
 package com.mygdx.game.gameworld;
 
+import static com.mygdx.game.config.GameConfig.MULTIPLY_BY_PPM;
+
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.PooledEngine;
@@ -15,6 +17,8 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.BodyDef;
 import com.badlogic.gdx.physics.box2d.World;
+import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
@@ -35,6 +39,7 @@ import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
+import com.mygdx.game.entitycomponentsystem.components.CharacterStatsComponent;
 import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.RemoteInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
@@ -61,12 +66,17 @@ public class GameWorldCreator {
     private Array<TextureRegion> magicLeftFrames;
     private Array<TextureRegion> magicRightFrames;
     private Array<TextureRegion> enemyAnimationFrames;
+    private Array<TextureRegion> heroAnimaitonFrames;
+    private TextureAtlas uiCharacterStatsAtlas;
+    private Skin uiSkin;
 
     GameWorld gameWorld;
     PooledEngine pooledEngine;
     HealthManagerSystem healthManagerSystem;
     OrthographicCamera orthographicCamera;
     AssetManagmentHandler assetManagmentHandler;
+
+    Stage characterHUD;
 
 
     public static GameWorldCreator getInstance() {
@@ -90,9 +100,9 @@ public class GameWorldCreator {
     {
         if(this.assetManagmentHandler != null)
         {
-            this.playerAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.PLAYER_ANIMATION);
-            this.magicSpellAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.FIRE_MAGIC_ANIMATION);
-            this.magicSpellLeftAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT);
+            this.playerAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.PLAYER_ANIMATION);
+            this.magicSpellAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.FIRE_MAGIC_ANIMATION);
+            this.magicSpellLeftAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT);
 
             this.magicLeftFrames = new Array<>();
             this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB001"));
@@ -108,11 +118,20 @@ public class GameWorldCreator {
             this.magicRightFrames.add(magicSpellAtlas.findRegion("FB004"));
             this.magicRightFrames.add(magicSpellAtlas.findRegion("FB005"));
 
-            TextureAtlas enemyAnimationAtlas = this.assetManagmentHandler.getResource(AssetDescriptors.ENEMY_ANIMATION);
+            TextureAtlas enemyAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.ENEMY_ANIMATION);
             this.enemyAnimationFrames = new Array<>();
             this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk1"));
             this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk2"));
             this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk3"));
+
+            TextureAtlas heroAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.WIZARD_ANIMATION);
+            this.heroAnimaitonFrames = new Array<>();
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning1"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning2"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning3"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning4"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning5"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning6"));
         }
     }
 
@@ -251,6 +270,7 @@ public class GameWorldCreator {
         SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
         AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
         TextureComponent texture = this.pooledEngine.createComponent(TextureComponent.class);
+        CharacterStatsComponent characterStatsComponent = this.pooledEngine.createComponent(CharacterStatsComponent.class);
         Component inputTypeForPlayerComponent;
         Rectangle rectangle;
         //ControlledInputRemoteComponent controlledInputRemoteComponent = this.pooledEngine.createComponent(ControlledInputRemoteComponent.class);
@@ -272,13 +292,16 @@ public class GameWorldCreator {
         entity.add(b2dBodyComponent);
 
         transformComponent.position.set(b2dBodyComponent.body.getPosition().x
-                                        * GameConfig.MULTIPLY_BY_PPM,
+                                        * MULTIPLY_BY_PPM,
                                         b2dBodyComponent.body.getPosition().y
-                                        * GameConfig.MULTIPLY_BY_PPM);
+                                        * MULTIPLY_BY_PPM);
 
         entity.add(transformComponent);
 
-        Animation anim = new Animation(0.1f,playerAtlas.findRegions("flame_a"));
+        texture.region = this.heroAnimaitonFrames.get(0);
+        entity.add(texture);
+
+        Animation anim = new Animation(0.1f, this.heroAnimaitonFrames);
         anim.setPlayMode(Animation.PlayMode.LOOP);
         animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
         animationComponent.animations.put(StateComponent.STATE_MOVING, anim);
@@ -287,9 +310,6 @@ public class GameWorldCreator {
         animationComponent.animations.put(StateComponent.STATE_HIT, anim);
         entity.add(animationComponent);
 
-        texture.region = playerAtlas.findRegion("flame_a");
-        texture.offsetY = 0.5f;
-        entity.add(texture);
         entity.add(directionComponent);
 
         typeComponent.type = TypeComponent.PLAYER;
@@ -301,6 +321,13 @@ public class GameWorldCreator {
         steeringComponent.body = b2dBodyComponent.body;
         entity.add(steeringComponent);
 
+        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin
+                ,rectangle.getX()
+                ,rectangle.getY()
+                ,this.characterHUD
+                );
+
+        entity.add(characterStatsComponent);
         //entity.add(controlledInputRemoteComponent);
         entity.add(collisionComponent);
         entity.add(cntrlInComp);
@@ -354,6 +381,7 @@ public class GameWorldCreator {
         TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
         StateComponent stateCom = pooledEngine.createComponent(StateComponent.class);
         DirectionComponent directionComponent = pooledEngine.createComponent(DirectionComponent.class);
+        CharacterStatsComponent characterStatsComponent = this.pooledEngine.createComponent(CharacterStatsComponent.class);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
@@ -382,11 +410,19 @@ public class GameWorldCreator {
         transformComponent.position.set(rectangle.getX(), rectangle.getY());
         entity.add(transformComponent);
 
+        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin
+                ,rectangle.getX()
+                ,rectangle.getY()
+                ,this.characterHUD
+        );
+
+        entity.add(characterStatsComponent);
+
         enemyComponent.xPosCenter = rectangle.getX();
         boolean isOrientedLeft = (boolean)object.getProperties().get("StartingDirectionLeft");
         enemyComponent.velocity = (isOrientedLeft)?EnemyComponent.LEFT_SPEED:EnemyComponent.RIGHT_SPEED;
         enemyComponent.noOfSteps = (int)object.getProperties().get("NoOfSteps") *
-                (int)GameConfig.MULTIPLY_BY_PPM;
+                (int) MULTIPLY_BY_PPM;
 
         entity.add(enemyComponent);
 
@@ -528,6 +564,7 @@ public class GameWorldCreator {
         BulletComponent bul = pooledEngine.createComponent(BulletComponent.class);
         AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
         TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
+        DirectionComponent directionComponent = this.pooledEngine.createComponent(DirectionComponent.class);
         bul.owner = own;
 
         Rectangle rectangle = new Rectangle(x,y, 32,32);
@@ -545,19 +582,10 @@ public class GameWorldCreator {
         stateCom.set(StateComponent.STATE_NORMAL);
         entity.add(stateCom);
 
-        Array<TextureRegion> magicFrames;
+        directionComponent.direction = direction;
+        entity.add(directionComponent);
 
-        if(direction == Direction.RIGHT)
-        {
-            magicFrames = this.magicRightFrames;
-            textureComponent.offsetX = -15f;
-        }
-        else
-        {
-            magicFrames = this.magicLeftFrames;
-            textureComponent.offsetX = 15f;
-        }
-        Animation anim = new Animation(0.1f,magicFrames);
+        Animation anim = new Animation(0.1f,this.magicRightFrames);
         anim.setPlayMode(Animation.PlayMode.LOOP);
         animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
         entity.add(animationComponent);
@@ -633,4 +661,27 @@ public class GameWorldCreator {
         return gameWorld;
     }
 
+    public TextureAtlas getUiCharacterStatsAtlas() {
+        return uiCharacterStatsAtlas;
+    }
+
+    public void setUiCharacterStatsAtlas(TextureAtlas uiCharacterStatsAtlas) {
+        this.uiCharacterStatsAtlas = uiCharacterStatsAtlas;
+    }
+
+    public Skin getUiSkin() {
+        return uiSkin;
+    }
+
+    public void setUiSkin(Skin uiSkin) {
+        this.uiSkin = uiSkin;
+    }
+
+    public Stage getCharacterHUD() {
+        return characterHUD;
+    }
+
+    public void setCharacterHUD(Stage characterHUD) {
+        this.characterHUD = characterHUD;
+    }
 }

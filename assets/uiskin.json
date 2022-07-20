@@ -1,0 +1,61 @@
+{
+  "BitmapFont": {
+    "default-font": {
+      "file": "ui/fonts/ui_font_32.fnt"
+    }
+  },
+
+  "Color": {
+    "green": { "a": 1, "b": 0.73, "g": 0.81, "r": 0.54 },
+    "pink": { "a":1 , "b": 1, "g": 0.68, "r": 0.68},
+    "blue": { "a": 1, "b": 0.92, "g": 0.77, "r": 0.64 },
+    "white": { "a": 1, "b": 1, "g": 1, "r": 1 },
+    "red": { "a": 1, "b": 0, "g": 0, "r": 1 },
+    "yellow": {"a": 1, "b": 0.2, "g": 0.84, "r": 1 },
+    "black": { "a": 1, "b": 0, "g": 0, "r": 0 },
+    "brown": {"a": 1, "b": 0.07, "g": 0.27, "r": 0.54 },
+    "lightGray":{"a": 1, "b": 0.75, "g": 0.75, "r": 0.75},
+    "purple": {"r": 0.21 , "g": 0 , "b":0.43 , "a":1}
+  },
+
+  "LabelStyle": {
+    "default": {"font": "default-font", "fontColor": "white"},
+    "dialog": {"font": "default-font", "fontColor": "white"},
+    "credits": {"font": "default-font", "fontColor": "brown"},
+    "credits_text": {"font": "default-font", "fontColor": "black"},
+    "credits_small": {"font": "default-font", "fontColor": "black"},
+    "credits_small_brown": {"font": "default-font", "fontColor": "brown"},
+    "title": {"font": "default-font", "fontColor": "white"},
+    "middle_outline": {"font": "default-font", "fontColor": "white"},
+    "middle": {"font": "default-font", "fontColor": "white"},
+    "h1title":{"font": "default-font", "fontColor": "white"},
+    "h3title":{"font": "default-font", "fontColor": "white"},
+    "header":{"font": "default-font", "fontColor": "white"},
+    "header_brown":{"font": "default-font", "fontColor": "brown"},
+    "body":{"font": "default-font", "fontColor": "white"},
+    "numeric":{"font": "default-font", "fontColor": "white"}
+  },
+
+  "ButtonStyle":{
+    "action":{"up": "action2" , "down":"action2_p"},
+    "back":{"up": "back1" , "down":"back1_p"},
+    "next":{"up":"action3","down":"action3_p"},   "info":{"up":"info2","down":"info2_p"},
+    "share":{"up":"share2","down":"share2_p"},
+    "locked":{"up":"locked","down":"locked_p"},
+    "leftArrow":{"up":"arrowLeft","down":"arrowLeft_p"},
+    "rightArrow":{"up":"arrowRight","down":"arrowRight_p"},
+    "close":{"up":"close","down":"close_p"},
+    "pause":{"up":"pause","down":"pause_p"},
+    "upArrow":{"up":"arrowUp","down":"arrowUp_p"},
+    "downArrow":{"up":"arrowDown","down":"arrowDown_p"},
+    "left_arrow_menu":{"up":"arrow_left","down":"arrow_left"},
+    "right_arrow_menu":{"up":"arrow_right","down":"arrow_right"},
+    "next_white_button":{"up":"next_white_button","down":"next_white_button"},
+    "previous_white_button":{"up":"previous_white_button","down":"previous_white_button"}
+  },
+
+  "TextButtonStyle":{
+    "longBrown":{"font": "default-font" , "up": "buttonLongBrown" , "down":"buttonLongBrown_p"},
+    "longNegative":{"font": "default-font", "up": "longNegative" , "down":"longNegative_p"}
+  }
+}

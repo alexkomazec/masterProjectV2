@@ -4,12 +4,16 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.gdx.Application;
 import com.badlogic.gdx.Game;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
+import com.badlogic.gdx.graphics.g2d.TextureAtlas;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.ConnectScreen;
+import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
@@ -52,9 +56,13 @@ public class MyGdxGame extends Game {
 	private TileMapHandler			tileMapHandler;
 	private GameWorldCreator 		gameWorldCreator;
 	private GameWorld				gameWorld;
-
+	private InputMultiplexer 		InputMultiplexer;
 	private PooledEngine 			pooledEngine;
 	private static MyGdxGame 		instance;
+
+	private Skin					uiSkin;
+	private Skin					uiInGameSkin;
+	private TextureAtlas			uiInGameBackgrounds;
 
 	private ClientHandler clientHandler = null;
 	private boolean connectionType;
@@ -80,6 +88,7 @@ public class MyGdxGame extends Game {
 	public void create() {
 
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
+		this.InputMultiplexer = new InputMultiplexer();
 		this.tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
 		this.gameWorld  = new GameWorld(tileMapHandler.getTiledMap());
 		//this.viewport	= new StretchViewport(GameConfig.VIRTUAL_WIDTH ,GameConfig.VIRTUAL_HEIGHT);
@@ -91,6 +100,7 @@ public class MyGdxGame extends Game {
 		this.gameWorldCreator = GameWorldCreator.getInstance();
 		this.gameWorldCreator.setAssetManagementHandler(this.assetManagmentHandler);
 		this.gameWorldCreator.setGameWorld(this.gameWorld);
+		this.gameWorldCreator.setUiSkin(this.uiSkin);
 
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);
 	}
@@ -194,4 +204,40 @@ public class MyGdxGame extends Game {
 		assetManagmentHandler.getAssetManager().dispose();
 		batch.dispose();
 	}
+
+	public Skin getUiSkin() {
+		return uiSkin;
+	}
+
+	public void setUiSkin(Skin uiSkin) {
+		this.uiSkin = uiSkin;
+		this.gameWorldCreator.setUiSkin(this.uiSkin);
+	}
+
+	public com.badlogic.gdx.InputMultiplexer getInputMultiplexer() {
+		return InputMultiplexer;
+	}
+
+	public Skin getUiInGameSkin() {
+		return uiInGameSkin;
+	}
+
+	public void setUiInGameSkin(Skin uiInGameSkin) {
+		this.uiInGameSkin = uiInGameSkin;
+	}
+
+	public TextureAtlas getUiInGameBackgrounds() {
+		return uiInGameBackgrounds;
+	}
+
+	public void setUiInGameBackgrounds(TextureAtlas uiInGameBackgrounds) {
+		this.uiInGameBackgrounds = uiInGameBackgrounds;
+	}
+
+	public void setUiCharacterAtlas()
+	{
+		this.gameWorldCreator.setUiCharacterStatsAtlas(this.assetManagmentHandler.getResources(AssetDescriptors.UI_CHARACTER_STATS));
+	}
+
+
 }

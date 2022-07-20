@@ -4,6 +4,8 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.Input;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.KeyboardController;
 import com.mygdx.game.common.InputAdapterWrapper;
@@ -26,12 +28,14 @@ public class InputManagerSystem extends IteratingSystem {
     private final HashMap<InputAdapterWrapper, Integer> hmpInputprocessor;
     private boolean isOnlineConnection = false;
     private static final int UNASSIGNED_INPUT_PROCESSOR = 999;
+    private InputMultiplexer inputMultiplexer;
 
-    public InputManagerSystem(boolean isOnlineConnection) {
+    public InputManagerSystem(boolean isOnlineConnection, InputMultiplexer inputMultiplexer) {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class, ControllableComponent.class).get());
         hmpInputprocessor = new HashMap<>();
         this.isOnlineConnection = isOnlineConnection;
         hmpInputprocessor.put(new KeyboardController(),UNASSIGNED_INPUT_PROCESSOR);
+        this.inputMultiplexer = inputMultiplexer;
     }
 
     @Override
@@ -97,7 +101,7 @@ public class InputManagerSystem extends IteratingSystem {
 
                 if(!key.isInputProcesorSet())
                 {
-                    Gdx.input.setInputProcessor(key);
+                    this.inputMultiplexer.addProcessor(key);
                     key.setInputProcesorSet(true);
                 }
                 isPlayerAssigend = true;

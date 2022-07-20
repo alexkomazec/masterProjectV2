@@ -1,8 +1,7 @@
 {
   "BitmapFont": {
-    "default-font": {
-      "file": "fonts/ui_font_32.fnt"
-    }
+    "default-font": { "file": "fonts/ui_font_32.fnt" },
+    "small-font": { "file": "fonts/SDS_6x6_small.fnt" }
   },
   "Color": {
     "white": {
@@ -56,5 +55,15 @@
       "downFontColor": "black",
       "overFontColor": "gray"
     }
-  }
+  },
+  "ButtonStyle":
+  {
+    "pause":{
+      "up":"blue_button07",
+      "down":"blue_button08"
+    }
+  },
+  "LabelStyle": {
+    "font": { "font": "small-font" },
+  },
 }

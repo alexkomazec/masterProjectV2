@@ -10,6 +10,7 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
+import com.mygdx.game.entitycomponentsystem.components.CharacterStatsComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
 
@@ -45,6 +46,7 @@ public class PhysicsSystem extends IteratingSystem {
             for (Entity entity : bodiesQueue) {
                 TransformComponent tfm = tm.get(entity);
                 B2dBodyComponent bodyComp = bm.get(entity);
+                CharacterStatsComponent characterStatsComponent = entity.getComponent(CharacterStatsComponent.class);
                 Vector2 position = bodyComp.body.getPosition();
                 tfm.position.x = position.x * GameConfig.MULTIPLY_BY_PPM;
                 tfm.position.y = position.y * GameConfig.MULTIPLY_BY_PPM;
@@ -52,6 +54,9 @@ public class PhysicsSystem extends IteratingSystem {
                 if(bodyComp.isDead){
                     logger.debug("Removing a body and entity");
                 	world.destroyBody(bodyComp.body);
+
+                	if(characterStatsComponent != null)
+                        characterStatsComponent.removeTable();
                 	getEngine().removeEntity(entity);
                 }
             }

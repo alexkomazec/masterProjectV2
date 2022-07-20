@@ -1,24 +1,25 @@
 package com.mygdx.game.common.assets;
 
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.assets.AssetDescriptor;
+import com.badlogic.gdx.assets.AssetErrorListener;
+import com.badlogic.gdx.assets.AssetLoaderParameters;
 import com.badlogic.gdx.assets.AssetManager;
 import com.badlogic.gdx.assets.loaders.resolvers.InternalFileHandleResolver;
 import com.badlogic.gdx.utils.Logger;
-import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 
-public class AssetManagmentHandler {
+public class AssetManagmentHandler implements AssetErrorListener {
 
     /*Class Members*/
     protected static final Logger logger = new Logger(AssetManagmentHandler.class.getSimpleName(), Logger.INFO);
-    private InternalFileHandleResolver filePathResolver =  new InternalFileHandleResolver();
+    private final InternalFileHandleResolver internalFileHandleREsolver;
     private AssetManager assetManager;
 
     /*Class Methods*/
     public AssetManagmentHandler()
     {
-        assetManager = new AssetManager();
-        filePathResolver = new InternalFileHandleResolver();
+        this.assetManager = new AssetManager();
+        this.assetManager.setErrorListener(this);
+        internalFileHandleREsolver = new InternalFileHandleResolver();
     }
 
     public void setAssetManager(AssetManager assetManager)
@@ -28,29 +29,49 @@ public class AssetManagmentHandler {
 
     public AssetManager getAssetManager()
     {
-        return assetManager;
+        return this.assetManager;
     }
 
     @SafeVarargs
-    public final void loadResource(AssetDescriptor... assetDescriptors)
+    public final void loadResources(AssetDescriptor... assetDescriptors)
     {
 
         /*Load all assets for received assetDescriptors*/
         for(AssetDescriptor assetDescriptor : assetDescriptors){
-
-            if( filePathResolver.resolve(assetDescriptor.fileName).exists() )
-            {
-                assetManager.load(assetDescriptor);
-                logger.debug("Loaded" + assetDescriptor.fileName);
-            }
-            else
-            {
-                logger.error("This asset has not been found: " + assetDescriptor.fileName);
-            }
+            loadResource(assetDescriptor);
         }
 
         /*Be sure that all assets have been loaded until this line*/
-        assetManager.finishLoading();
+        this.assetManager.finishLoading();
+    }
+
+    public synchronized <T>void loadResource(AssetDescriptor assetDescriptor)
+    {
+        if(internalFileHandleREsolver.resolve(assetDescriptor.fileName).exists() )
+        {
+            this.assetManager.load(assetDescriptor);
+            logger.debug("Loaded asset without AssetLoaderParameters" + assetDescriptor.fileName);
+        }
+        else
+        {
+            logger.error("This asset has not been found: " + assetDescriptor.fileName);
+        }
+    }
+
+    public synchronized <T>void loadResource (String fileName, Class<T> type, AssetLoaderParameters<T> parameter)
+    {
+        if(internalFileHandleREsolver.resolve(fileName).exists())
+        {
+            this.assetManager.load(fileName, type, parameter);
+            logger.debug("Loaded asset with AssetLoaderParameters" + fileName);
+        }
+        else
+        {
+            logger.error("This asset has not been found: " + fileName);
+        }
+
+        /*Be sure that all assets have been loaded until this line*/
+        this.assetManager.finishLoading();
     }
 
     public <T> void unloadResources(AssetDescriptor<T>... assetDescriptors)
@@ -60,9 +81,9 @@ public class AssetManagmentHandler {
         for (AssetDescriptor<T> assetDescriptor : assetDescriptors)
         {
 
-            if (assetManager.isLoaded(assetDescriptor.fileName))
+            if (this.assetManager.isLoaded(assetDescriptor.fileName))
             {
-                assetManager.unload(assetDescriptor.fileName);
+                this.assetManager.unload(assetDescriptor.fileName);
                 logger.debug("This resourse has been unloaded " + assetDescriptor.fileName);
             }
             else
@@ -72,20 +93,20 @@ public class AssetManagmentHandler {
         }
     }
 
-    public <T> T getResource(AssetDescriptor ... assetDescriptors)
+    public <T> T getResources(AssetDescriptor ... assetDescriptors)
     {
 
         for(AssetDescriptor assetDescriptor : assetDescriptors)
         {
 
-            /*Check if the assed is loaded*/
-            if(assetManager.isLoaded(assetDescriptor.fileName))
+            /* Check if the asset is loaded */
+            if(this.assetManager.isLoaded(assetDescriptor.fileName))
             {
-                return assetManager.get(assetDescriptor.fileName);
+                return this.assetManager.get(assetDescriptor.fileName);
             }
             else
             {
-                logger.debug("This asset has not been loaded: " + assetDescriptor.fileName);
+                logger.debug("This asset has not been gotten: " + assetDescriptor.fileName);
             }
         }
         return null;
@@ -93,11 +114,16 @@ public class AssetManagmentHandler {
 
     public float getProgress()
     {
-        return assetManager.getProgress();
+        return this.assetManager.getProgress();
     }
 
     public boolean updateAssetLoading()
     {
-        return assetManager.update();
+        return this.assetManager.update();
+    }
+
+    @Override
+    public void error(AssetDescriptor asset, Throwable throwable) {
+        logger.error("Could not load asset" + asset.fileName, (Exception)throwable);
     }
 }

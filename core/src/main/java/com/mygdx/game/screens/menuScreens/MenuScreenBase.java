@@ -9,7 +9,6 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.GameManager;
-import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.utils.GdxUtils;
@@ -37,8 +36,8 @@ public abstract class MenuScreenBase extends ScreenAdapter {
     public MenuScreenBase(MyGdxGame game) {
         this.game = game;
         this.assetManager = game.getAssetManagmentHandler();
-        this.music = assetManager.getResource(AssetDescriptors.BACKGROUND_MUSIC);
-        this.sound = assetManager.getResource(AssetDescriptors.CLICK_SOUND);
+        this.music = assetManager.getResources(AssetDescriptors.BACKGROUND_MUSIC);
+        this.sound = assetManager.getResources(AssetDescriptors.CLICK_SOUND);
     }
 
     // == public methods == //

@@ -29,10 +29,10 @@ public class OptionsScreen extends MenuScreenBase {
         table.defaults().pad(15);
 
         //Getting texture atlas from asset manager
-        TextureAtlas backGround = assetManager.getResource(AssetDescriptors.BACK_GROUND);
+        TextureAtlas backGround = assetManager.getResources(AssetDescriptors.BACK_GROUND);
 
         //Getting skin for all the menus
-        Skin uiskin = assetManager.getResource(AssetDescriptors.UI_SKIN);
+        Skin uiskin = assetManager.getResources(AssetDescriptors.UI_SKIN);
 
         gameMusic = new CheckBox(GameConfig.GAME_MUSIC, uiskin);
         gameMusic.setName(GameConfig.GAME_MUSIC);
