@@ -1,27 +1,20 @@
 
 playerStatsUI.png
-size: 64, 32
+size: 256, 128
 format: RGBA8888
 filter: Nearest, Nearest
 repeat: none
-background
+BgScreen
   rotate: false
   xy: 2, 2
-  size: 17, 17
-  orig: 17, 17
-  offset: 0, 0
-  index: -1
-border
-  rotate: false
-  xy: 40, 2
-  size: 17, 17
-  orig: 17, 17
+  size: 98, 97
+  orig: 98, 97
   offset: 0, 0
   index: -1
 heart
   rotate: false
-  xy: 21, 2
-  size: 17, 17
-  orig: 17, 17
+  xy: 102, 22
+  size: 86, 77
+  orig: 86, 77
   offset: 0, 0
   index: -1

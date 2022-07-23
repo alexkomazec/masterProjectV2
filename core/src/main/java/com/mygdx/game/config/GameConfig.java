@@ -2,31 +2,22 @@ package com.mygdx.game.config;
 
 public class GameConfig {
 
-    /* Size of one tile in the game. Tiles are squared so the dimension of one tile is
-       WORLD_BOX_SIZE x WORLD_BOX_SIZE pixels
-    */
-    public static final float WORLD_BOX_SIZE = 16f;
-
-    public static final float DEFAULT_PLAYER_WIDTH = 32f;
-    public static final float DEFAULT_PLAYER_HEIGHT = 32f;
-
-    public static final float WORLD_WIDTH = 500;
-    public static final float WORLD_HEIGHT = 500;
-
-    public static final float VIRTUAL_WIDTH = 720;
-    public static final float VIRTUAL_HEIGHT = 1280;
-
+    public static final float DEFAULT_PLAYER_WIDTH = 180f;
+    public static final float DEFAULT_PLAYER_HEIGHT = 200f;
 
     // == Box2d Scalling ==
 
-    //INFO: Creating a body with width 16 and height 16, in box2D world it is represented as 16 meters x 16 meters body
+    //INFO: Creating a body with width X and height X, in box2D world it is represented as X meters x X meters body
     //      which is too heavy, so scalling is important part.
-    private static final float PPM = 32; // pixels per meter
+    //private static final float PPM = 32; // pixels per meter
+    private static final float PPM = 200; // pixels per meter
     public static final float MULTIPLY_BY_PPM = PPM;
     public static final float DIVIDE_BY_PPM = 1/PPM;
 
-    public static final float WIDTH = 800f; //pixels
-    public static final float HEIGHT  = 416f; //pixels
+
+    public static final int   NUMBER_OF_TILES = 10; // One tile is sized PPMxPPM
+    public static final float WORLD_WIDTH = PPM*NUMBER_OF_TILES;
+    public static final float WORLD_HEIGHT = PPM*NUMBER_OF_TILES;
 
     /* Physical dimensions of the screen */
     public static final float PHYSICAL_WIDTH = 640; //pixels
@@ -41,11 +32,11 @@ public class GameConfig {
 
 
     // Region atlas names
-    public static final String BACKGROUND = "background";
+    public static final String BACKGROUND = "background1";
 
     // == Predefined string ==
-    public static final String GAME_SOUND = "GAME SOUND";
-    public static final String GAME_MUSIC = "GAME MUSIC";
+    public static final String GAME_SOUND = "SFX";
+    public static final String GAME_MUSIC = "MUSIC";
 
     // == Enemy Stats ==
     public static final int ENEMY_DPS = 100;
@@ -100,7 +91,8 @@ public class GameConfig {
     public static final int SURVIVAL_DIFFICULTY_HARD= (int)(SURVIVAL_DIFFICULTY*HARD_MULTIPLIER); // 150% of normal
 
     // == Names of Level Maps
-    public static final String LEVEL1 = "tiledmaps/dummy.tmx";
+    //public static final String LEVEL1 = "tiledmaps/dummy.tmx";
+    public static final String LEVEL1 = "tiledmaps/Level1.tmx";
     public static final String LEVEL2 = "SnowWave";
     public static final String LEVEL3 = "EternalSummer";
     public static final String LEVEL4 = "TheGreatSea";
@@ -186,5 +178,7 @@ public class GameConfig {
     public static final int STOMP = 2;
     public static final int COLLECTABLE_BASIC_MAX = 3;
 
+    public static final float SPELL_WIDTH = 200f;
+    public static final float SPELL_HEIGHT = 200f;
     private GameConfig(){}
 }

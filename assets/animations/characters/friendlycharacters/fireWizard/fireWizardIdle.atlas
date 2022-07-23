@@ -1,0 +1,13 @@
+
+fireWizardIdle.png
+size: 256, 256
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+fireWizard_00_idle
+  rotate: false
+  xy: 2, 2
+  size: 180, 200
+  orig: 180, 200
+  offset: 0, 0
+  index: -1

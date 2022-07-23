@@ -1,0 +1,67 @@
+{
+  "BitmapFont": {
+    "default-font": { "file": "fonts/ui_font_32.fnt" },
+    "small-font": { "file": "fonts/SDS_6x6_small.fnt" },
+    "hud-font": { "file": "fonts/hudFont.fnt"}
+  },
+  "Color": {
+    "white": {
+      "a": 1,
+      "b": 1,
+      "g": 1,
+      "r": 1
+    },
+    "black": {
+      "a": 1,
+      "b": 0,
+      "g": 0,
+      "r": 0
+    },
+    "gray": {
+      "a": 1,
+      "b": 0.5,
+      "g": 0.5,
+      "r": 0.5
+    }
+  },
+  "TextButtonStyle": {
+    "default": {
+      "down": "yellow_button01",
+      "up": "yellow_button00",
+      "font": "default-font",
+      "fontColor": "black",
+      "downFontColor": "white",
+      "overFontColor": "gray"
+    }
+    "readOnly": {
+      "up": "yellow_button00",
+      "font": "default-font",
+      "fontColor": "black",
+    }
+  },
+  "LabelStyle": {
+    "default": {
+      "font": "hud-font",
+      "fontColor": "black"
+    }
+  },
+  "CheckBoxStyle": {
+    "default": {
+      "down": "yellow_button00",
+      "up": "yellow_button00",
+      "checkboxOn": "yellow_boxTick",
+      "checkboxOff": "grey_circle",
+      "font": "default-font",
+      "fontColor": "white",
+      "downFontColor": "black",
+      "overFontColor": "gray"
+    }
+  },
+  "ButtonStyle":
+  {
+    "pause":{
+      "up":"blue_button07",
+      "down":"blue_button08"
+    }
+  }
+}

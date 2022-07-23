@@ -41,7 +41,7 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         TextureRegion backgroundRegion = backGround.findRegion(GameConfig.BACKGROUND);
         table.setBackground(new TextureRegionDrawable(backgroundRegion));
 
-        TextButton playButton = new TextButton("Offline - SinglePlayer", uiskin);
+        TextButton playButton = new TextButton("SOLO", uiskin);
         playButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -50,14 +50,14 @@ public class ModeSelectionScreen extends  MenuScreenBase {
             }
         });
 
-        TextButton setDifficulty = new TextButton("Offline - Co-op", uiskin);
+        TextButton setDifficulty = new TextButton("COOP", uiskin);
         setDifficulty.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
             }
         });
 
-        TextButton optionsButton = new TextButton("Online Co-op", uiskin);
+        TextButton optionsButton = new TextButton("ONLINE COOP", uiskin);
         optionsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -67,7 +67,7 @@ public class ModeSelectionScreen extends  MenuScreenBase {
             }
         });
 
-        TextButton quitButton = new TextButton("Online - PvP", uiskin);
+        TextButton quitButton = new TextButton("ONLINE PVP", uiskin);
         quitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -77,7 +77,7 @@ public class ModeSelectionScreen extends  MenuScreenBase {
             }
         });
 
-        TextButton backButton = new TextButton("Back", uiskin);
+        TextButton backButton = new TextButton("BACK", uiskin);
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {

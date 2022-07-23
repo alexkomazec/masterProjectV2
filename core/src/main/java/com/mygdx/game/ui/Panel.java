@@ -17,12 +17,12 @@ public class Panel extends Table {
     public Panel(Skin skin){
         this.skin = skin;
         this.setFillParent(true);
-        this.setBackground(skin.getDrawable("opaque_pixel"));
-        this.setTouchable(Touchable.enabled);
-        this.setVisible(false);
+        //this.setBackground(skin.getDrawable("box1"));
+        //this.setTouchable(Touchable.enabled);
+        //this.setVisible(false);
 
         root = new Table();
-        root.setBackground(skin.getDrawable("pause_panel"));
+        root.setBackground(skin.getDrawable("box1"));
         root.setTransform(true);
     }
 

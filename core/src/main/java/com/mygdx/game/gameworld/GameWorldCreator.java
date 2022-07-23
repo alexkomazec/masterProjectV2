@@ -1,6 +1,8 @@
 package com.mygdx.game.gameworld;
 
 import static com.mygdx.game.config.GameConfig.MULTIPLY_BY_PPM;
+import static com.mygdx.game.config.GameConfig.SPELL_HEIGHT;
+import static com.mygdx.game.config.GameConfig.SPELL_WIDTH;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
@@ -105,33 +107,40 @@ public class GameWorldCreator {
             this.magicSpellLeftAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT);
 
             this.magicLeftFrames = new Array<>();
-            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB001"));
-            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB002"));
-            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB003"));
-            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB004"));
-            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("FB005"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("fireball1"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("fireball2"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("fireball3"));
+            this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("fireball4"));
 
             this.magicRightFrames = new Array<>();
-            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB001"));
-            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB002"));
-            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB003"));
-            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB004"));
-            this.magicRightFrames.add(magicSpellAtlas.findRegion("FB005"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("fireball1"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("fireball2"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("fireball3"));
+            this.magicRightFrames.add(magicSpellAtlas.findRegion("fireball4"));
 
             TextureAtlas enemyAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.ENEMY_ANIMATION);
             this.enemyAnimationFrames = new Array<>();
-            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk1"));
-            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk2"));
-            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("skeleWalk3"));
+            //this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard00run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard01run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard02run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard03run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard04run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard05run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard06run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard07run"));
+            this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard08run"));
 
             TextureAtlas heroAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.WIZARD_ANIMATION);
             this.heroAnimaitonFrames = new Array<>();
-            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning1"));
-            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning2"));
-            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning3"));
-            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning4"));
-            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning5"));
-            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("wizardRunning6"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard00run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard01run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard02run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard03run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard04run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard05run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard06run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard07run"));
+            this.heroAnimaitonFrames.add(heroAnimationAtlas.findRegion("fireWizard08run"));
         }
     }
 
@@ -321,10 +330,8 @@ public class GameWorldCreator {
         steeringComponent.body = b2dBodyComponent.body;
         entity.add(steeringComponent);
 
-        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin
-                ,rectangle.getX()
-                ,rectangle.getY()
-                ,this.characterHUD
+        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin,
+                this.characterHUD
                 );
 
         entity.add(characterStatsComponent);
@@ -410,10 +417,8 @@ public class GameWorldCreator {
         transformComponent.position.set(rectangle.getX(), rectangle.getY());
         entity.add(transformComponent);
 
-        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin
-                ,rectangle.getX()
-                ,rectangle.getY()
-                ,this.characterHUD
+        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin,
+                this.characterHUD
         );
 
         entity.add(characterStatsComponent);
@@ -567,7 +572,7 @@ public class GameWorldCreator {
         DirectionComponent directionComponent = this.pooledEngine.createComponent(DirectionComponent.class);
         bul.owner = own;
 
-        Rectangle rectangle = new Rectangle(x,y, 32,32);
+        Rectangle rectangle = new Rectangle(x,y, SPELL_WIDTH,SPELL_HEIGHT);
         b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,world,

@@ -32,15 +32,16 @@ public class LoadingIntroScreen extends LoadingScreenBase {
                 AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT,
                 AssetDescriptors.ENEMY_ANIMATION,
                 AssetDescriptors.WIZARD_ANIMATION,
-                AssetDescriptors.UI_CHARACTER_STATS
+                AssetDescriptors.UI_CHARACTER_STATS,
+                AssetDescriptors.UI_ATLAS
         );
 
         game.getAssetManagmentHandler().loadResources(
-                AssetDescriptors.UI_IN_GAME_BACKGROUNDS,
-                AssetDescriptors.UI_ATLAS_IN_GAME);
+                AssetDescriptors.UI_IN_GAME_BACKGROUNDS);
 
         ObjectMap<String, Object> resources = new ObjectMap<>();
-        TextureAtlas uiInGameTextureAtlas = assetManager.getResources(AssetDescriptors.UI_ATLAS_IN_GAME);
+        TextureAtlas uiInGameTextureAtlas = assetManager.getResources(AssetDescriptors.UI_ATLAS);
+        game.setUIAtlas(uiInGameTextureAtlas);
 
         for(int i = 0; i <uiInGameTextureAtlas.getRegions().size;i++){
             TextureAtlas.AtlasRegion region = uiInGameTextureAtlas.getRegions().get(i);
@@ -48,10 +49,10 @@ public class LoadingIntroScreen extends LoadingScreenBase {
         }
 
         SkinLoader.SkinParameter skinParameter = new SkinLoader.SkinParameter(AssetPaths.UI_IN_GAME_BACKGROUNDS,resources);
-        assetManager.loadResource(AssetDescriptors.UI_SKIN_IN_GAME.fileName, Skin.class,skinParameter);
+        assetManager.loadResource(AssetDescriptors.UI_SKIN.fileName, Skin.class,skinParameter);
 
         this.game.setUiSkin(assetManager.getAssetManager().get(AssetPaths.UI_SKIN));
-        this.game.setUiInGameSkin(assetManager.getAssetManager().get(AssetPaths.UI_SKIN_IN_GAME));
+        //this.game.setUiInGameSkin(assetManager.getAssetManager().get(AssetPaths.UI_SKIN_IN_GAME));
         this.game.setUiCharacterAtlas();
 
         //this.game.setUiInGameBackgrounds(assetManager.getResources(AssetDescriptors.UI_IN_GAME_BACKGROUNDS));

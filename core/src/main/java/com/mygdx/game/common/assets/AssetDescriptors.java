@@ -40,6 +40,9 @@ public class AssetDescriptors {
     public static final AssetDescriptor<Skin> UI_SKIN =
             new AssetDescriptor<>(AssetPaths.UI_SKIN, Skin.class);
 
+    public static final AssetDescriptor<Skin> UI_ATLAS =
+            new AssetDescriptor<>(AssetPaths.UI_ATLAS, Skin.class);
+
     public static final AssetDescriptor<Skin> UI_SKIN_IN_GAME =
             new AssetDescriptor<Skin>(AssetPaths.UI_SKIN_IN_GAME, Skin.class);
 

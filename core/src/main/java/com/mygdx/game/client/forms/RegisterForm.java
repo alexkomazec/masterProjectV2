@@ -15,10 +15,10 @@ import com.mygdx.game.MyGdxGame;
 public class RegisterForm extends VisWindow {
     public RegisterForm(final MyGdxGame game)
     {
-        super("User Register");
+        super("REGISTRATION");
 
-        VisTextButton cancelButton = new VisTextButton("Cancel");
-        VisTextButton registerButton = new VisTextButton("Register");
+        VisTextButton cancelButton = new VisTextButton("CANCEL");
+        VisTextButton registerButton = new VisTextButton("REGISTER");
 
         final VisValidatableTextField username = new VisValidatableTextField();
         final VisValidatableTextField password = new VisValidatableTextField();
@@ -32,13 +32,13 @@ public class RegisterForm extends VisWindow {
         buttonTable.add(cancelButton);
         buttonTable.add(registerButton);
 
-        add(new VisLabel("e-mail: "));
+        add(new VisLabel("E-MAIL"));
         add(username).expand().fill();
         row();
-        add(new VisLabel("password: "));
+        add(new VisLabel("PASSWORD"));
         add(password).expand().fill();
         row();
-        add(new VisLabel("Confirm password: "));
+        add(new VisLabel("PASSWORD"));
         add(confirmPassword).expand().fill();
         row();
         add(buttonTable).fill().expand().colspan(2).padBottom(10);
@@ -46,10 +46,10 @@ public class RegisterForm extends VisWindow {
 
         SimpleFormValidator validator; //for GWT compatibility
         validator = new SimpleFormValidator(registerButton, errorLabel, "smooth");
-        validator.setSuccessMessage("all good!");
-        validator.notEmpty(username, "e-mail can not be empty");
-        validator.notEmpty(password, "password can not be empty");
-        validator.notEmpty(confirmPassword, "Confirmed password can not be empty");
+        validator.setSuccessMessage("READY!");
+        validator.notEmpty(username, "E-MAIL EMPTY");
+        validator.notEmpty(password, "PASSWORD EMPTY");
+        validator.notEmpty(confirmPassword, "PASSWORD EMPTY");
 
         registerButton.addListener(new ChangeListener() {
             @Override

@@ -1,6 +1,7 @@
 package com.mygdx.game;
 
 import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
@@ -21,13 +22,13 @@ public class AndroidController {
     protected boolean[] abInputCommandList;
     protected boolean inputProcesorSet;
 
-    public AndroidController(SpriteBatch batch, Viewport viewport)
+    public AndroidController(SpriteBatch batch, Viewport viewport, InputMultiplexer inputMultiplexer)
     {
         this.abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
         inputProcesorSet = false;
 
         stage = new Stage(viewport, batch);
-        Gdx.input.setInputProcessor(stage);
+        inputMultiplexer.addProcessor(stage);
         Table table = new Table();
         table.left().bottom();
 
@@ -130,6 +131,7 @@ public class AndroidController {
         table1.add().size(upImg.getWidth(), upImg.getHeight());
         table1.add(upImg).size(upImg.getWidth(), upImg.getHeight());
         table1.add(fireImg).size(fireImg.getWidth(), fireImg.getHeight());
+        table1.add(downImg).size(downImg.getWidth(), downImg.getHeight());
 
 
         stage.addActor(table1);

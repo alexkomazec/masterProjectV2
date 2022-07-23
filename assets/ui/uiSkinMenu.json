@@ -1,7 +1,8 @@
 {
   "BitmapFont": {
     "default-font": { "file": "fonts/ui_font_32.fnt" },
-    "small-font": { "file": "fonts/SDS_6x6_small.fnt" }
+    "small-font": { "file": "fonts/SDS_6x6_small.fnt" },
+    "hud-font": { "file": "fonts/hudFont.fnt"}
   },
   "Color": {
     "white": {
@@ -25,33 +26,40 @@
   },
   "TextButtonStyle": {
     "default": {
-      "down": "yellow_button01",
-      "up": "yellow_button00",
+      "down": "clickedBtn",
+      "up": "unClickedBtn",
       "font": "default-font",
       "fontColor": "black",
       "downFontColor": "white",
       "overFontColor": "gray"
-    }
+    },
     "readOnly": {
-      "up": "yellow_button00",
+      "up": "clickedBtn",
       "font": "default-font",
-      "fontColor": "black",
+      "fontColor": "black"
     }
   },
   "LabelStyle": {
-    "default": {
-      "font": "default-font",
+    "default":
+    {
+      "font": "hud-font",
+      "fontColor": "black"
+    }
+
+    "title":
+    {
+      "font": "hud-font",
       "fontColor": "black"
     }
   },
   "CheckBoxStyle": {
     "default": {
-      "down": "yellow_button00",
-      "up": "yellow_button00",
-      "checkboxOn": "yellow_boxTick",
-      "checkboxOff": "grey_circle",
+      "down": "clickedBtn",
+      "up": "unClickedBtn",
+      "checkboxOn": "RadioBtnFill",
+      "checkboxOff": "RadioBtnEmpty",
       "font": "default-font",
-      "fontColor": "white",
+      "fontColor": "black",
       "downFontColor": "black",
       "overFontColor": "gray"
     }
@@ -59,11 +67,8 @@
   "ButtonStyle":
   {
     "pause":{
-      "up":"blue_button07",
-      "down":"blue_button08"
+      "up":"VolBtn",
+      "down":"VolBtn"
     }
-  },
-  "LabelStyle": {
-    "font": { "font": "small-font" },
-  },
+  }
 }

@@ -6,8 +6,11 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.scenes.scene2d.Actor;
 import com.badlogic.gdx.scenes.scene2d.Stage;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
+import com.badlogic.gdx.scenes.scene2d.utils.Layout;
 import com.badlogic.gdx.utils.Logger;
+import com.kotcrab.vis.ui.util.Validators;
 import com.kotcrab.vis.ui.util.dialog.Dialogs;
 import com.kotcrab.vis.ui.util.form.SimpleFormValidator;
 import com.kotcrab.vis.ui.widget.VisLabel;
@@ -34,19 +37,20 @@ public class LoginForm extends VisWindow
 	private ConnectScreen connectScreen;
 
 	public LoginForm(final MyGdxGame game, final ConnectScreen connectScreen) {
-		super("Enter your credentials");
+		super("LOGIN PAGE");
+
 		this.game = game;
 		this.connectScreen = connectScreen;
 		configSocketEvents();
-		VisTextButton cancelButton = new VisTextButton("Cancel");
-		VisTextButton loginButton = new VisTextButton("Login");
-		VisTextButton registerButton = new VisTextButton("Register");
+		VisTextButton cancelButton = new VisTextButton("CANCEL");
+		VisTextButton loginButton = new VisTextButton("LOGIN");
+		VisTextButton registerButton = new VisTextButton("REGISTER");
 
 		final VisValidatableTextField username = new VisValidatableTextField();
 		final VisValidatableTextField password = new VisValidatableTextField();
 
 		VisLabel errorLabel = new VisLabel();
-		errorLabel.setColor(Color.RED);
+		//errorLabel.setColor(Color.BLACK);
 
 		VisTable buttonTable = new VisTable(true);
 		buttonTable.add(errorLabel).expand().fill();
@@ -54,10 +58,10 @@ public class LoginForm extends VisWindow
 		buttonTable.add(loginButton);
 		buttonTable.add(registerButton);
 
-		add(new VisLabel("e-mail: "));
+		add(new VisLabel("E-MAIL: "));
 		add(username).expand().fill();
 		row();
-		add(new VisLabel("password: "));
+		add(new VisLabel("PASSWORD: "));
 		add(password).expand().fill();
 		row();
 		add(buttonTable).fill().expand().colspan(2).padBottom(10);
@@ -65,9 +69,9 @@ public class LoginForm extends VisWindow
 
 		SimpleFormValidator validator; //for GWT compatibility
 		validator = new SimpleFormValidator(loginButton, errorLabel, "smooth");
-		validator.setSuccessMessage("all good!");
-		validator.notEmpty(username, "e-mail can not be empty");
-		validator.notEmpty(password, "password can not be empty");
+		validator.setSuccessMessage("READY!");
+		validator.notEmpty(username, "E-MAIL EMPTY");
+		validator.notEmpty(password, "PASSWORD EMPTY");
 
 		loginButton.addListener(new ChangeListener() {
 			@Override

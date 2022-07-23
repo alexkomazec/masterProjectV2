@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.scenes.scene2d.Actor;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.scenes.scene2d.ui.Table;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
@@ -42,8 +43,11 @@ public class MenuScreen extends  MenuScreenBase {
         TextureRegion backgroundRegion = backGround.findRegion(GameConfig.BACKGROUND);
         table.setBackground(new TextureRegionDrawable(backgroundRegion));
 
+        // Title
+        Label title = new Label("BRICK IT!", uiskin);
+
         // start game
-        TextButton playButton = new TextButton("START GAME", uiskin);
+        TextButton playButton = new TextButton("START", uiskin);
         playButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -53,7 +57,7 @@ public class MenuScreen extends  MenuScreenBase {
         });
 
         // set difficulty button
-        TextButton setDifficulty = new TextButton("SET DIFFICULTY", uiskin);
+        TextButton setDifficulty = new TextButton("DIFFICULTY", uiskin);
         setDifficulty.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
@@ -86,6 +90,7 @@ public class MenuScreen extends  MenuScreenBase {
         Table buttonTable = new Table(uiskin);
         buttonTable.defaults().pad(20);
 
+        buttonTable.add(title).row();
         buttonTable.add(playButton).row();
         buttonTable.add(setDifficulty).row();
         buttonTable.add(optionsButton).row();

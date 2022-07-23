@@ -1,0 +1,62 @@
+
+snailyRichardsRun.png
+size: 2048, 1024
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+snailyRichard01run
+  rotate: false
+  xy: 364, 2
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard02run
+  rotate: false
+  xy: 364, 279
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard03run
+  rotate: false
+  xy: 2, 2
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard04run
+  rotate: false
+  xy: 364, 556
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard05run
+  rotate: false
+  xy: 2, 279
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard06run
+  rotate: false
+  xy: 2, 556
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard07run
+  rotate: false
+  xy: 726, 279
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1
+snailyRichard08run
+  rotate: false
+  xy: 726, 556
+  size: 360, 275
+  orig: 360, 275
+  offset: 0, 0
+  index: -1

@@ -23,14 +23,14 @@ public class PauseMenu extends Panel {
         void resume();
     }
 
-    public  PauseMenu(final Listener listener1, Skin skin){
+    public PauseMenu(final Listener listener1, Skin skin){
         super(skin);
         this.listener = listener1;
 
-        label = new Label("pause",skin,"header");
+        label = new Label("PAUSE",skin,"default");
         label.setColor(Color.BROWN);
 
-        resume = new TextButton("resume",skin,"longBrown");
+        resume = new TextButton("RESUME",skin,"default");
         //resume.addListener(UI_Utils.clickSound());
         resume.addListener(new ClickListener(){
             @Override
@@ -39,7 +39,7 @@ public class PauseMenu extends Panel {
             }
         });
 
-        settings = new TextButton("quit",skin,"longBrown");
+        settings = new TextButton("QUIT",skin,"default");
         //settings.addListener(UI_Utils.clickSound());
         settings.addListener(new ClickListener(){
             @Override
@@ -49,7 +49,7 @@ public class PauseMenu extends Panel {
         });
 
 
-        exit = new TextButton("exit",skin,"longNegative");
+        exit = new TextButton("EXIT",skin,"default");
         //exit.addListener(UI_Utils.clickSound());
         exit.addListener(new ClickListener(){
             @Override

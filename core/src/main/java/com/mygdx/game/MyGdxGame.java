@@ -61,8 +61,8 @@ public class MyGdxGame extends Game {
 	private static MyGdxGame 		instance;
 
 	private Skin					uiSkin;
+	private TextureAtlas			uiAtlas;
 	private Skin					uiInGameSkin;
-	private TextureAtlas			uiInGameBackgrounds;
 
 	private ClientHandler clientHandler = null;
 	private boolean connectionType;
@@ -222,16 +222,12 @@ public class MyGdxGame extends Game {
 		return uiInGameSkin;
 	}
 
-	public void setUiInGameSkin(Skin uiInGameSkin) {
-		this.uiInGameSkin = uiInGameSkin;
+	public void setUIAtlas(TextureAtlas uiAtlas) {
+		this.uiAtlas = uiAtlas;
 	}
 
-	public TextureAtlas getUiInGameBackgrounds() {
-		return uiInGameBackgrounds;
-	}
-
-	public void setUiInGameBackgrounds(TextureAtlas uiInGameBackgrounds) {
-		this.uiInGameBackgrounds = uiInGameBackgrounds;
+	public TextureAtlas getUIAtlas() {
+		return this.uiAtlas;
 	}
 
 	public void setUiCharacterAtlas()

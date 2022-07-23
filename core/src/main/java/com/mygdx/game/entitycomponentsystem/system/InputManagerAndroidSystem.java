@@ -3,6 +3,7 @@ package com.mygdx.game.entitycomponentsystem.system;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.InputMultiplexer;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.AndroidController;
@@ -14,10 +15,10 @@ public class InputManagerAndroidSystem extends IteratingSystem {
 
     AndroidController androidController;
 
-    public InputManagerAndroidSystem(SpriteBatch batch, Viewport viewport)
+    public InputManagerAndroidSystem(SpriteBatch batch, Viewport viewport, InputMultiplexer inputMultiplexer)
     {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class).get());
-        this.androidController = new AndroidController(batch, viewport);
+        this.androidController = new AndroidController(batch, viewport, inputMultiplexer);
     }
 
     @Override

@@ -67,6 +67,7 @@ public class GameScreen implements Screen {
 
             @Override
             public void quit() {
+                pauseMenu.hide();
                 game.changeScreen(MyGdxGame.MENU_SCREEN);
             }
 
@@ -74,7 +75,7 @@ public class GameScreen implements Screen {
             public void resume() {
                 pauseMenu.hide();
             }
-        }, game.getUiInGameSkin());
+        }, game.getUiSkin());
 
         pauseMenu.setPosition(0,0);
         pauseMenu.setFillParent(true);
@@ -125,7 +126,7 @@ public class GameScreen implements Screen {
         {
             /* Running application is on android device*/
             InputManagerAndroidSystem inManAndroidSys =
-                    new InputManagerAndroidSystem(this.game.getBatch(), hudViewport);
+                    new InputManagerAndroidSystem(this.game.getBatch(), hudViewport, this.game.getInputMultiplexer());
             RenderAndroidControllerSystem renderASys =
                     new RenderAndroidControllerSystem(inManAndroidSys.getAndroidController());
 
@@ -169,27 +170,27 @@ public class GameScreen implements Screen {
         this.stageHUD.addActor(pauseMenu);
         this.stageHUD.addActor(pauseButton);
         this.game.getInputMultiplexer().addProcessor(this.stageHUD);
-        Gdx.input.setInputProcessor(this.game.getInputMultiplexer());
+
+        ViewPortConfiguration.setupPhysicalSize();
+        this.game.getWorldCreator().setCharacterHUD(this.characterHUD);
+        this.game.getWorldCreator().createPlatforms();
+        //this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
+        this.game.getWorldCreator().createPlayer(true,null);
+        this.game.getWorldCreator().createBasicCollectibles();
+
+        this.game.getWorldCreator().createEnemies();
+        //this.game.getWorldCreator().createClouds();
+        this.game.getWorldCreator().createPotions();
     }
 
     @Override
     public void show()
     {
-        ViewPortConfiguration.setupPhysicalSize();
         this.camera.setToOrtho(false,
                 ViewPortConfiguration.physicalWidth,
                 ViewPortConfiguration.physicalHeight);
         this.camera.update();
-
-        this.game.getWorldCreator().setCharacterHUD(this.characterHUD);
-        this.game.getWorldCreator().createPlatforms();
-        this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
-        this.game.getWorldCreator().createPlayer(true,null);
-        this.game.getWorldCreator().createBasicCollectibles();
-
-        this.game.getWorldCreator().createEnemies();
-        this.game.getWorldCreator().createClouds();
-        this.game.getWorldCreator().createPotions();
+        Gdx.input.setInputProcessor(this.game.getInputMultiplexer());
     }
 
     @Override
@@ -199,8 +200,8 @@ public class GameScreen implements Screen {
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
         game.getPooledEngine().update(delta);
-        this.stageHUD.draw();
         this.characterHUD.draw();
+        this.stageHUD.draw();
         camera.update();
     }
 
@@ -222,8 +223,8 @@ public class GameScreen implements Screen {
 
     @Override
     public void hide() {
-        game.getPooledEngine().removeAllEntities();
-        game.getPooledEngine().removeAllSystems();
+        //game.getPooledEngine().removeAllEntities();
+        //game.getPooledEngine().removeAllSystems();
     }
 
     @Override
@@ -234,11 +235,11 @@ public class GameScreen implements Screen {
     /* Put all systems that are responsisble for rendering */
     void setRenderSystems(RenderingSystem renderingSystem)
     {
-        this.game.getPooledEngine().addSystem(renderingSystem);
         this.game.getPooledEngine().addSystem(
                 new RenderTiledMapSystem(game.getTileMapHandler().getOrthogonalTiledMapRenderer(),
                         this.camera,
                         this.game.getGameWorld().getTiledMap()));
+        this.game.getPooledEngine().addSystem(renderingSystem);
         this.game.getPooledEngine().addSystem(
                 new PhysicsDebugSystem(game.getGameWorld().getWorldSingleton().getWorld(),
                         this.camera));
