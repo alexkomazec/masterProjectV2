@@ -76,6 +76,7 @@ public class CollisionSystem extends IteratingSystem {
 						break;
 
 					case TypeComponent.BASIC_COLLECTIBLE:
+						logger.info("Player " + pm.get(entity).playerID + " picked up collectible");
 						CollectibleBasicArrayComponent cbac = entity.getComponent(CollectibleBasicArrayComponent.class);
 						CollectibleBasicComponent cbc = collidedEntity.getComponent(CollectibleBasicComponent.class);
 						if(cbac == null)
@@ -97,6 +98,7 @@ public class CollisionSystem extends IteratingSystem {
 
 						break;
 					case TypeComponent.POTIONS:
+						logger.info("Player " + pm.get(entity).playerID + " picked up potion!");
 						PotionComponent potionComponent = collidedEntity.getComponent(PotionComponent.class);
 						CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
 
@@ -213,6 +215,74 @@ public class CollisionSystem extends IteratingSystem {
 				else
 				{
 					logger.error("Bullet: collidedEntity.type == null");
+				}
+			}
+		}
+		else if(thisType.type == TypeComponent.POTIONS)
+		{
+			if(collidedEntity != null)
+			{
+				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+				CollisionComponent collisionComponent = collidedEntity.getComponent(CollisionComponent.class);
+
+				PotionComponent potionComponent = entity.getComponent(PotionComponent.class);
+				B2dBodyComponent b2bcColided = entity.getComponent(B2dBodyComponent.class);
+
+				if(type != null) {
+					switch (type.type) {
+						case TypeComponent.PLAYER:
+							potionComponent.isDead = true;
+							b2bcColided.isDead = true;
+							collisionComponent.healthAction[GameConfig.INCREASE_HP] = true;
+							break;
+						default:
+							logger.error("No matching type found");
+					}
+				}
+				else
+				{
+					logger.error("type is null");
+				}
+			}
+		}
+		else if(thisType.type == TypeComponent.BASIC_COLLECTIBLE)
+		{
+			if(collidedEntity != null)
+			{
+				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+				CollectibleBasicArrayComponent cbac = collidedEntity.getComponent(CollectibleBasicArrayComponent.class);
+
+				CollectibleBasicComponent cbc = entity.getComponent(CollectibleBasicComponent.class);
+				B2dBodyComponent b2bcColided = entity.getComponent(B2dBodyComponent.class);
+
+				if(type != null) {
+					switch (type.type) {
+						case TypeComponent.PLAYER:
+
+							if(cbac == null)
+							{
+								/* This is player's first time to collect some basic collectibles
+								 *  Prepare array that will store the existence of basic collectibles
+								 */
+								cbac = new CollectibleBasicArrayComponent();
+								collidedEntity.add(cbac);
+							}
+
+							/* Store Basic Collectible to a player's array */
+							int collectibleBasicType = cbc.type;
+							cbac.collectibleBasicArray[collectibleBasicType] = true;
+
+							/* Delete already picked up basic collectible*/
+							b2bcColided.isDead = true;
+							cbc.isDead = true;
+							break;
+						default:
+							logger.error("No matching type found");
+					}
+				}
+				else
+				{
+					logger.error("type is null");
 				}
 			}
 		}

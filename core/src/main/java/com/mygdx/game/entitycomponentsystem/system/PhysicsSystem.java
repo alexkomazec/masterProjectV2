@@ -11,6 +11,8 @@ import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.CharacterStatsComponent;
+import com.mygdx.game.entitycomponentsystem.components.Mapper;
+import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
 

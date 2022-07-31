@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="18" nextobjectid="441">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="19" nextobjectid="498">
  <tileset firstgid="1" source="tiles/platform/Platform1.tsx"/>
  <tileset firstgid="2" source="tiles/platform/Platform11.tsx"/>
  <tileset firstgid="3" source="tiles/platform/Platform12.tsx"/>
@@ -15,7 +15,7 @@
  <tileset firstgid="13" source="tiles/basicPowerUps/stompPowerUp.tsx"/>
  <tileset firstgid="14" source="tiles/basicPowerUps/longJumpPowerUp.tsx"/>
  <tileset firstgid="15" source="tiles/basicPowerUps/doubleFirePowerUp.tsx"/>
- <objectgroup id="14" name="Backgronds">
+ <objectgroup id="14" name="Backgronds" visible="0">
   <object id="378" gid="10" x="0" y="40000" width="9000" height="2500"/>
   <object id="379" gid="10" x="8864" y="40000" width="8936" height="2500"/>
   <object id="381" gid="1073741834" x="0" y="37600" width="9000" height="2500"/>
@@ -89,7 +89,6 @@
   <object id="57" gid="1073741829" x="1000" y="39800" width="200" height="200"/>
   <object id="58" gid="1073741831" x="800" y="40000" width="200" height="200"/>
   <object id="59" gid="1073741832" x="1000" y="40000" width="200" height="200"/>
-  <object id="66" gid="1" x="1600" y="39000" width="200" height="200"/>
   <object id="67" gid="2" x="1600" y="39200" width="200" height="200"/>
   <object id="68" gid="3" x="1600" y="39400" width="200" height="200"/>
   <object id="69" gid="4" x="1800" y="39000" width="200" height="200"/>
@@ -142,14 +141,10 @@
   <object id="207" gid="1073741831" x="5800" y="38000" width="200" height="200"/>
   <object id="208" gid="1073741832" x="6000" y="38000" width="200" height="200"/>
   <object id="209" gid="2147483652" x="6200" y="37000" width="200" height="200"/>
-  <object id="210" gid="2147483653" x="6200" y="37200" width="200" height="200"/>
-  <object id="211" gid="2147483654" x="6200" y="37400" width="200" height="200"/>
   <object id="212" gid="3221225478" x="6200" y="37600" width="200" height="200"/>
   <object id="213" gid="3221225477" x="6200" y="37800" width="200" height="200"/>
   <object id="214" gid="3221225480" x="6200" y="38000" width="200" height="200"/>
   <object id="215" gid="2147483649" x="6400" y="37000" width="200" height="200"/>
-  <object id="216" gid="2147483650" x="6400" y="37200" width="200" height="200"/>
-  <object id="217" gid="2147483651" x="6400" y="37400" width="200" height="200"/>
   <object id="218" gid="3221225475" x="6400" y="37600" width="200" height="200"/>
   <object id="219" gid="3221225474" x="6400" y="37800" width="200" height="200"/>
   <object id="220" gid="3221225479" x="6400" y="38000" width="200" height="200"/>
@@ -227,6 +222,47 @@
   <object id="352" gid="1073741832" x="6800" y="40000" width="200" height="200"/>
   <object id="371" gid="1" x="4400" y="38400" width="200" height="200"/>
   <object id="372" gid="2" x="4400" y="38600" width="200" height="200"/>
+  <object id="442" gid="1" x="2000" y="39000" width="200" height="200"/>
+  <object id="443" gid="2" x="2000" y="39200" width="200" height="200"/>
+  <object id="444" gid="4" x="2200" y="39000" width="200" height="200"/>
+  <object id="445" gid="5" x="2200" y="39200" width="200" height="200"/>
+  <object id="447" gid="2" x="1600" y="39000" width="200" height="200"/>
+  <object id="448" gid="2" x="1600" y="38800" width="200" height="200"/>
+  <object id="449" gid="1" x="3600" y="39000" width="200" height="200"/>
+  <object id="450" gid="2" x="3600" y="39200" width="200" height="200"/>
+  <object id="451" gid="4" x="3800" y="39000" width="200" height="200"/>
+  <object id="452" gid="5" x="3800" y="39200" width="200" height="200"/>
+  <object id="453" gid="1" x="4600" y="37000" width="200" height="200"/>
+  <object id="454" gid="2" x="4600" y="37200" width="200" height="200"/>
+  <object id="455" gid="4" x="4800" y="37000" width="200" height="200"/>
+  <object id="456" gid="5" x="4800" y="37200" width="200" height="200"/>
+  <object id="457" gid="2147483652" x="5000" y="37000" width="200" height="200"/>
+  <object id="458" gid="2147483653" x="5000" y="37200" width="200" height="200"/>
+  <object id="459" gid="2147483649" x="5200" y="37000" width="200" height="200"/>
+  <object id="460" gid="2147483650" x="5200" y="37200" width="200" height="200"/>
+  <object id="461" gid="1" x="5400" y="37000" width="200" height="200"/>
+  <object id="462" gid="2" x="5400" y="37200" width="200" height="200"/>
+  <object id="463" gid="4" x="5600" y="37000" width="200" height="200"/>
+  <object id="464" gid="5" x="5600" y="37200" width="200" height="200"/>
+  <object id="471" gid="1" x="4000" y="39400" width="200" height="200"/>
+  <object id="472" gid="2" x="4000" y="39600" width="200" height="200"/>
+  <object id="473" gid="4" x="4200" y="39400" width="200" height="200"/>
+  <object id="474" gid="5" x="4200" y="39600" width="200" height="200"/>
+  <object id="475" gid="1" x="4400" y="39400" width="200" height="200"/>
+  <object id="476" gid="2" x="4400" y="39600" width="200" height="200"/>
+  <object id="477" gid="4" x="4600" y="39400" width="200" height="200"/>
+  <object id="478" gid="5" x="4600" y="39600" width="200" height="200"/>
+  <object id="489" gid="4" x="4800" y="39000" width="200" height="200"/>
+  <object id="490" gid="5" x="4800" y="39200" width="200" height="200"/>
+  <object id="491" gid="1" x="5000" y="39000" width="200" height="200"/>
+  <object id="492" gid="2" x="5000" y="39200" width="200" height="200"/>
+  <object id="493" gid="4" x="5200" y="39000" width="200" height="200"/>
+  <object id="494" gid="5" x="5200" y="39200" width="200" height="200"/>
+ </objectgroup>
+ <objectgroup id="18" name="CloudEnemies">
+  <object id="497" x="2000" y="38200" width="200" height="200">
+   <ellipse/>
+  </object>
  </objectgroup>
  <objectgroup id="10" name="BasicEnemies">
   <object id="369" x="3800" y="38000" width="200" height="200">
@@ -243,30 +279,74 @@
    </properties>
    <ellipse/>
   </object>
+  <object id="469" x="400" y="38600" width="200" height="200">
+   <properties>
+    <property name="NoOfSteps" type="int" value="2"/>
+    <property name="StartingDirectionLeft" type="bool" value="true"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="470" x="600" y="38600" width="200" height="200">
+   <properties>
+    <property name="NoOfSteps" type="int" value="2"/>
+    <property name="StartingDirectionLeft" type="bool" value="true"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="495" x="5000" y="38600" width="200" height="200">
+   <properties>
+    <property name="NoOfSteps" type="int" value="1"/>
+    <property name="StartingDirectionLeft" type="bool" value="true"/>
+   </properties>
+   <ellipse/>
+  </object>
+  <object id="496" x="4200" y="39000" width="200" height="200">
+   <properties>
+    <property name="NoOfSteps" type="int" value="1"/>
+    <property name="StartingDirectionLeft" type="bool" value="true"/>
+   </properties>
+   <ellipse/>
+  </object>
  </objectgroup>
  <objectgroup id="6" name="PlayersSpawnSpots">
-  <object id="360" x="2530" y="38655" width="150" height="150">
+  <object id="360" x="2445.15" y="38645.9" width="150" height="150">
    <ellipse/>
   </object>
  </objectgroup>
  <objectgroup id="17" name="PowerUpsBasic">
-  <object id="438" name="DoubleFire" gid="15" x="6000" y="36800" width="200" height="200">
+  <object id="438" name="DoubleFire" gid="15" x="5000" y="36804" width="200" height="200">
    <properties>
     <property name="CollectibleType" type="int" value="1"/>
    </properties>
   </object>
-  <object id="439" name="LongJump" gid="14" x="6400" y="36800" width="200" height="200">
+  <object id="439" name="LongJump" gid="14" x="5200" y="36800" width="200" height="200">
    <properties>
     <property name="CollectibleType" type="int" value="0"/>
    </properties>
   </object>
-  <object id="440" name="Stomp" gid="13" x="6792" y="36796" width="200" height="200">
+  <object id="440" name="Stomp" gid="13" x="5400" y="36800" width="200" height="200">
+   <properties>
+    <property name="CollectibleType" type="int" value="2"/>
+   </properties>
+  </object>
+  <object id="466" name="DoubleFire" gid="15" x="6200" y="37400" width="200" height="200">
+   <properties>
+    <property name="CollectibleType" type="int" value="1"/>
+   </properties>
+  </object>
+  <object id="467" name="LongJump" gid="14" x="6400" y="37200" width="200" height="200">
+   <properties>
+    <property name="CollectibleType" type="int" value="0"/>
+   </properties>
+  </object>
+  <object id="468" name="Stomp" gid="13" x="6400" y="37400" width="200" height="200">
    <properties>
     <property name="CollectibleType" type="int" value="2"/>
    </properties>
   </object>
  </objectgroup>
  <objectgroup id="16" name="Potions">
-  <object id="437" gid="12" x="5800" y="36800" width="200" height="200"/>
+  <object id="437" gid="12" x="4800" y="36800" width="200" height="200"/>
+  <object id="465" gid="12" x="6200" y="37200" width="200" height="200"/>
  </objectgroup>
 </map>

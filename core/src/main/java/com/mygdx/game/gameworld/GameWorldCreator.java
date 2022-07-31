@@ -11,6 +11,7 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.TextureAtlas;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
@@ -34,6 +35,7 @@ import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
+import com.mygdx.game.entitycomponentsystem.components.CollisionEffectComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
@@ -64,11 +66,17 @@ public class GameWorldCreator {
     private TextureAtlas playerAtlas;
     private TextureAtlas magicSpellAtlas;
     private TextureAtlas magicSpellLeftAtlas;
+    private TextureAtlas voidSBoltSpellAtlas;
+    private TextureAtlas collidedSpellAtlas;
 
     private Array<TextureRegion> magicLeftFrames;
     private Array<TextureRegion> magicRightFrames;
+    private Array<TextureRegion> voidSBoltSpellFrames;
     private Array<TextureRegion> enemyAnimationFrames;
+    private Array<TextureRegion> flyingBobAnimationFrames;
     private Array<TextureRegion> heroAnimaitonFrames;
+    private Array<TextureRegion> collisionEffectFrames;
+
     private TextureAtlas uiCharacterStatsAtlas;
     private Skin uiSkin;
 
@@ -105,6 +113,19 @@ public class GameWorldCreator {
             this.playerAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.PLAYER_ANIMATION);
             this.magicSpellAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.FIRE_MAGIC_ANIMATION);
             this.magicSpellLeftAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT);
+            this.voidSBoltSpellAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.VOID_MAGIC_ANIMATION);
+            this.collidedSpellAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.SPELL_COLLIDED_EFFECT);
+
+            this.collisionEffectFrames = new Array<>();
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect1"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect2"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect3"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect4"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect5"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect6"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect7"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect8"));
+            this.collisionEffectFrames.add(collidedSpellAtlas.findRegion("boomEffect9"));
 
             this.magicLeftFrames = new Array<>();
             this.magicLeftFrames.add(magicSpellLeftAtlas.findRegion("fireball1"));
@@ -118,6 +139,9 @@ public class GameWorldCreator {
             this.magicRightFrames.add(magicSpellAtlas.findRegion("fireball3"));
             this.magicRightFrames.add(magicSpellAtlas.findRegion("fireball4"));
 
+            this.voidSBoltSpellFrames = new Array<>();
+            this.voidSBoltSpellFrames.add(voidSBoltSpellAtlas.findRegion("voidBall01"));
+
             TextureAtlas enemyAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.ENEMY_ANIMATION);
             this.enemyAnimationFrames = new Array<>();
             //this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard00run"));
@@ -129,6 +153,17 @@ public class GameWorldCreator {
             this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard06run"));
             this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard07run"));
             this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard08run"));
+
+            TextureAtlas flyingBobAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.FLYING_BOB_ANIMATION);
+            this.flyingBobAnimationFrames = new Array<>();
+            //this.enemyAnimationFrames.add(enemyAnimationAtlas.findRegion("snailyRichard00run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob01run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob02run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob03run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob04run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob05run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob06run"));
+            this.flyingBobAnimationFrames.add(flyingBobAnimationAtlas.findRegion("flyingBob07run"));
 
             TextureAtlas heroAnimationAtlas = this.assetManagmentHandler.getResources(AssetDescriptors.WIZARD_ANIMATION);
             this.heroAnimaitonFrames = new Array<>();
@@ -147,13 +182,15 @@ public class GameWorldCreator {
     public void createClouds()
     {
         TiledMap map = this.gameWorld.getTiledMap();
-        for(EllipseMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_CLOUD_ENEMIES).
-                getObjects().
-                getByType(EllipseMapObject.class))
+
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_CLOUD_ENEMIES);
+        if(mapLayer != null)
         {
-            createCloud(object);
-        };
+            for(EllipseMapObject object : mapLayer.getObjects().getByType(EllipseMapObject.class))
+            {
+                createCloud(object);
+            };
+        }
     }
 
     private void createCloud(MapObject object)
@@ -164,8 +201,12 @@ public class GameWorldCreator {
         CollisionComponent collisionComponent = this.pooledEngine.createComponent(CollisionComponent.class);
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
         StateComponent stateComponent = this.pooledEngine.createComponent(StateComponent.class);
+        AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
+        TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
         EnemyComponent enemyComponent = this.pooledEngine.createComponent(EnemyComponent.class);
+        DirectionComponent directionComponent = pooledEngine.createComponent(DirectionComponent.class);
         SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
+        CharacterStatsComponent characterStatsComponent = this.pooledEngine.createComponent(CharacterStatsComponent.class);
         Rectangle rectangle = getRectangle(object);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
@@ -181,6 +222,17 @@ public class GameWorldCreator {
         typeComponent.type = TypeComponent.ENEMY;
         stateComponent.set(StateComponent.STATE_NORMAL);
         b2dBodyComponent.body.setUserData(entity);
+
+        textureComponent.region = this.flyingBobAnimationFrames.get(0);
+        entity.add(textureComponent);
+
+        Array<TextureRegion> enemyFrames = this.flyingBobAnimationFrames;
+
+        Animation anim = new Animation(GameConfig.FRAME_DURATION,enemyFrames);
+        anim.setPlayMode(Animation.PlayMode.LOOP);
+        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
+        entity.add(animationComponent);
+
         // bodyFactory.makeAllFixturesSensors(b2dbody.body); // seeker  should fly about not fall
         steeringComponent.body = b2dBodyComponent.body;
         enemyComponent.enemyType = EnemyComponent.Type.CLOUD;
@@ -190,7 +242,11 @@ public class GameWorldCreator {
         //scom.setIndependentFacing(true); // stop clouds rotating
         steeringComponent.currentMode = SteeringComponent.SteeringState.WANDER;
 
-        this.healthManagerSystem.initializeHealth(entity);
+        characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin,
+                this.characterHUD
+        );
+
+        entity.add(characterStatsComponent);
         entity.add(b2dBodyComponent);
         entity.add(transformComponent);
         entity.add(collisionComponent);
@@ -198,7 +254,8 @@ public class GameWorldCreator {
         entity.add(enemyComponent);
         entity.add(stateComponent);
         entity.add(steeringComponent);
-
+        entity.add(directionComponent);
+        this.healthManagerSystem.initializeHealth(entity);
         this.pooledEngine.addEntity(entity);
     }
 
@@ -206,13 +263,14 @@ public class GameWorldCreator {
     {
         TiledMap map = this.gameWorld.getTiledMap();
         //Create Platform
-        for(TextureMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_PLATFORM).
-                getObjects().
-                getByType(TextureMapObject.class))
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_PLATFORM);
+        if(mapLayer != null)
         {
-            createPlatform(object);
-        };
+            for(TextureMapObject object : mapLayer.getObjects().getByType(TextureMapObject.class))
+            {
+                createPlatform(object);
+            }
+        }
     }
 
     private void createPlatform (TextureMapObject object)
@@ -246,26 +304,27 @@ public class GameWorldCreator {
         /* Add the index to the brick component*/
         brickComponent.textureMapObject = object;
         entity.add(brickComponent);
-
         this.pooledEngine.addEntity(entity);
     }
 
-    public Entity createPlayer(boolean isLocalPlayer, Vector2 position)
+    public Entity createPlayer(boolean isLocalPlayer, boolean isOnlineMode, Vector2 position)
     {
         TiledMap map = this.gameWorld.getTiledMap();
         Entity entity = null;
         //Create Players
-        for(EllipseMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_PLAYERS_SPAWN_SPOTS).
-                getObjects().
-                getByType(EllipseMapObject.class))
+
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_PLAYERS_SPAWN_SPOTS);
+        if(mapLayer != null)
         {
-            entity = createPlayer(object, position, isLocalPlayer);
+            for(EllipseMapObject object :mapLayer.getObjects().getByType(EllipseMapObject.class))
+            {
+                entity = createPlayer(object, position, isLocalPlayer, isOnlineMode);
+            }
         }
         return entity;
     }
 
-    private Entity createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer)
+    private Entity createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer, boolean isOnlineMode)
     {
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
@@ -286,6 +345,7 @@ public class GameWorldCreator {
 
         rectangle = (isLocalPlayer) ? getRectangle(object) : getRectangle(position);
         playerComponent.playerID = currentAvailablePlayerID;
+        logger.debug("[createPlayer]: playerComponent.playerID assigned to " + playerComponent.playerID);
         currentAvailablePlayerID++;
         entity.add(playerComponent);
 
@@ -310,7 +370,7 @@ public class GameWorldCreator {
         texture.region = this.heroAnimaitonFrames.get(0);
         entity.add(texture);
 
-        Animation anim = new Animation(0.1f, this.heroAnimaitonFrames);
+        Animation anim = new Animation(GameConfig.FRAME_DURATION, this.heroAnimaitonFrames);
         anim.setPlayMode(Animation.PlayMode.LOOP);
         animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
         animationComponent.animations.put(StateComponent.STATE_MOVING, anim);
@@ -331,20 +391,23 @@ public class GameWorldCreator {
         entity.add(steeringComponent);
 
         characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin,
-                this.characterHUD
-                );
+                this.characterHUD);
 
         entity.add(characterStatsComponent);
         //entity.add(controlledInputRemoteComponent);
         entity.add(collisionComponent);
         entity.add(cntrlInComp);
-        entity.add(new ControllableComponent());
+
         entity.add(new CoolDownComponent());
         this.healthManagerSystem.initializeHealth(entity);
 
         InputManagerSystem inputManagerSystem = this.pooledEngine.getSystem(InputManagerSystem.class);
         if(isLocalPlayer)
         {
+            if(isOnlineMode == GameConfig.LOCAL_CONNECTION)
+            {
+                entity.add(new ControllableComponent());
+            }
             inputTypeForPlayerComponent = this.pooledEngine.createComponent(LocalInputComponent.class);
             playerComponent.cam = this.orthographicCamera;
 
@@ -367,12 +430,13 @@ public class GameWorldCreator {
     {
         TiledMap map = this.gameWorld.getTiledMap();
         //Create Enemies
-        for(EllipseMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_BASIC_ENEMIES).
-                getObjects().
-                getByType(EllipseMapObject.class))
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_BASIC_ENEMIES);
+        if(mapLayer != null)
         {
-            createEnemy(object);
+            for(EllipseMapObject object : mapLayer.getObjects().getByType(EllipseMapObject.class))
+            {
+                createEnemy(object);
+            }
         }
     }
 
@@ -404,7 +468,7 @@ public class GameWorldCreator {
 
         Array<TextureRegion> enemyFrames = this.enemyAnimationFrames;
 
-        Animation anim = new Animation(0.1f,enemyFrames);
+        Animation anim = new Animation(GameConfig.FRAME_DURATION,enemyFrames);
         anim.setPlayMode(Animation.PlayMode.LOOP);
         animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
         entity.add(animationComponent);
@@ -450,12 +514,13 @@ public class GameWorldCreator {
     {
         TiledMap map = this.gameWorld.getTiledMap();
         //Create basic collectibles
-        for(TextureMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_BASIC_COLLECTIBLES).
-                getObjects().
-                getByType(TextureMapObject.class))
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_BASIC_COLLECTIBLES);
+        if(mapLayer != null)
         {
-            createBasicCollectible(object);
+            for(TextureMapObject object : mapLayer.getObjects().getByType(TextureMapObject.class))
+            {
+                createBasicCollectible(object);
+            }
         }
     }
 
@@ -508,13 +573,15 @@ public class GameWorldCreator {
     {
         TiledMap map = this.gameWorld.getTiledMap();
         //Create basic collectibles
-        for(TextureMapObject object : map.getLayers().
-                get(GameWorld.TM_LAYER_POTIONS).
-                getObjects().
-                getByType(TextureMapObject.class))
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_POTIONS);
+        if(mapLayer != null)
         {
-            createPotion(object);
+            for(TextureMapObject object :mapLayer.getObjects().getByType(TextureMapObject.class))
+            {
+                createPotion(object);
+            }
         }
+
     }
 
     private Entity createPotion(TextureMapObject object){
@@ -558,6 +625,7 @@ public class GameWorldCreator {
     public Entity createBullet(float x, float y,
                                float xVel, float yVel,
                                Direction direction,
+                               EnemyComponent enemyComponent,
                                BulletComponent.Owner own, PooledEngine pooledEngine, World world)
     {
         Entity entity = pooledEngine.createEntity();
@@ -571,6 +639,7 @@ public class GameWorldCreator {
         TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
         DirectionComponent directionComponent = this.pooledEngine.createComponent(DirectionComponent.class);
         bul.owner = own;
+        Array<TextureRegion> spellFrames = null;
 
         Rectangle rectangle = new Rectangle(x,y, SPELL_WIDTH,SPELL_HEIGHT);
         b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle,
@@ -581,19 +650,31 @@ public class GameWorldCreator {
         bodyCreator.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
         position.position.set(x,y);
 
-        textureComponent.region = this.magicRightFrames.get(0);
+        if(enemyComponent!= null)
+        {
+            if(enemyComponent.enemyType == EnemyComponent.Type.CLOUD)
+            {
+                spellFrames = this.voidSBoltSpellFrames;
+            }
+        }
+        else
+        {
+            spellFrames = this.magicRightFrames;
+        }
+
+        textureComponent.region = spellFrames.get(0);
+        Animation anim = new Animation(GameConfig.FRAME_DURATION,spellFrames);
+        anim.setPlayMode(Animation.PlayMode.LOOP);
+        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
+
         entity.add(textureComponent);
+        entity.add(animationComponent);
 
         stateCom.set(StateComponent.STATE_NORMAL);
         entity.add(stateCom);
 
         directionComponent.direction = direction;
         entity.add(directionComponent);
-
-        Animation anim = new Animation(0.1f,this.magicRightFrames);
-        anim.setPlayMode(Animation.PlayMode.LOOP);
-        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
-        entity.add(animationComponent);
 
         type.type = TypeComponent.BULLET;
         b2dbody.body.setUserData(entity);
@@ -610,6 +691,30 @@ public class GameWorldCreator {
         logger.debug("Bullet Created");
 
         return entity;
+    }
+
+    public void createExplosionEffect(float x, float y)
+    {
+        Entity entity = pooledEngine.createEntity();
+        CollisionEffectComponent collisionEffectComponent = pooledEngine.createComponent(CollisionEffectComponent.class);
+        AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
+        TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
+        StateComponent stateCom = pooledEngine.createComponent(StateComponent.class);
+        TransformComponent position = pooledEngine.createComponent(TransformComponent.class);
+
+        textureComponent.region = collisionEffectFrames.get(0);
+        Animation anim = new Animation(GameConfig.FRAME_DURATION, collisionEffectFrames);
+        anim.setPlayMode(Animation.PlayMode.NORMAL);
+        animationComponent.animations.put(StateComponent.STATE_NORMAL, anim);
+        stateCom.set(StateComponent.STATE_NORMAL);
+        position.position.set(x,y);
+
+        entity.add(collisionEffectComponent);
+        entity.add(animationComponent);
+        entity.add(textureComponent);
+        entity.add(position);
+        entity.add(stateCom);
+        pooledEngine.addEntity(entity);
     }
 
     private Rectangle getRectangle(MapObject object)
@@ -688,5 +793,9 @@ public class GameWorldCreator {
 
     public void setCharacterHUD(Stage characterHUD) {
         this.characterHUD = characterHUD;
+    }
+
+    public Array<TextureRegion> getCollisionEffectFrames() {
+        return collisionEffectFrames;
     }
 }

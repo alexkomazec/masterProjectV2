@@ -50,13 +50,6 @@ public class ModeSelectionScreen extends  MenuScreenBase {
             }
         });
 
-        TextButton setDifficulty = new TextButton("COOP", uiskin);
-        setDifficulty.addListener(new ChangeListener() {
-            @Override
-            public void changed(ChangeEvent event, Actor actor) {
-            }
-        });
-
         TextButton optionsButton = new TextButton("ONLINE COOP", uiskin);
         optionsButton.addListener(new ChangeListener() {
             @Override
@@ -90,7 +83,6 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         buttonTable.defaults().pad(20);
 
         buttonTable.add(playButton).row();
-        buttonTable.add(setDifficulty).row();
         buttonTable.add(optionsButton).row();
         buttonTable.add(quitButton).row();
         buttonTable.add(backButton);

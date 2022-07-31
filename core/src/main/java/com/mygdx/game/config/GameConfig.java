@@ -180,5 +180,7 @@ public class GameConfig {
 
     public static final float SPELL_WIDTH = 200f;
     public static final float SPELL_HEIGHT = 200f;
+
+    public static final float FRAME_DURATION = 0.1f; // Frame duration for one frame in seconds
     private GameConfig(){}
 }

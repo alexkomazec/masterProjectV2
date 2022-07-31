@@ -21,8 +21,14 @@ public class AssetDescriptors {
     public static final AssetDescriptor<TextureAtlas> FIRE_MAGIC_ANIMATION =
             new AssetDescriptor<TextureAtlas>(AssetPaths.FIRE_MAGIC_ANIMATION, TextureAtlas.class);
 
+    public static final AssetDescriptor<TextureAtlas> VOID_MAGIC_ANIMATION =
+            new AssetDescriptor<TextureAtlas>(AssetPaths.VOID_MAGIC_ANIMATION, TextureAtlas.class);
+
     public static final AssetDescriptor<TextureAtlas> FIRE_MAGIC_ANIMATION_LEFT =
             new AssetDescriptor<TextureAtlas>(AssetPaths.FIRE_MAGIC_ANIMATION_LEFT, TextureAtlas.class);
+
+    public static final AssetDescriptor<TextureAtlas> FLYING_BOB_ANIMATION =
+            new AssetDescriptor<TextureAtlas>(AssetPaths.FLYING_BOB_ANIMATION, TextureAtlas.class);
 
     public static final AssetDescriptor<TextureAtlas> ENEMY_ANIMATION =
             new AssetDescriptor<TextureAtlas>(AssetPaths.ENEMY_ANIMATION, TextureAtlas.class);
@@ -35,6 +41,9 @@ public class AssetDescriptors {
 
     public static final AssetDescriptor<TextureAtlas> UI_CHARACTER_STATS =
             new AssetDescriptor<>(AssetPaths.UI_CHARACTER_STATS, TextureAtlas.class);
+
+    public static final AssetDescriptor<TextureAtlas> SPELL_COLLIDED_EFFECT=
+            new AssetDescriptor<>(AssetPaths.SPELL_COLLIDED_EFFECT, TextureAtlas.class);
 
     /**************************Skins**************************/
     public static final AssetDescriptor<Skin> UI_SKIN =
@@ -61,6 +70,9 @@ public class AssetDescriptors {
     /**************************Sound**************************/
     public static final AssetDescriptor<Sound> CLICK_SOUND=
             new AssetDescriptor<Sound>(AssetPaths.CLICK_BUTTON, Sound.class);
+
+    public static final AssetDescriptor<Sound> SHOOT_SOUND=
+            new AssetDescriptor<Sound>(AssetPaths.SHOOT_SOUND, Sound.class);
 
     private AssetDescriptors(){
 

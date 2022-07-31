@@ -51,8 +51,11 @@ public class SteeringComponent implements Steerable<Vector2>, Component, Poolabl
 	 */
 	public void update (float delta) {
 		if (steeringBehavior != null) {
-			steeringBehavior.calculateSteering(steeringOutput);
-			applySteering(steeringOutput, delta);
+			if(body != null)
+			{
+				steeringBehavior.calculateSteering(steeringOutput);
+				applySteering(steeringOutput, delta);
+			}
 		}
 	}
 	
@@ -63,43 +66,45 @@ public class SteeringComponent implements Steerable<Vector2>, Component, Poolabl
 	protected void applySteering (SteeringAcceleration<Vector2> steering, float deltaTime) {
 		boolean anyAccelerations = false;
 
-		// Update position and linear velocity.
-		if (!steeringOutput.linear.isZero()) {
-			// this method internally scales the force by deltaTime
-			body.applyForceToCenter(steeringOutput.linear, true);
-			anyAccelerations = true;
-		}
-
-		// Update orientation and angular velocity
-		if (isIndependentFacing()) {
-			if (steeringOutput.angular != 0) {
-				// this method internally scales the torque by deltaTime
-				body.applyTorque(steeringOutput.angular, true);
+		if(body != null) {
+			// Update position and linear velocity.
+			if (!steeringOutput.linear.isZero()) {
+				// this method internally scales the force by deltaTime
+				body.applyForceToCenter(steeringOutput.linear, true);
 				anyAccelerations = true;
-		
 			}
-		} else {
-			// If we haven't got any velocity, then we can do nothing.
-			Vector2 linVel = getLinearVelocity();
-			if (!linVel.isZero(getZeroLinearSpeedThreshold())) {
-				float newOrientation = vectorToAngle(linVel);
-				body.setAngularVelocity((newOrientation - getAngularVelocity()) * deltaTime); // this is superfluous if independentFacing is always true
-				body.setTransform(body.getPosition(), newOrientation);
-			}
-		}
 
-		if (anyAccelerations) {
-			// Cap the linear speed
-			Vector2 velocity = body.getLinearVelocity();
-			float currentSpeedSquare = velocity.len2();
-			float maxLinearSpeed = getMaxLinearSpeed();
-			if (currentSpeedSquare > (maxLinearSpeed * maxLinearSpeed)) {
-				body.setLinearVelocity(velocity.scl(maxLinearSpeed / (float)Math.sqrt(currentSpeedSquare)));
+			// Update orientation and angular velocity
+			if (isIndependentFacing()) {
+				if (steeringOutput.angular != 0) {
+					// this method internally scales the torque by deltaTime
+					body.applyTorque(steeringOutput.angular, true);
+					anyAccelerations = true;
+
+				}
+			} else {
+				// If we haven't got any velocity, then we can do nothing.
+				Vector2 linVel = getLinearVelocity();
+				if (!linVel.isZero(getZeroLinearSpeedThreshold())) {
+					float newOrientation = vectorToAngle(linVel);
+					body.setAngularVelocity((newOrientation - getAngularVelocity()) * deltaTime); // this is superfluous if independentFacing is always true
+					body.setTransform(body.getPosition(), newOrientation);
+				}
 			}
-			// Cap the angular speed
-			float maxAngVelocity = getMaxAngularSpeed();
-			if (body.getAngularVelocity() > maxAngVelocity) {
-				body.setAngularVelocity(maxAngVelocity);
+
+			if (anyAccelerations) {
+				// Cap the linear speed
+				Vector2 velocity = body.getLinearVelocity();
+				float currentSpeedSquare = velocity.len2();
+				float maxLinearSpeed = getMaxLinearSpeed();
+				if (currentSpeedSquare > (maxLinearSpeed * maxLinearSpeed)) {
+					body.setLinearVelocity(velocity.scl(maxLinearSpeed / (float) Math.sqrt(currentSpeedSquare)));
+				}
+				// Cap the angular speed
+				float maxAngVelocity = getMaxAngularSpeed();
+				if (body.getAngularVelocity() > maxAngVelocity) {
+					body.setAngularVelocity(maxAngVelocity);
+				}
 			}
 		}
 	}
@@ -117,7 +122,10 @@ public class SteeringComponent implements Steerable<Vector2>, Component, Poolabl
 	
 	@Override
 	public void setOrientation(float orientation) {
-		body.setTransform(getPosition(), orientation);		
+		if(body != null)
+		{
+			body.setTransform(getPosition(), orientation);
+		}
 	}
 	@Override
 	public float vectorToAngle(Vector2 vector) {
@@ -190,5 +198,13 @@ public class SteeringComponent implements Steerable<Vector2>, Component, Poolabl
 	@Override
 	public void setTagged(boolean tagged) {
 		this.tagged = tagged;
+	}
+
+	public void setBody(Body body) {
+		this.body = body;
+	}
+
+	public Body getBody() {
+		return body;
 	}
 }

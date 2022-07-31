@@ -1,0 +1,69 @@
+
+boomEffect.png
+size: 2048, 256
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+boomEffect1
+  rotate: false
+  xy: 605, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect2
+  rotate: false
+  xy: 1007, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect3
+  rotate: false
+  xy: 203, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect4
+  rotate: false
+  xy: 1409, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect5
+  rotate: false
+  xy: 806, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect6
+  rotate: false
+  xy: 2, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect7
+  rotate: false
+  xy: 1208, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect8
+  rotate: false
+  xy: 404, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1
+boomEffect9
+  rotate: false
+  xy: 1610, 2
+  size: 199, 185
+  orig: 199, 185
+  offset: 0, 0
+  index: -1

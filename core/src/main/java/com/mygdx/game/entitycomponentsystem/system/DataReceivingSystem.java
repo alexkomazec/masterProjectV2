@@ -102,7 +102,10 @@ public class DataReceivingSystem extends IteratingSystem {
                 {
                     /* Set received ID to a main player */
                     playerComponent.playerID = playerDataContainer.getPlayerID();
-                    logger.debug("Player ID " + playerComponent.playerID+ " has been added to a local player");
+                    logger.info("[ASSIGN_ID_TO_PLAYER]: playerComponent.playerID assigned to " + playerComponent.playerID);
+
+                    this.gameWorldCreator.getGameWorld().getPlayerByReference(entity).
+                            getComponent(PlayerComponent.class).playerID = playerComponent.playerID;
 
                     PooledEngine pooledEngine = this.gameWorldCreator.getPooledEngine();
                     InputManagerSystem inputManagerSystem = pooledEngine.getSystem(InputManagerSystem.class);
@@ -208,10 +211,10 @@ public class DataReceivingSystem extends IteratingSystem {
 
                 if(!isIdFound)
                 {
-                    Entity entity = this.gameWorldCreator.createPlayer(false, playerDataContainer.getPosition());
+                    Entity entity = this.gameWorldCreator.createPlayer(false, GameConfig.ONLINE_CONNECTION, playerDataContainer.getPosition());
                     entity.getComponent(PlayerComponent.class).playerID = playerDataContainer.getPlayerID();
 
-                    logger.debug("Player with ID" + playerDataContainer.getPlayerID() + " has been created ");
+                    logger.info("Player with ID" + entity.getComponent(PlayerComponent.class).playerID + " has been created ");
 
                     Message message = new Message(PLAYER_TABLE_UPDATED, true);
                     message.addPlayerDataContainer(new PlayerDataContainer());
@@ -221,7 +224,7 @@ public class DataReceivingSystem extends IteratingSystem {
 
             case ClientHandler.PLAYER_DISCONNECTED:
 
-                logger.debug("PLAYER_DISCONNECTED");
+                logger.info("PLAYER_DISCONNECTED");
 
                 for (Entity entityPlayer: entityPlayers)
                 {

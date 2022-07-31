@@ -10,17 +10,19 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
+import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.gameworld.GameWorld;
+import com.mygdx.game.gameworld.GameWorldCreator;
 
 public class BulletSystem extends IteratingSystem{
 
 	protected static final Logger logger = new Logger(BulletSystem.class.getSimpleName(), Logger.INFO);
-	private GameWorld gameWorld;
+	private GameWorldCreator gameWorldCreator;
 	
 	@SuppressWarnings("unchecked")
-	public BulletSystem(GameWorld gameWorld){
+	public BulletSystem(GameWorldCreator gameWorldCreator){
 		super(Family.all(BulletComponent.class).get());
-		this.gameWorld = gameWorld;
+		this.gameWorldCreator = gameWorldCreator;
 	}
 
 	@Override
@@ -28,6 +30,7 @@ public class BulletSystem extends IteratingSystem{
 		//get box 2d body and bullet components
 		B2dBodyComponent b2body = Mapper.b2dCom.get(entity);
 		BulletComponent bullet = Mapper.bulletCom.get(entity);
+		TransformComponent transformComponent = Mapper.transCom.get(entity);
 		bullet.livingTime +=deltaTime;
 
 		float xVel = bullet.xVel * GameConfig.MULTIPLY_BY_PPM;
@@ -45,6 +48,9 @@ public class BulletSystem extends IteratingSystem{
 		if(bullet.isDead){
 			logger.debug("Bullet died");
 			b2body.isDead = true;
+
+			this.gameWorldCreator.
+					createExplosionEffect(transformComponent.position.x, transformComponent.position.y);
 		}
 	}
 }

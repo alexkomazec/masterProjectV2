@@ -17,6 +17,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.ViewPortConfiguration;
+import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.AnimationSystem;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
@@ -31,6 +32,9 @@ import com.mygdx.game.entitycomponentsystem.system.PhysicsDebugSystem;
 import com.mygdx.game.entitycomponentsystem.system.PhysicsSystem;
 import com.mygdx.game.entitycomponentsystem.system.PlayerControlSystem;
 import com.mygdx.game.entitycomponentsystem.system.RenderAndroidControllerSystem;
+import com.mygdx.game.entitycomponentsystem.system.RenderCharacterHudSystem;
+import com.mygdx.game.entitycomponentsystem.system.CollisionEffectsSystem;
+import com.mygdx.game.entitycomponentsystem.system.RenderGameHud;
 import com.mygdx.game.entitycomponentsystem.system.RenderTiledMapSystem;
 import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
 import com.mygdx.game.entitycomponentsystem.system.SteeringSystem;
@@ -90,17 +94,24 @@ public class GameScreen implements Screen {
         this.camera = renderingSystem.getCamera();
         this.game.getGameWorldCreator().setOrthographicCamera(this.camera);
 
-        setRenderSystems(renderingSystem);
-        this.game.getPooledEngine().addSystem(new AnimationSystem());
         viewport = new FitViewport(GameConfig.WORLD_WIDTH, GameConfig.WORLD_HEIGHT, camera);
         hudViewport = new StretchViewport(700,700);
+        this.stageHUD = new Stage(hudViewport, this.game.getBatch());
+        this.characterHUD = new Stage(viewport, this.game.getBatch());
+        setRenderSystems(renderingSystem, this.characterHUD, this.stageHUD);
+
+        this.game.getPooledEngine().addSystem(new AnimationSystem());
         this.game.getPooledEngine().addSystem(new HealthManagerSystem());
         this.game.getWorldCreator().setPooledEngine(this.game.getPooledEngine());
+
         this.game.getPooledEngine().addSystem(
                 new PlayerControlSystem(
                         game.getWorldCreator(),
                         game.getPooledEngine(),
-                        game.getGameWorld().getWorldSingleton().getWorld())
+                        game.getGameWorld().getWorldSingleton().getWorld(),
+                        game.getAssetManagmentHandler().getResources(AssetDescriptors.SHOOT_SOUND)
+                        //game.getAssetManagmentHandler().getResources(AssetDescriptors.CLICK_SOUND)
+                )
         );
         this.game.getPooledEngine().addSystem(
                 new CollectibleBasicManagerSystem(game.getWorldCreator(),
@@ -108,14 +119,17 @@ public class GameScreen implements Screen {
                                                   game.getPooledEngine())
         );
         this.game.getPooledEngine().addSystem(
-                new EnemySystem(game.getWorldCreator(), game.getGameWorld(), game.getPooledEngine())
+                new CollisionEffectsSystem(this.game.getGameWorldCreator().getCollisionEffectFrames().size)
         );
         this.game.getPooledEngine().addSystem(
                 new PhysicsSystem(game.getGameWorld().getWorldSingleton().getWorld()));
         this.game.getPooledEngine().addSystem(
                 new CollisionSystem());
         this.game.getPooledEngine().addSystem(
-                new BulletSystem(game.getGameWorld()));
+                new BulletSystem(game.getWorldCreator()));
+        this.game.getPooledEngine().addSystem(
+                new EnemySystem(game.getWorldCreator(), game.getGameWorld(), game.getPooledEngine())
+        );
         this.game.getPooledEngine().addSystem(
                 new SteeringSystem());
         this.game.getPooledEngine().addSystem(
@@ -141,8 +155,6 @@ public class GameScreen implements Screen {
             );
         }
 
-        this.stageHUD = new Stage(hudViewport, this.game.getBatch());
-        this.characterHUD = new Stage(viewport, this.game.getBatch());
         buildUI();
     }
 
@@ -152,9 +164,12 @@ public class GameScreen implements Screen {
         Skin skin = this.game.getUiSkin();
 
         pauseButton = new Button(skin,"pause");
+        pauseButton.setWidth(70);
+        pauseButton.setHeight(70);
+
         pauseButton.setPosition(
                 0,
-                Gdx.graphics.getHeight()
+                700 - pauseButton.getHeight()
                 //stageHUD.getHeight() - 30 - pauseButton.getHeight()
         );
         //pauseButton.addListener(UI_Utils.clickSound());
@@ -175,12 +190,15 @@ public class GameScreen implements Screen {
         this.game.getWorldCreator().setCharacterHUD(this.characterHUD);
         this.game.getWorldCreator().createPlatforms();
         //this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
-        this.game.getWorldCreator().createPlayer(true,null);
+        this.game.getWorldCreator().createPlayer(true, this.game.getConnectionType(),null);
         this.game.getWorldCreator().createBasicCollectibles();
-
-        this.game.getWorldCreator().createEnemies();
-        //this.game.getWorldCreator().createClouds();
         this.game.getWorldCreator().createPotions();
+
+        if(this.game.getConnectionType() == GameConfig.LOCAL_CONNECTION)
+        {
+            this.game.getWorldCreator().createEnemies();
+            this.game.getWorldCreator().createClouds();
+        }
     }
 
     @Override
@@ -199,8 +217,8 @@ public class GameScreen implements Screen {
         Gdx.gl.glBlendFunc(GL30.GL_SRC_ALPHA, GL30.GL_ONE_MINUS_SRC_ALPHA);
         Gdx.gl.glClear(GL30.GL_COLOR_BUFFER_BIT);
 
-        game.getPooledEngine().update(delta);
         this.characterHUD.draw();
+        game.getPooledEngine().update(delta);
         this.stageHUD.draw();
         camera.update();
     }
@@ -233,15 +251,18 @@ public class GameScreen implements Screen {
     }
 
     /* Put all systems that are responsisble for rendering */
-    void setRenderSystems(RenderingSystem renderingSystem)
+    void setRenderSystems(RenderingSystem renderingSystem, Stage characterHudStage, Stage gameHudStage)
     {
         this.game.getPooledEngine().addSystem(
                 new RenderTiledMapSystem(game.getTileMapHandler().getOrthogonalTiledMapRenderer(),
                         this.camera,
                         this.game.getGameWorld().getTiledMap()));
+        this.game.getPooledEngine().addSystem(new RenderCharacterHudSystem(characterHudStage));
         this.game.getPooledEngine().addSystem(renderingSystem);
-        this.game.getPooledEngine().addSystem(
-                new PhysicsDebugSystem(game.getGameWorld().getWorldSingleton().getWorld(),
+        this.game.getPooledEngine().addSystem
+                (new PhysicsDebugSystem(game.getGameWorld().getWorldSingleton().getWorld(),
                         this.camera));
+        this.game.getPooledEngine().addSystem(
+                new RenderGameHud(gameHudStage));
     }
 }

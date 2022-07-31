@@ -5,11 +5,13 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.ViewPortConfiguration;
+import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
@@ -25,7 +27,7 @@ import com.mygdx.game.utils.GdxUtils;
 
 public class PlayerControlSystem extends IteratingSystem{
 
-	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.DEBUG);
+	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.INFO);
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
@@ -34,11 +36,14 @@ public class PlayerControlSystem extends IteratingSystem{
 	GameWorldCreator gameWorldCreator;
 	PooledEngine pooledEngine;
 	World world;
+	Sound shootSound;
 
 	@SuppressWarnings("unchecked")
 	public PlayerControlSystem(GameWorldCreator gameWorldCreator,
 							   PooledEngine pooledEngine,
-							   World world) {
+							   World world,
+							   Sound sound)
+	{
 		super(Family.all(PlayerComponent.class).get());
 		this.gameWorldCreator = gameWorldCreator;
 		this.pooledEngine = pooledEngine;
@@ -48,6 +53,7 @@ public class PlayerControlSystem extends IteratingSystem{
 		bodm = ComponentMapper.getFor(B2dBodyComponent.class);
 		sm = ComponentMapper.getFor(StateComponent.class);
 		cp = ComponentMapper.getFor(ControlledInputComponent.class);
+		this.shootSound = sound;
 	}
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
@@ -146,9 +152,11 @@ public class PlayerControlSystem extends IteratingSystem{
 
 				startBulletPositionY = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
 
+				this.shootSound.play();
 				this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
 						xVel, 0,
 						directionComponent.direction,
+						null,
 						BulletComponent.Owner.PLAYER, this.pooledEngine,
 						world);
 				playerComponent.alreadyFired = true;

@@ -24,15 +24,19 @@ public class LoadingIntroScreen extends LoadingScreenBase {
         game.getAssetManagmentHandler().loadResources(
                 AssetDescriptors.BACKGROUND_MUSIC,
                 AssetDescriptors.CLICK_SOUND,
+                AssetDescriptors.SHOOT_SOUND,
                 AssetDescriptors.FONT,
                 AssetDescriptors.BACK_GROUND,
                 AssetDescriptors.UI_SKIN,
                 AssetDescriptors.PLAYER_ANIMATION,
                 AssetDescriptors.FIRE_MAGIC_ANIMATION,
                 AssetDescriptors.FIRE_MAGIC_ANIMATION_LEFT,
+                AssetDescriptors.VOID_MAGIC_ANIMATION,
                 AssetDescriptors.ENEMY_ANIMATION,
+                AssetDescriptors.FLYING_BOB_ANIMATION,
                 AssetDescriptors.WIZARD_ANIMATION,
                 AssetDescriptors.UI_CHARACTER_STATS,
+                AssetDescriptors.SPELL_COLLIDED_EFFECT,
                 AssetDescriptors.UI_ATLAS
         );
 

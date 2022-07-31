@@ -15,15 +15,11 @@ import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicArrayComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
-import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
 import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
-import com.mygdx.game.gameworld.BodyCreator;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.utils.GdxUtils;
-
-import javax.swing.plaf.nimbus.State;
 
 public class CollectibleBasicManagerSystem extends IteratingSystem {
 
@@ -116,6 +112,7 @@ public class CollectibleBasicManagerSystem extends IteratingSystem {
         this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
                 xVel, 0,
                 directionComponent.direction,
+                null,
                 BulletComponent.Owner.PLAYER, this.pooledEngine,
                 world);
     }

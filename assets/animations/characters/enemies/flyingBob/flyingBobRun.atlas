@@ -1,0 +1,55 @@
+
+flyingBobRun.png
+size: 1024, 256
+format: RGBA8888
+filter: Nearest, Nearest
+repeat: none
+flyingBob01run
+  rotate: false
+  xy: 179, 129
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1
+flyingBob02run
+  rotate: false
+  xy: 2, 2
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1
+flyingBob03run
+  rotate: false
+  xy: 2, 129
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1
+flyingBob04run
+  rotate: false
+  xy: 533, 129
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1
+flyingBob05run
+  rotate: false
+  xy: 356, 2
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1
+flyingBob06run
+  rotate: false
+  xy: 356, 129
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1
+flyingBob07run
+  rotate: false
+  xy: 179, 2
+  size: 175, 125
+  orig: 175, 125
+  offset: 0, 0
+  index: -1

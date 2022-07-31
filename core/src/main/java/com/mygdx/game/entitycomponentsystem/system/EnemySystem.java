@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Array;
@@ -17,6 +18,7 @@ import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
+import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
@@ -78,43 +80,70 @@ public class EnemySystem extends IteratingSystem{
 			bodyCom.body.setTransform(bodyCom.body.getPosition().x + enemyCom.velocity,
 					bodyCom.body.getPosition().y,
 					bodyCom.body.getAngle());	
-		}else if(enemyCom.enemyType == EnemyComponent.Type.CLOUD){
-			B2dBodyComponent b2Player = Mapper.b2dCom.get(this.gameWorld.getPlayer(0));
-			B2dBodyComponent b2Enemy = Mapper.b2dCom.get(entity);
-			
-			float distance = b2Player.body.getPosition().dst(b2Enemy.body.getPosition());
-			SteeringComponent scom = Mapper.sCom.get(entity);
-			if(distance < 3 && scom.currentMode != SteeringComponent.SteeringState.FLEE){
-				scom.steeringBehavior = SteeringPresets.getFlee(Mapper.sCom.get(entity),Mapper.sCom.get(this.gameWorld.getPlayer(0)));
-				scom.currentMode = SteeringComponent.SteeringState.FLEE;
-			}else if(distance > 3 && distance < 10 && scom.currentMode != SteeringComponent.SteeringState.ARRIVE){
-				scom.steeringBehavior = SteeringPresets.getArrive(Mapper.sCom.get(entity),Mapper.sCom.get(this.gameWorld.getPlayer(0)));
-				scom.currentMode = SteeringComponent.SteeringState.ARRIVE;
-			}else if(distance > 15 && scom.currentMode != SteeringComponent.SteeringState.WANDER){
-				scom.steeringBehavior  = SteeringPresets.getWander(Mapper.sCom.get(entity));
-				scom.currentMode = SteeringComponent.SteeringState.WANDER;
+		}
+		else if(enemyCom.enemyType == EnemyComponent.Type.CLOUD)
+		{
+			Entity tempEntity = getPlayerById(0);
+			B2dBodyComponent b2Player = null;
+
+			if(tempEntity != null)
+			{
+				b2Player = Mapper.b2dCom.get(tempEntity);
 			}
-			
-			// should enemy shoot
-			if(scom.currentMode == SteeringComponent.SteeringState.ARRIVE){
-				// enemy is following
-				if(enemyCom.timeSinceLastShot >= enemyCom.shootDelay){
-					//do shoot
-					Vector2 aim = GdxUtils.aimTo(bodyCom.body.getPosition(), b2Player.body.getPosition());
-					aim.scl(10);
-					this.gameWorldCreator.createBullet(
-							bodyCom.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM,
-							bodyCom.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM,
-							aim.x, 
-							aim.y,
-							directionComponent.direction,
-							BulletComponent.Owner.ENEMY,
-							this.pooledEngine,
-							this.gameWorld.getWorldSingleton().getWorld()
-							);
-					//reset timer
-					enemyCom.timeSinceLastShot = 0;
+
+			B2dBodyComponent b2Enemy = Mapper.b2dCom.get(entity);
+			SteeringComponent scom = Mapper.sCom.get(entity);
+
+			if(b2Player != null)
+			{
+				if(enemyCom.velocity == EnemyComponent.LEFT_SPEED)
+				{
+					directionComponent.direction = Direction.LEFT;
 				}
+				else if(enemyCom.velocity == EnemyComponent.RIGHT_SPEED)
+				{
+					directionComponent.direction = Direction.RIGHT;
+				}
+
+				float distance = b2Player.body.getPosition().dst(b2Enemy.body.getPosition());
+				if(distance < 3 && scom.currentMode != SteeringComponent.SteeringState.FLEE){
+					scom.steeringBehavior = SteeringPresets.getFlee(Mapper.sCom.get(entity),Mapper.sCom.get(getPlayerById(0)));
+					scom.currentMode = SteeringComponent.SteeringState.FLEE;
+				}else if(distance > 3 && distance < 10 && scom.currentMode != SteeringComponent.SteeringState.ARRIVE){
+					scom.steeringBehavior = SteeringPresets.getArrive(Mapper.sCom.get(entity),Mapper.sCom.get(getPlayerById(0)));
+					scom.currentMode = SteeringComponent.SteeringState.ARRIVE;
+				}else if(distance > 15 && scom.currentMode != SteeringComponent.SteeringState.WANDER){
+					scom.steeringBehavior  = SteeringPresets.getWander(Mapper.sCom.get(entity));
+					scom.currentMode = SteeringComponent.SteeringState.WANDER;
+				}
+
+				// should enemy shoot
+				if(scom.currentMode == SteeringComponent.SteeringState.ARRIVE){
+					// enemy is following
+					if(enemyCom.timeSinceLastShot >= enemyCom.shootDelay){
+						//do shoot
+						Vector2 aim = GdxUtils.aimTo(bodyCom.body.getPosition(), b2Player.body.getPosition());
+						aim.scl(10);
+						this.gameWorldCreator.createBullet(
+								bodyCom.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM,
+								bodyCom.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM,
+								aim.x,
+								aim.y,
+								directionComponent.direction,
+								enemyCom,
+								BulletComponent.Owner.ENEMY,
+								this.pooledEngine,
+								this.gameWorld.getWorldSingleton().getWorld()
+						);
+						//reset timer
+						enemyCom.timeSinceLastShot = 0;
+					}
+				}
+			}
+			else
+			{
+				/* Update body if needed (Usually when the player died) */
+				scom.setBody(null);
 			}
 		}
 		
@@ -125,5 +154,26 @@ public class EnemySystem extends IteratingSystem{
 		if(enemyCom.isDead){
 			bodyCom.isDead =true;
 		}
+	}
+
+	private Entity getPlayerById(int playerID)
+	{
+		ImmutableArray<Entity> arrayOfentities =  this.pooledEngine.
+				getEntitiesFor(Family.all(PlayerComponent.class).get());
+		PlayerComponent playerComponent = null;
+		Entity entity = null;
+		int iterator = 0;
+
+		for (iterator = 0; iterator < arrayOfentities.size(); iterator++)
+		{
+			playerComponent = arrayOfentities.get(iterator).getComponent(PlayerComponent.class);
+			if(playerID == playerComponent.playerID)
+			{
+				entity = arrayOfentities.get(iterator);
+				break;
+			}
+		}
+
+		return entity;
 	}
 }
