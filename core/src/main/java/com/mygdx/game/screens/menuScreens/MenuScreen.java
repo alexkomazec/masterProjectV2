@@ -52,7 +52,7 @@ public class MenuScreen extends  MenuScreenBase {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
                 CheckAndPlayMenuSound();
-                game.changeScreen(MODE_SELECTION_SCREEN);
+                game.changeScreen(MyGdxGame.CONNECTION_TYPE_SCREEN);
             }
         });
 

@@ -1,6 +1,7 @@
 package com.mygdx.game.client;
 
 import static com.mygdx.game.MyGdxGame.GAME_SCREEN;
+import static com.mygdx.game.MyGdxGame.MODE_SELECTION_SCREEN;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.ScreenAdapter;
@@ -72,7 +73,7 @@ public class ConnectScreen extends ScreenAdapter
 
 		if(this.readyToChangeScreen)
 		{
-            game.changeScreen(GAME_SCREEN);
+            game.changeScreen(MODE_SELECTION_SCREEN);
         }
     }
 

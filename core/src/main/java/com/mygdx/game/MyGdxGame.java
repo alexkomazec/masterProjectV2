@@ -13,6 +13,7 @@ import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.ConnectScreen;
+import com.mygdx.game.client.data.GeneralInfoContainer;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
@@ -20,12 +21,14 @@ import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.gameworld.TileMapHandler;
+import com.mygdx.game.screens.ConnectionTypeScreen;
 import com.mygdx.game.screens.GameScreen;
 import com.mygdx.game.screens.loadingScreens.LoadingIntroScreen;
 import com.mygdx.game.screens.menuScreens.DifficultyScreen;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
 import com.mygdx.game.screens.menuScreens.ModeSelectionScreen;
 import com.mygdx.game.screens.menuScreens.OptionsScreen;
+import com.mygdx.game.screens.menuScreens.RoomsScreen;
 import com.mygdx.game.utils.ScreenOrientation;
 
 public class MyGdxGame extends Game {
@@ -39,15 +42,19 @@ public class MyGdxGame extends Game {
 	public final static int LOADING_INTRO_SCREEN 	= 4;
 	public final static int MODE_SELECTION_SCREEN 	= 5;
 	public final static int CONNECT_SCREEN			= 6;
+	public final static int CONNECTION_TYPE_SCREEN	= 7;
+	public final static int ROOMS_SCREEN			= 8;
 
 	/* List of screen references */
-	private MenuScreen 			menuScreen;
-	private GameScreen 			gameScreen;
-	private OptionsScreen 		optionsScreen;
-	private DifficultyScreen 	difficultyScreen;
-	private LoadingIntroScreen 	loadingIntroScreen;
-	private ModeSelectionScreen modeSelectionScreen;
-	private ConnectScreen		connectScreen;
+	private MenuScreen 				menuScreen;
+	private GameScreen 				gameScreen;
+	private OptionsScreen 			optionsScreen;
+	private DifficultyScreen 		difficultyScreen;
+	private LoadingIntroScreen 		loadingIntroScreen;
+	private ModeSelectionScreen 	modeSelectionScreen;
+	private ConnectScreen			connectScreen;
+	private ConnectionTypeScreen	connectionTypeScreen;
+	private RoomsScreen 			roomsScreen;
 
 	/*Class Members*/
 	private SpriteBatch				batch;
@@ -66,7 +73,10 @@ public class MyGdxGame extends Game {
 
 	private ClientHandler clientHandler = null;
 	private boolean connectionType;
+	private String gameMode;
 	private ScreenOrientation screenOrientation;
+
+	private GeneralInfoContainer generalInfoContainer;
 	/*Class Methods*/
 
 	private MyGdxGame()
@@ -101,6 +111,7 @@ public class MyGdxGame extends Game {
 		this.gameWorldCreator.setAssetManagementHandler(this.assetManagmentHandler);
 		this.gameWorldCreator.setGameWorld(this.gameWorld);
 		this.gameWorldCreator.setUiSkin(this.uiSkin);
+		this.generalInfoContainer = new GeneralInfoContainer();
 
 		changeScreen(MyGdxGame.LOADING_INTRO_SCREEN);
 	}
@@ -145,7 +156,14 @@ public class MyGdxGame extends Game {
 				if(connectScreen == null) connectScreen = new ConnectScreen(this);
 				this.setScreen(connectScreen);
 				break;
-
+			case CONNECTION_TYPE_SCREEN:
+				if(connectionTypeScreen == null) connectionTypeScreen = new ConnectionTypeScreen(this);
+				this.setScreen(connectionTypeScreen);
+				break;
+			case ROOMS_SCREEN:
+				if(roomsScreen == null) roomsScreen = new RoomsScreen(this);
+				this.setScreen(roomsScreen);
+				break;
 		}
 	}
 
@@ -171,7 +189,7 @@ public class MyGdxGame extends Game {
 
 	public void setClientHandler()
 	{
-		this.clientHandler = ClientHandler.getInstance(pooledEngine);
+		this.clientHandler = ClientHandler.getInstance(pooledEngine, this);
 	}
 
 	public void setConnectionType(boolean connectionType) {
@@ -235,5 +253,19 @@ public class MyGdxGame extends Game {
 		this.gameWorldCreator.setUiCharacterStatsAtlas(this.assetManagmentHandler.getResources(AssetDescriptors.UI_CHARACTER_STATS));
 	}
 
+	public String getGameMode() {
+		return gameMode;
+	}
 
+	public void setGameMode(String gameMode) {
+		this.gameMode = gameMode;
+	}
+
+	public GeneralInfoContainer getGeneralInfoContainer() {
+		return generalInfoContainer;
+	}
+
+	public void setGeneralInfoContainer(GeneralInfoContainer generalInfoContainer) {
+		this.generalInfoContainer = generalInfoContainer;
+	}
 }

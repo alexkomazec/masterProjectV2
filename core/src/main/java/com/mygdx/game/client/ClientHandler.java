@@ -6,6 +6,8 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.TimeUtils;
+import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.client.data.GeneralInfoContainer;
 import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
@@ -19,6 +21,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
@@ -31,19 +34,20 @@ public class ClientHandler {
     protected static final Logger logger = new Logger(ClientHandler.class.getSimpleName(), Logger.INFO);
     public static ClientHandler instance;
 
-    public static ClientHandler getInstance(PooledEngine pooledEngine) {
+    public static ClientHandler getInstance(PooledEngine pooledEngine, MyGdxGame game) {
         if (instance == null) {
-            instance = new ClientHandler(pooledEngine);
+            instance = new ClientHandler(pooledEngine, game);
         }
         return instance;
     }
 
     private Socket socket;
     private IO.Options options;
-    public static String url = "http://138.68.160.152:8080";
+    //public static String url = "http://138.68.160.152:8080";
     //public static String url = "http://localhost:8080";
-    //public static String url = "http://192.168.0.12:8080";
+    public static String url = "http://192.168.0.12:8080";
 
+    private MyGdxGame game;
     private Array<Message> receivedMessageArray;
     private Array<Message> transmitingMessageArray;
 
@@ -56,16 +60,18 @@ public class ClientHandler {
     public static final int PLAYER_CHANGED_DIR = 5;             /* Some Player changed direction*/
     public static final int PLAYER_DISCONNECTED = 6;            /* Some Player Disconnected */
     public static final int CREATE_ALL_ENEMIES = 7;             /* Create All enemies */
+    public static final int SET_USERNAME = 8;                   /* Set username to the client */
 
     /* Transmitting Actions */
-    public static final int SEND_PLAYER_TO_SERVER = 8;          /* Send Player data of a newly created player */
-    public static final int UPLOAD_CURRENT_PLAYER_POS_REQ = 9;  /* Upload Current Player Position upon a request */
-    public static final int PLAYER_TABLE_UPDATED = 10;          /* Inform server that player table has been updated */
+    public static final int SEND_PLAYER_TO_SERVER = 9;          /* Send Player data of a newly created player */
+    public static final int UPLOAD_CURRENT_PLAYER_POS_REQ = 10;  /* Upload Current Player Position upon a request */
+    public static final int PLAYER_TABLE_UPDATED = 11;          /* Inform server that player table has been updated */
 
-    private ClientHandler(PooledEngine pooledEngine) {
+    private ClientHandler(PooledEngine pooledEngine, MyGdxGame game) {
         createSocket();
         this.receivedMessageArray = new Array<>();
         this.transmitingMessageArray = new Array<>();
+        this.game = game;
         pooledEngine.addSystem(new DataReceivingSystem(this));
         pooledEngine.addSystem(new DataTransmittingSystem(this));
         pooledEngine.addSystem(new InputManagerTransmittingSystem(this));
@@ -221,10 +227,73 @@ public class ClientHandler {
             }
         });
 
+        this.socket.on("setUsername", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    setUsername(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
+        this.socket.on("getRoomsStatusResp", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    parseRoomsStatus(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
 
     }
 
     //===============Callbacks for event listener ==========================//
+
+    public void parseRoomsStatus(Object... args) throws JSONException {
+        logger.debug("PARSE_ROOMS_STATUS");
+        JSONArray jsonArray = (JSONArray) args[0];
+
+        /* Parse coop room*/
+        JSONArray jsonArrayRoom  = (JSONArray) jsonArray.get(0);
+        int[] coopRooms = new int[GameConfig.NO_OF_ROOMS];
+        int[] pvpRooms = new int[GameConfig.NO_OF_ROOMS];
+
+        for (int i = 0; i < coopRooms.length; i++)
+        {
+            coopRooms[i] = (Integer) jsonArrayRoom.get(i);
+        }
+        this.game.getGeneralInfoContainer().setCoopRooms(coopRooms);
+
+        /* Parse pvp room*/
+        jsonArrayRoom = (JSONArray) jsonArray.get(1);
+
+        for (int i = 0; i < pvpRooms.length; i++)
+        {
+            pvpRooms[i] = (Integer) jsonArrayRoom.get(i);
+        }
+        this.game.getGeneralInfoContainer().setPvpRooms(pvpRooms);
+        this.game.getGeneralInfoContainer().setRoomStatusReceived(true);
+    }
+
+    public void getRoomsStatus(String roomType)
+    {
+        logger.debug("GET_ROOMS_STATUS");
+        this.socket.emit("getRoomsStatusReq");
+    }
+
+    public void setUsername(Object... args) throws JSONException
+    {
+        logger.debug("SET_USERNAME");
+        this.game.getGeneralInfoContainer().setUserName((String)args[0]);
+    }
 
     public void createAllEnemies(Object... args) throws JSONException
     {

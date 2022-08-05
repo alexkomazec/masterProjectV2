@@ -11,6 +11,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.Message;
+import com.mygdx.game.client.data.GeneralInfoContainer;
 import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
@@ -28,12 +29,14 @@ public class DataReceivingSystem extends IteratingSystem {
     protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.INFO);
     private ClientHandler clientHandler;
     private GameWorldCreator gameWorldCreator;
+    private GeneralInfoContainer generalInfoContainer;
     private Message message;
 
     public DataReceivingSystem(ClientHandler clientHandler) {
         super(Family.all(PlayerComponent.class, ControlledInputComponent.class).get());
         this.clientHandler = clientHandler;
         this.gameWorldCreator = GameWorldCreator.getInstance();
+        this.generalInfoContainer = generalInfoContainer;
     }
 
     @Override
@@ -183,6 +186,7 @@ public class DataReceivingSystem extends IteratingSystem {
 
     private void processData(PlayerDataContainer playerDataContainer, int actionType)
     {
+
         /* Entities that represent players */
         ImmutableArray<Entity> entityPlayers = this.gameWorldCreator.getPooledEngine().
                 getEntitiesFor(Family.all(PlayerComponent.class, ControlledInputComponent.class).
@@ -195,7 +199,6 @@ public class DataReceivingSystem extends IteratingSystem {
             case ClientHandler.UPDATE_PLAYER_TABLE:
 
                 logger.debug("UPDATE_PLAYER_TABLE");
-
                 boolean isIdFound = false;
 
                 /* Find player searching by Player Id */
@@ -225,7 +228,6 @@ public class DataReceivingSystem extends IteratingSystem {
             case ClientHandler.PLAYER_DISCONNECTED:
 
                 logger.info("PLAYER_DISCONNECTED");
-
                 for (Entity entityPlayer: entityPlayers)
                 {
                     PlayerComponent playerComponent = entityPlayer.getComponent(PlayerComponent.class);

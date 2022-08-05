@@ -1,4 +1,4 @@
-package com.mygdx.game.screens.menuScreens;
+package com.mygdx.game.screens;
 
 import static com.mygdx.game.MyGdxGame.CONNECT_SCREEN;
 import static com.mygdx.game.MyGdxGame.GAME_SCREEN;
@@ -15,64 +15,51 @@ import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.screens.menuScreens.MenuScreenBase;
 
-public class ModeSelectionScreen extends  MenuScreenBase {
+public class ConnectionTypeScreen extends MenuScreenBase {
 
-    private static final String CLASS_NAME  = ModeSelectionScreen.class.getSimpleName();
-    private static final Logger logger         = new Logger(CLASS_NAME, Logger.INFO);
+    private static final Logger logger = new Logger(ConnectionTypeScreen.class.getSimpleName(), Logger.INFO);
 
-    public ModeSelectionScreen(MyGdxGame game) {
+    public ConnectionTypeScreen(MyGdxGame game) {
         super(game);
         this.game.getWorldCreator().getRequiredResources();
         System.gc();
     }
 
     @Override
-    protected Actor createUi()
-    {
+    protected Actor createUi() {
         Table table = new Table();
 
         //Getting texture atlas from asset manager
         TextureAtlas backGround = assetManager.getResources(AssetDescriptors.BACK_GROUND);
 
         //Getting skin for all the menus
-        Skin uiskin = assetManager.getResources(AssetDescriptors.UI_SKIN);
+        Skin uiskin = this.game.getUiSkin();
 
         TextureRegion backgroundRegion = backGround.findRegion(GameConfig.BACKGROUND);
         table.setBackground(new TextureRegionDrawable(backgroundRegion));
 
-        TextButton optionsButton = new TextButton("COOP", uiskin);
-        optionsButton.addListener(new ChangeListener() {
+        // Singleplayer
+        TextButton singleplayerButton = new TextButton("OFFLINE", uiskin);
+        singleplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if(!game.getGeneralInfoContainer().isRoomStatusReceived())
-                {
-                    game.setGameMode(GameConfig.GAME_MODE_COOP);
-                    game.getClientHandler().getRoomsStatus(GameConfig.GAME_MODE_COOP);
-                }
-                else
-                {
-                    game.changeScreen(MyGdxGame.ROOMS_SCREEN);
-                    game.getGeneralInfoContainer().setRoomStatusReceived(false);
-                }
+                CheckAndPlayMenuSound();
+                game.setConnectionType(GameConfig.LOCAL_CONNECTION);
+                game.changeScreen(GAME_SCREEN);
             }
         });
 
-        TextButton quitButton = new TextButton("PVP", uiskin);
-        quitButton.addListener(new ChangeListener() {
+        // Multiplayer
+        TextButton multiplayerButton = new TextButton("ONLINE", uiskin);
+        multiplayerButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
-                if(!game.getGeneralInfoContainer().isRoomStatusReceived())
-                {
-                    game.setGameMode(GameConfig.GAME_MODE_PVP);
-                    game.getClientHandler().getRoomsStatus(GameConfig.GAME_MODE_PVP);
-                }
-                else
-                {
-                    game.changeScreen(MyGdxGame.ROOMS_SCREEN);
-                    game.getGeneralInfoContainer().setRoomStatusReceived(false);
-                }
+                CheckAndPlayMenuSound();
+                game.setConnectionType(GameConfig.ONLINE_CONNECTION);
+                game.setClientHandler();
+                game.changeScreen(CONNECT_SCREEN);
             }
         });
 
@@ -88,11 +75,9 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         Table buttonTable = new Table(uiskin);
         buttonTable.defaults().pad(20);
 
-        buttonTable.add(optionsButton).row();
-        buttonTable.add(quitButton).row();
+        buttonTable.add(singleplayerButton).row();
+        buttonTable.add(multiplayerButton).row();
         buttonTable.add(backButton);
-
-        buttonTable.center();
 
         table.add(buttonTable);
         table.center();
@@ -101,5 +86,4 @@ public class ModeSelectionScreen extends  MenuScreenBase {
 
         return table;
     }
-
 }

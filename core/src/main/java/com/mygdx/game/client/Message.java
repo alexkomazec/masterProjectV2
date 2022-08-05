@@ -1,17 +1,20 @@
 package com.mygdx.game.client;
 
 import com.badlogic.gdx.utils.Array;
+import com.mygdx.game.client.data.GeneralInfoContainer;
 import com.mygdx.game.client.data.PlayerDataContainer;
 
 public class Message {
 
     private Array<PlayerDataContainer> playerDataContainerArray;
+    private GeneralInfoContainer generalInfoContainer;
     private final int actionType;
     private final boolean actionDependsOnEntity;
 
 
     public Message(int actionType, boolean actionDependsOnEntity) {
         this.playerDataContainerArray = new Array<>();
+        this.generalInfoContainer = new GeneralInfoContainer();
         this.actionType = actionType;
         this.actionDependsOnEntity = actionDependsOnEntity;
     }
@@ -45,5 +48,13 @@ public class Message {
 
     public boolean doesActionDependsOnEntity() {
         return actionDependsOnEntity;
+    }
+
+    public GeneralInfoContainer getGeneralInfoContainer() {
+        return this.generalInfoContainer;
+    }
+
+    public void setGeneralInfoContainer(GeneralInfoContainer generalInfoContainer) {
+        this.generalInfoContainer = generalInfoContainer;
     }
 }
