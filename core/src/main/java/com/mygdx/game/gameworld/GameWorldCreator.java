@@ -51,6 +51,7 @@ import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TextureComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
+import com.mygdx.game.entitycomponentsystem.components.ViewAreaComponent;
 import com.mygdx.game.entitycomponentsystem.system.HealthManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
 
@@ -59,7 +60,7 @@ public class GameWorldCreator {
 
     protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.DEBUG);
     private BodyCreator bodyCreator;
-    private static int currentAvailablePlayerID = 0;
+    public static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
     public boolean connectionType;
 
@@ -193,6 +194,30 @@ public class GameWorldCreator {
         }
     }
 
+    private void createViewArea(Rectangle rectangle, Entity owner)
+    {
+        Entity entity = this.pooledEngine.createEntity();
+        ViewAreaComponent viewAreaComponent = this.pooledEngine.createComponent(ViewAreaComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        typeComponent.type = TypeComponent.VIEW_AREA;
+        /* View area should be wider, than enemy's surface */
+        rectangle.width *= 5;
+        rectangle.height *= 5;
+
+        viewAreaComponent.viewAreaBody = bodyCreator.makeCirclePolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.DynamicBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true);
+        viewAreaComponent.viewAreaBody.setBullet(true);
+        bodyCreator.makeAllFixturesSensors(viewAreaComponent.viewAreaBody);
+        viewAreaComponent.viewAreaBody.setUserData(entity);
+        viewAreaComponent.owner = owner;
+        entity.add(viewAreaComponent);
+        entity.add(typeComponent);
+
+        this.pooledEngine.addEntity(entity);
+    }
     private void createCloud(MapObject object)
     {
         Entity entity = this.pooledEngine.createEntity();
@@ -238,9 +263,7 @@ public class GameWorldCreator {
         enemyComponent.enemyType = EnemyComponent.Type.CLOUD;
 
         // set out steering behaviour
-        steeringComponent.steeringBehavior  = SteeringPresets.getWander(steeringComponent);
-        //scom.setIndependentFacing(true); // stop clouds rotating
-        steeringComponent.currentMode = SteeringComponent.SteeringState.WANDER;
+        steeringComponent.currentMode = SteeringComponent.SteeringState.NONE;
 
         characterStatsComponent.init(this.uiCharacterStatsAtlas, this.uiSkin,
                 this.characterHUD
@@ -255,6 +278,8 @@ public class GameWorldCreator {
         entity.add(stateComponent);
         entity.add(steeringComponent);
         entity.add(directionComponent);
+
+        createViewArea(rectangle, entity);
         this.healthManagerSystem.initializeHealth(entity);
         this.pooledEngine.addEntity(entity);
     }
@@ -626,7 +651,7 @@ public class GameWorldCreator {
                                float xVel, float yVel,
                                Direction direction,
                                EnemyComponent enemyComponent,
-                               BulletComponent.Owner own, PooledEngine pooledEngine, World world)
+                               BulletComponent.Owner own, B2dBodyComponent ownerRef, PooledEngine pooledEngine, World world)
     {
         Entity entity = pooledEngine.createEntity();
         B2dBodyComponent b2dbody = pooledEngine.createComponent(B2dBodyComponent.class);
@@ -639,8 +664,11 @@ public class GameWorldCreator {
         TextureComponent textureComponent = this.pooledEngine.createComponent(TextureComponent.class);
         DirectionComponent directionComponent = this.pooledEngine.createComponent(DirectionComponent.class);
         bul.owner = own;
+        bul.ownerReference = ownerRef;
+
         Array<TextureRegion> spellFrames = null;
 
+        //x = pleaseOffsetX(direction, x);
         Rectangle rectangle = new Rectangle(x,y, SPELL_WIDTH,SPELL_HEIGHT);
         b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
@@ -741,7 +769,7 @@ public class GameWorldCreator {
                 GameConfig.DEFAULT_PLAYER_HEIGHT);
     }
 
-    private void setHealthManagerSystem(HealthManagerSystem healthManagerSystem)
+    public void setHealthManagerSystem(HealthManagerSystem healthManagerSystem)
     {
         this.healthManagerSystem = healthManagerSystem;
     }
@@ -752,7 +780,6 @@ public class GameWorldCreator {
 
     public void setPooledEngine(PooledEngine pooledEngine) {
         this.pooledEngine = pooledEngine;
-        setHealthManagerSystem(this.pooledEngine.getSystem(HealthManagerSystem.class));
     }
 
     public void setOrthographicCamera(OrthographicCamera orthographicCamera) {
@@ -797,5 +824,12 @@ public class GameWorldCreator {
 
     public Array<TextureRegion> getCollisionEffectFrames() {
         return collisionEffectFrames;
+    }
+
+    private float pleaseOffsetX(Direction direction, float x)
+    {
+        float offsetPos;
+        offsetPos = (direction == Direction.LEFT)? (x - 50):(x + 50);
+        return offsetPos;
     }
 }

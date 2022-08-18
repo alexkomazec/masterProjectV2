@@ -15,6 +15,7 @@ public class BulletComponent implements Component, Poolable{
 	public float yVel = 0;
 	public boolean isDead = false;
 	public Owner owner = Owner.NONE;
+	public B2dBodyComponent ownerReference;
 	public Direction direction = Direction.LEFT;
 	
 	@Override
@@ -24,5 +25,6 @@ public class BulletComponent implements Component, Poolable{
 		yVel = 0;
 		isDead = false;
 		livingTime = 0;
+		ownerReference = null;
 	}
 }

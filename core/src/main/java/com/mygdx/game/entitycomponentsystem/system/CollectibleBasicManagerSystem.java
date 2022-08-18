@@ -113,7 +113,9 @@ public class CollectibleBasicManagerSystem extends IteratingSystem {
                 xVel, 0,
                 directionComponent.direction,
                 null,
-                BulletComponent.Owner.PLAYER, this.pooledEngine,
+                BulletComponent.Owner.PLAYER,
+                b2dbodyComponent,
+                this.pooledEngine,
                 world);
     }
 

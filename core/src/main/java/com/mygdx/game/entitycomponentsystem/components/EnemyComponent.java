@@ -1,6 +1,7 @@
 package com.mygdx.game.entitycomponentsystem.components;
 
 import com.badlogic.ashley.core.Component;
+import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.utils.Pool.Poolable;
 import com.mygdx.game.common.Direction;
 
@@ -18,6 +19,7 @@ public class EnemyComponent implements Component, Poolable{
 
 	public float velocity = LEFT_SPEED;
 	public int noOfSteps = 0;
+	public Entity target;
 
 	@Override
 	public void reset() {

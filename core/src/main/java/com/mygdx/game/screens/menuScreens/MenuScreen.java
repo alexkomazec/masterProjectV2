@@ -110,5 +110,6 @@ public class MenuScreen extends  MenuScreenBase {
     {
         CheckAndPlayMenuSound();
         Gdx.app.exit();
+        System.exit(-1);
     }
 }

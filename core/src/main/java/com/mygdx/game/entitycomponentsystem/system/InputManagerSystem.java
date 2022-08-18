@@ -1,11 +1,13 @@
 package com.mygdx.game.entitycomponentsystem.system;
 
+import com.badlogic.ashley.core.Engine;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputMultiplexer;
+import com.badlogic.gdx.InputProcessor;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.KeyboardController;
 import com.mygdx.game.common.InputAdapterWrapper;
@@ -29,6 +31,13 @@ public class InputManagerSystem extends IteratingSystem {
     private boolean isOnlineConnection = false;
     private static final int UNASSIGNED_INPUT_PROCESSOR = 999;
     private InputMultiplexer inputMultiplexer;
+
+    /* BIG NOTE: InputManagerSystem implementation looks complicated, and prepared for Split screen
+    *  gaming, but this mode is dicontinued, so the only inputprocessor used is a keyboard.
+    * tempInputProcessor is used to get reference to input processor that is set in order to
+    * can easily remove it from Gdx multiplexer
+    * */
+    private InputProcessor tempInputProcessor;
 
     public InputManagerSystem(boolean isOnlineConnection, InputMultiplexer inputMultiplexer) {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class, ControllableComponent.class).get());
@@ -101,6 +110,7 @@ public class InputManagerSystem extends IteratingSystem {
 
                 if(!key.isInputProcesorSet())
                 {
+                    tempInputProcessor = key;
                     this.inputMultiplexer.addProcessor(key);
                     key.setInputProcesorSet(true);
                 }
@@ -112,5 +122,10 @@ public class InputManagerSystem extends IteratingSystem {
         {
             logger.error("Player is not assigned");
         }
+    }
+
+    public void removeInputProcessor()
+    {
+        this.inputMultiplexer.removeProcessor(this.tempInputProcessor);
     }
 }

@@ -2,7 +2,8 @@
   "BitmapFont": {
     "default-font": { "file": "fonts/ui_font_32.fnt" },
     "small-font": { "file": "fonts/SDS_6x6_small.fnt" },
-    "hud-font": { "file": "fonts/hudFont.fnt"}
+    "hud-font": { "file": "fonts/hudFont.fnt"},
+    "ui-font_32": { "file": "fonts/ui_font_32.fnt"}
   },
   "Color": {
     "white": {
@@ -40,6 +41,7 @@
     }
   },
   "LabelStyle": {
+
     "default":
     {
       "font": "hud-font",
@@ -51,6 +53,13 @@
       "font": "hud-font",
       "fontColor": "black"
     }
+
+    "roomStatus":
+    {
+      "font": "ui-font_32",
+      "fontColor": "black"
+    }
+
   },
   "CheckBoxStyle": {
     "default": {

@@ -106,7 +106,7 @@ public abstract class MenuScreenBase extends ScreenAdapter {
     protected abstract Actor createUi();
 
     protected void back() {
-        game.changeScreen(MyGdxGame.MENU_SCREEN);
+        game.backOneScreen();
     }
 
 }

@@ -73,6 +73,7 @@ public class ConnectScreen extends ScreenAdapter
 
 		if(this.readyToChangeScreen)
 		{
+            this.readyToChangeScreen = false;
             game.changeScreen(MODE_SELECTION_SCREEN);
         }
     }

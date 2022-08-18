@@ -90,7 +90,7 @@ public class DataReceivingSystem extends IteratingSystem {
     {
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
         DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
-
+        B2dBodyComponent b2dBodyComponent;
         ControlledInputComponent controlledInputComponent = entity.getComponent(ControlledInputComponent.class);
 
         switch(actionType)
@@ -121,6 +121,7 @@ public class DataReceivingSystem extends IteratingSystem {
                     playerDataContainerTmp.setPlayerID(playerComponent.playerID);
                     playerDataContainerTmp.setAbInputCommandList(controlledInputComponent.abInputCommandList);
                     playerDataContainerTmp.setPosition(transformComponent.position);
+                    playerDataContainerTmp.setPlayerWidth(GameConfig.DEFAULT_PLAYER_WIDTH);
                     Message message = new Message(ClientHandler.SEND_PLAYER_TO_SERVER, false);
                     message.addPlayerDataContainer(playerDataContainerTmp);
 
@@ -129,6 +130,15 @@ public class DataReceivingSystem extends IteratingSystem {
                 }
             break;
 
+            case ClientHandler.REDEFINE_PLAYER_POSITION:
+                logger.debug("REDEFINE_PLAYER_POSITION");
+                b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
+                b2dBodyComponent.body.setTransform(
+                        playerDataContainer.getPosition().x * GameConfig.DIVIDE_BY_PPM ,
+                        playerDataContainer.getPosition().y * GameConfig.DIVIDE_BY_PPM,
+                        0);
+
+            break;
             /* CLARIFICATION: REMOTE_PLAYER_MOVED is deprecated so far, UPDATE_PLAYER_POS is used instead*/
             /*case ClientHandler.REMOTE_PLAYER_MOVED:
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
@@ -140,7 +150,7 @@ public class DataReceivingSystem extends IteratingSystem {
             case ClientHandler.UPDATE_PLAYER_POS:
 
                 logger.debug("UPDATE_PLAYER_POS");
-                B2dBodyComponent b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
+                b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
                 //logger.debug("GetLinearVelocity" + b2dBodyComponent.body.getLinearVelocity());
 
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
@@ -255,10 +265,12 @@ public class DataReceivingSystem extends IteratingSystem {
             case ClientHandler.CREATE_ALL_ENEMIES:
 
                 logger.debug("CREATE_ALL_ENEMIES");
-                logger.debug("createAllEnemies started, Current time:" + TimeUtils.millis());
-                this.gameWorldCreator.createEnemies();
-                this.gameWorldCreator.createClouds();
-                logger.debug("createAllEnemies finished, Current time:" + TimeUtils.millis());
+
+                if(this.clientHandler.getGame().getGameMode().equals(GameConfig.GAME_MODE_COOP))
+                {
+                    this.gameWorldCreator.createEnemies();
+                    this.gameWorldCreator.createClouds();
+                }
 
                 for (Entity entityPlayer: entityPlayers)
                 {

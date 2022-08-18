@@ -13,17 +13,21 @@ import com.badlogic.gdx.scenes.scene2d.utils.ChangeListener;
 import com.badlogic.gdx.scenes.scene2d.utils.TextureRegionDrawable;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.common.Observer;
+import com.mygdx.game.common.Topics;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
 
-public class ModeSelectionScreen extends  MenuScreenBase {
+public class ModeSelectionScreen extends  MenuScreenBase implements Observer {
 
-    private static final String CLASS_NAME  = ModeSelectionScreen.class.getSimpleName();
+    private static final String CLASS_NAME     = ModeSelectionScreen.class.getSimpleName();
     private static final Logger logger         = new Logger(CLASS_NAME, Logger.INFO);
+    private boolean readyToChangeScreen        = false;
 
     public ModeSelectionScreen(MyGdxGame game) {
         super(game);
         this.game.getWorldCreator().getRequiredResources();
+        this.game.registerObserver(Topics.UPDATE_ROOMS_STATE, this);
         System.gc();
     }
 
@@ -45,16 +49,8 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         optionsButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-                if(!game.getGeneralInfoContainer().isRoomStatusReceived())
-                {
-                    game.setGameMode(GameConfig.GAME_MODE_COOP);
-                    game.getClientHandler().getRoomsStatus(GameConfig.GAME_MODE_COOP);
-                }
-                else
-                {
-                    game.changeScreen(MyGdxGame.ROOMS_SCREEN);
-                    game.getGeneralInfoContainer().setRoomStatusReceived(false);
-                }
+                game.setGameMode(GameConfig.GAME_MODE_COOP);
+                game.getClientHandler().getRoomsStatus();
             }
         });
 
@@ -62,17 +58,8 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         quitButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
-
-                if(!game.getGeneralInfoContainer().isRoomStatusReceived())
-                {
-                    game.setGameMode(GameConfig.GAME_MODE_PVP);
-                    game.getClientHandler().getRoomsStatus(GameConfig.GAME_MODE_PVP);
-                }
-                else
-                {
-                    game.changeScreen(MyGdxGame.ROOMS_SCREEN);
-                    game.getGeneralInfoContainer().setRoomStatusReceived(false);
-                }
+                game.setGameMode(GameConfig.GAME_MODE_PVP);
+                game.getClientHandler().getRoomsStatus();
             }
         });
 
@@ -80,6 +67,7 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         backButton.addListener(new ChangeListener() {
             @Override
             public void changed(ChangeEvent event, Actor actor) {
+                game.getClientHandler().getSocket().close();
                 back();
             }
         });
@@ -102,4 +90,19 @@ public class ModeSelectionScreen extends  MenuScreenBase {
         return table;
     }
 
+    @Override
+    public void render(float delta) {
+        super.render(delta);
+        if(readyToChangeScreen)
+        {
+            game.changeScreen(MyGdxGame.ROOMS_SCREEN);
+            readyToChangeScreen = false;
+        }
+    }
+
+    @Override
+    public void update(Object... args)
+    {
+        readyToChangeScreen = true;
+    }
 }

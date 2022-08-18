@@ -185,9 +185,14 @@ public class GameConfig {
     public static final int HALF_ROOM = 1;
     public static final int FULL_ROOM = 2;
     public static final int NO_OF_ROOMS = 3;
+    public static final int PLAYERS_IN_ROOM_CAPACITY = 2;
 
     public static final String GAME_MODE_COOP = "COOP";
     public static final String GAME_MODE_PVP = "PVP";
+
+    public static final int ROOM0 = 0;
+    public static final int ROOM1 = 1;
+    public static final int ROOM2 = 2;
 
     public static final float FRAME_DURATION = 0.1f; // Frame duration for one frame in seconds
     private GameConfig(){}

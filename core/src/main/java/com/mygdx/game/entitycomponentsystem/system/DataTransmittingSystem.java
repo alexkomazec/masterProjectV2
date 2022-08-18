@@ -15,7 +15,7 @@ import io.socket.client.Socket;
 
 public class DataTransmittingSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(DataTransmittingSystem.class.getSimpleName(), Logger.INFO);
+    protected static final Logger logger = new Logger(DataTransmittingSystem.class.getSimpleName(), Logger.DEBUG);
     private ClientHandler clientHandler;
     private Message message;
 
@@ -76,7 +76,7 @@ public class DataTransmittingSystem extends IteratingSystem {
                 socket.emit("refreshPlayersPosition",
                         playerDataContainer.getPosition().x,
                         playerDataContainer.getPosition().y,
-                        playerDataContainer.getPlayerID());
+                        socket.id());
             break;
 
             case ClientHandler.PLAYER_TABLE_UPDATED:
@@ -86,7 +86,7 @@ public class DataTransmittingSystem extends IteratingSystem {
 
                 logger.debug("playerTableUpdated: Player with ID " + playerComponent.playerID + " updated Player Table");
                 socket.emit("playerTableUpdated",
-                        playerComponent.playerID);
+                        socket.id());
             break;
 
             default:
@@ -106,9 +106,10 @@ public class DataTransmittingSystem extends IteratingSystem {
 
                 logger.debug("addPlayer: Please add Player with ID " + playerDataContainer.getPlayerID());
                 socket.emit("addPlayer",
+                        playerDataContainer.getPlayerWidth(),
                         playerDataContainer.getPosition().x,
                         playerDataContainer.getPosition().y,
-                        playerDataContainer.getPlayerID());
+                        clientHandler.getSocket().id());
             break;
 
             default:

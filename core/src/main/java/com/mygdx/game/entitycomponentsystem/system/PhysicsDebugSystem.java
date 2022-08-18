@@ -14,7 +14,7 @@ public class PhysicsDebugSystem extends IteratingSystem {
     private Box2DDebugRenderer debugRenderer;
     private World world;
     private OrthographicCamera camera;
-    private boolean debug = false;
+    private boolean debug = true;
 
     @SuppressWarnings("unchecked")
 	public PhysicsDebugSystem(World world, OrthographicCamera camera){

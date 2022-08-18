@@ -31,7 +31,7 @@ import io.socket.emitter.Emitter;
 
 public class LoginForm extends VisWindow
 {
-	protected static final Logger logger = new Logger(LoginForm.class.getSimpleName(), Logger.INFO);
+	protected static final Logger logger = new Logger(LoginForm.class.getSimpleName(), Logger.DEBUG);
 	private MyGdxGame game;
 	private Stage stage;
 	private ConnectScreen connectScreen;
@@ -77,6 +77,7 @@ public class LoginForm extends VisWindow
 			@Override
 			public void changed (ChangeEvent event, Actor actor) {
 
+				logger.debug("Login button clicked");
 				if(stage == null)
 				{
 					stage = getStage();
@@ -97,7 +98,7 @@ public class LoginForm extends VisWindow
 				{
 					stage = getStage();
 				}
-				game.changeScreen(MENU_SCREEN);
+				game.backOneScreen();
 
 			}
 		});

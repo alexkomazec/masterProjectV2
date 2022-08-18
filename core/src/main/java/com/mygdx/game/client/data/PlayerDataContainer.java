@@ -8,6 +8,7 @@ public class PlayerDataContainer {
 
     private boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
     private Vector2 position       = new Vector2();
+    private float playerWidth      = 0f;
     private int playerID;
 
     public PlayerDataContainer() {}
@@ -45,5 +46,13 @@ public class PlayerDataContainer {
 
     public void setPosition(Vector2 position) {
         this.position = position;
+    }
+
+    public float getPlayerWidth() {
+        return playerWidth;
+    }
+
+    public void setPlayerWidth(float playerWidth) {
+        this.playerWidth = playerWidth;
     }
 }

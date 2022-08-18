@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="19" nextobjectid="498">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="19" nextobjectid="499">
  <tileset firstgid="1" source="tiles/platform/Platform1.tsx"/>
  <tileset firstgid="2" source="tiles/platform/Platform11.tsx"/>
  <tileset firstgid="3" source="tiles/platform/Platform12.tsx"/>
@@ -260,7 +260,7 @@
   <object id="494" gid="5" x="5200" y="39200" width="200" height="200"/>
  </objectgroup>
  <objectgroup id="18" name="CloudEnemies">
-  <object id="497" x="2000" y="38200" width="200" height="200">
+  <object id="498" x="1800" y="38000" width="200" height="200">
    <ellipse/>
   </object>
  </objectgroup>
@@ -309,7 +309,7 @@
   </object>
  </objectgroup>
  <objectgroup id="6" name="PlayersSpawnSpots">
-  <object id="360" x="2445.15" y="38645.9" width="150" height="150">
+  <object id="360" x="2433.33" y="38651.5" width="150" height="150">
    <ellipse/>
   </object>
  </objectgroup>

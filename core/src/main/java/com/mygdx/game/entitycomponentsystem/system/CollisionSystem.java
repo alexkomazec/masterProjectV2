@@ -18,6 +18,7 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
+import com.mygdx.game.entitycomponentsystem.components.ViewAreaComponent;
 
 public class CollisionSystem extends IteratingSystem {
 
@@ -49,11 +50,19 @@ public class CollisionSystem extends IteratingSystem {
 			if(collidedEntity != null){
 				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
 				B2dBodyComponent b2bcColided = collidedEntity.getComponent(B2dBodyComponent.class);
+				B2dBodyComponent b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
+
 				if(type != null){
 					switch(type.type){
 					case TypeComponent.ENEMY:
 						logger.debug("player hit enemy");
 						cc.healthAction[GameConfig.DECREASE_HP] = true;
+						break;
+					case TypeComponent.VIEW_AREA:
+						logger.debug("player hit viewArea");
+						ViewAreaComponent viewAreaComponent = collidedEntity.getComponent(ViewAreaComponent.class);
+						viewAreaComponent.bodyThatColidedViewArea = entity;
+						viewAreaComponent.collisionHappened = true;
 						break;
 					case TypeComponent.SCENERY:
 						pm.get(entity).onPlatform = true;
@@ -69,14 +78,15 @@ public class CollisionSystem extends IteratingSystem {
 						break; 
 					case TypeComponent.BULLET:
 						BulletComponent bullet = Mapper.bulletCom.get(collidedEntity);
-						if(bullet.owner != BulletComponent.Owner.PLAYER){ // can't shoot own team
+						if(bullet.ownerReference != b2dBodyComponent)
+						{
 							cc.healthAction[GameConfig.DECREASE_HP] = true;
 						}
 						logger.debug("Player just shot. bullet in player atm");
 						break;
 
 					case TypeComponent.BASIC_COLLECTIBLE:
-						logger.info("Player " + pm.get(entity).playerID + " picked up collectible");
+						logger.debug("Player " + pm.get(entity).playerID + " picked up collectible");
 						CollectibleBasicArrayComponent cbac = entity.getComponent(CollectibleBasicArrayComponent.class);
 						CollectibleBasicComponent cbc = collidedEntity.getComponent(CollectibleBasicComponent.class);
 						if(cbac == null)
@@ -98,7 +108,7 @@ public class CollisionSystem extends IteratingSystem {
 
 						break;
 					case TypeComponent.POTIONS:
-						logger.info("Player " + pm.get(entity).playerID + " picked up potion!");
+						logger.debug("Player " + pm.get(entity).playerID + " picked up potion!");
 						PotionComponent potionComponent = collidedEntity.getComponent(PotionComponent.class);
 						CollisionComponent collisionComponent = entity.getComponent(CollisionComponent.class);
 
@@ -166,8 +176,10 @@ public class CollisionSystem extends IteratingSystem {
 					switch(type.type)
 					{
 						case TypeComponent.PLAYER:
+							B2dBodyComponent b2dBcollided = collidedEntity.getComponent(B2dBodyComponent.class);
 							logger.debug("bullet hit player");
-							if(bullet.owner != BulletComponent.Owner.PLAYER) { // It is not a friendly bullet
+							if(bullet.ownerReference != b2dBcollided)
+							{
 								bullet.isDead = true;
 								ccColided.healthAction[GameConfig.DECREASE_HP] = true;
 								logger.debug("player hit by the enemy's hit");
@@ -275,6 +287,29 @@ public class CollisionSystem extends IteratingSystem {
 							/* Delete already picked up basic collectible*/
 							b2bcColided.isDead = true;
 							cbc.isDead = true;
+							break;
+						default:
+							logger.error("No matching type found");
+					}
+				}
+				else
+				{
+					logger.error("type is null");
+				}
+			}
+		}
+		else if(thisType.type == TypeComponent.VIEW_AREA)
+		{
+			if(collidedEntity != null)
+			{
+				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+
+				if(type != null) {
+					switch (type.type) {
+						case TypeComponent.PLAYER:
+							ViewAreaComponent viewAreaComponent = entity.getComponent(ViewAreaComponent.class);
+							viewAreaComponent.bodyThatColidedViewArea = collidedEntity;
+							viewAreaComponent.collisionHappened = true;
 							break;
 						default:
 							logger.error("No matching type found");

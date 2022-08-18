@@ -64,14 +64,14 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
             this.clientHandler.getSocket().emit("updatePlayerInputPosition",
                     transformComponent.position.x,
                     transformComponent.position.y,
-                    playerComponent.playerID);
+                    this.clientHandler.getSocket().id());
             lastStoredPosition.set(transformComponent.position);
         }
 
         if(currentDirection!= directionComponent.direction)
         {
             logger.debug("playerChangedDirReq: Player with ID " + playerComponent.playerID + " changed direction");
-            this.clientHandler.getSocket().emit("playerChangedDirReq", playerComponent.playerID);
+            this.clientHandler.getSocket().emit("playerChangedDirReq", this.clientHandler.getSocket().id());
             currentDirection = directionComponent.direction;
         }
 
@@ -92,7 +92,7 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
                 jAInputCommandList.put(cntrlInComp.abInputCommandList[GameConfig.SPACE]);
                 logger.debug("magicFired: Player with ID " + playerComponent.playerID + " fire Magic");
                 this.clientHandler.getSocket().emit("magicFired",
-                        playerComponent.playerID,
+                        this.clientHandler.getSocket().id(),
                         jAInputCommandList
                         );
                 this.isMagicFired = cntrlInComp.abInputCommandList[GameConfig.SPACE];
