@@ -20,7 +20,6 @@ import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
-import com.mygdx.game.entitycomponentsystem.components.ViewAreaComponent;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.utils.GdxUtils;
@@ -53,33 +52,31 @@ public class EnemySystem extends IteratingSystem{
 		Array<Fixture> fixtureArray = bodyCom.body.getFixtureList();
 
 		float halfRadius = fixtureArray.get(0).getShape().getRadius()*GameConfig.MULTIPLY_BY_PPM;
-		if(enemyCom.enemyType == EnemyComponent.Type.BASIC_ENEMY){
-			// get distance of enemy from its original start position (pad center)
-			float currentXpos = bodyCom.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM - halfRadius;
-			float distFromOrig = Math.abs(enemyCom.xPosCenter - currentXpos);
-
-			if(distFromOrig > enemyCom.noOfSteps)
+		if(enemyCom.enemyType == EnemyComponent.Type.BASIC_ENEMY)
+		{
+			if(enemyCom.playerTouchedViewArea)
 			{
-				if(enemyCom.velocity == EnemyComponent.LEFT_SPEED)
-				{
-					enemyCom.velocity = EnemyComponent.RIGHT_SPEED;
-					directionComponent.direction = Direction.RIGHT;
+				// get distance of enemy from its original start position (pad center)
+				float currentXpos = bodyCom.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM - halfRadius;
+				float distFromOrig = Math.abs(enemyCom.xPosCenter - currentXpos);
+
+				if (distFromOrig > enemyCom.noOfSteps) {
+					if (enemyCom.velocity == EnemyComponent.LEFT_SPEED) {
+						enemyCom.velocity = EnemyComponent.RIGHT_SPEED;
+						directionComponent.direction = Direction.RIGHT;
+					} else if (enemyCom.velocity == EnemyComponent.RIGHT_SPEED) {
+						enemyCom.velocity = EnemyComponent.LEFT_SPEED;
+						directionComponent.direction = Direction.LEFT;
+					} else {
+						logger.error("Impossible combination");
+					}
 				}
-				else if(enemyCom.velocity == EnemyComponent.RIGHT_SPEED)
-				{
-					enemyCom.velocity = EnemyComponent.LEFT_SPEED;
-					directionComponent.direction = Direction.LEFT;
-				}
-				else
-				{
-					logger.error("Impossible combination");
-				}
+
+				// apply speed to body
+				bodyCom.body.setTransform(bodyCom.body.getPosition().x + enemyCom.velocity,
+						bodyCom.body.getPosition().y,
+						bodyCom.body.getAngle());
 			}
-			
-			// apply speed to body
-			bodyCom.body.setTransform(bodyCom.body.getPosition().x + enemyCom.velocity,
-					bodyCom.body.getPosition().y,
-					bodyCom.body.getAngle());	
 		}
 		else if(enemyCom.enemyType == EnemyComponent.Type.CLOUD)
 		{
@@ -104,10 +101,10 @@ public class EnemySystem extends IteratingSystem{
 
 					float distance = b2Player.body.getPosition().dst(b2Enemy.body.getPosition());
 					if(distance < 3 && scom.currentMode != SteeringComponent.SteeringState.FLEE){
-						scom.steeringBehavior = SteeringPresets.getFlee(Mapper.sCom.get(entity),Mapper.sCom.get(getPlayerById(0)));
+						scom.steeringBehavior = SteeringPresets.getFlee(Mapper.sCom.get(entity),Mapper.sCom.get(targetEntity));
 						scom.currentMode = SteeringComponent.SteeringState.FLEE;
 					}else if(distance > 3 && distance < 10 && scom.currentMode != SteeringComponent.SteeringState.ARRIVE){
-						scom.steeringBehavior = SteeringPresets.getArrive(Mapper.sCom.get(entity),Mapper.sCom.get(getPlayerById(0)));
+						scom.steeringBehavior = SteeringPresets.getArrive(Mapper.sCom.get(entity),Mapper.sCom.get(targetEntity));
 						scom.currentMode = SteeringComponent.SteeringState.ARRIVE;
 					}else if(distance > 15 && scom.currentMode != SteeringComponent.SteeringState.WANDER){
 						scom.steeringBehavior  = SteeringPresets.getWander(Mapper.sCom.get(entity));
@@ -153,26 +150,5 @@ public class EnemySystem extends IteratingSystem{
 		if(enemyCom.isDead){
 			bodyCom.isDead =true;
 		}
-	}
-
-	private Entity getPlayerById(int playerID)
-	{
-		ImmutableArray<Entity> arrayOfentities =  this.pooledEngine.
-				getEntitiesFor(Family.all(PlayerComponent.class).get());
-		PlayerComponent playerComponent = null;
-		Entity entity = null;
-		int iterator = 0;
-
-		for (iterator = 0; iterator < arrayOfentities.size(); iterator++)
-		{
-			playerComponent = arrayOfentities.get(iterator).getComponent(PlayerComponent.class);
-			if(playerID == playerComponent.playerID)
-			{
-				entity = arrayOfentities.get(iterator);
-				break;
-			}
-		}
-
-		return entity;
 	}
 }

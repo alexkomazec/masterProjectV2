@@ -2,11 +2,14 @@ package com.mygdx.game;
 
 import com.badlogic.gdx.Input.Keys;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.common.InputAdapterWrapper;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.system.PlayerControlSystem;
 
 public class KeyboardController extends InputAdapterWrapper {
 
+	private static final Logger logger = new Logger(KeyboardController.class.getSimpleName(), Logger.DEBUG);
 	private final Vector2 mouseLocation = new Vector2(0,0);
 
 	public KeyboardController()

@@ -200,8 +200,8 @@ public class RoomsScreen extends  MenuScreenBase implements Observer {
         super.render(delta);
         if(readyToChangeScreen)
         {
-            this.game.changeScreen(GAME_SCREEN);
             readyToChangeScreen = false;
+            this.game.changeScreen(GAME_SCREEN);
         }
     }
 

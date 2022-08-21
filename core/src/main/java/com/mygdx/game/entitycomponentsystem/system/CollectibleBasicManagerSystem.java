@@ -23,7 +23,7 @@ import com.mygdx.game.utils.GdxUtils;
 
 public class CollectibleBasicManagerSystem extends IteratingSystem {
 
-    private static final Logger logger = new Logger(CollectibleBasicManagerSystem.class.getSimpleName(), Logger.DEBUG);
+    private static final Logger logger = new Logger(CollectibleBasicManagerSystem.class.getSimpleName(), Logger.INFO);
     public final int MAX_BUFF = 3;
 
     /* Mechanism for delayed double shoot in order to make some space between the first shoot,

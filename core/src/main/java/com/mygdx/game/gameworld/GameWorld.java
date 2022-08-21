@@ -12,13 +12,14 @@ public class GameWorld {
     private static final Logger logger = new Logger(GameWorld.class.getSimpleName(), Logger.DEBUG);
 
     /* box2d world represents all bodies in the game world as 2d body with regular physics*/
-    private final WorldSingleton box2dWorldSingleton;
+    private WorldSingleton box2dWorldSingleton;
     private Array<Entity> aplayers;
 
     /* tiledMap is a game world composed of layers, and each layer is composed of tiled objects*/
     TiledMap tiledMap;
     public static final String TM_LAYER_PLATFORM = "Platform";
     public static final String TM_LAYER_PLAYERS_SPAWN_SPOTS = "PlayersSpawnSpots";
+    public static final String TM_LAYER_PORTALS = "Portals";
 
     public static final String TM_LAYER_BASIC_ENEMIES = "BasicEnemies";
     public static final String TM_LAYER_CLOUD_ENEMIES = "CloudEnemies";
@@ -28,6 +29,7 @@ public class GameWorld {
 
     public GameWorld(TiledMap tiledMap)
     {
+        WorldSingleton.instance = null;
         this.box2dWorldSingleton = WorldSingleton.getInstance(new Vector2(0, -15), true);
         this.tiledMap = tiledMap;
         this.aplayers = new Array<>();
@@ -72,5 +74,11 @@ public class GameWorld {
 
     public WorldSingleton getBox2dWorldSingleton() {
         return box2dWorldSingleton;
+    }
+
+    public void reset()
+    {
+        this.box2dWorldSingleton = null;
+        aplayers = null;
     }
 }

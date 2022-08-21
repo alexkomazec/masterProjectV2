@@ -24,6 +24,8 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
 
+import javax.swing.text.TabExpander;
+
 public class DataReceivingSystem extends IteratingSystem {
 
     protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.INFO);
@@ -34,6 +36,7 @@ public class DataReceivingSystem extends IteratingSystem {
 
     public DataReceivingSystem(ClientHandler clientHandler) {
         super(Family.all(PlayerComponent.class, ControlledInputComponent.class).get());
+        logger.debug("DataReceivingSystem has been created");
         this.clientHandler = clientHandler;
         this.gameWorldCreator = GameWorldCreator.getInstance();
         this.generalInfoContainer = generalInfoContainer;
@@ -238,29 +241,23 @@ public class DataReceivingSystem extends IteratingSystem {
             case ClientHandler.PLAYER_DISCONNECTED:
 
                 logger.info("PLAYER_DISCONNECTED");
-                for (Entity entityPlayer: entityPlayers)
-                {
-                    PlayerComponent playerComponent = entityPlayer.getComponent(PlayerComponent.class);
-                    if(playerComponent.playerID == playerDataContainer.getPlayerID())
-                    {
-                        tempEntity = entityPlayer;
-                        break;
-                    }
-                }
-
-                /* Delete Entity that contains player component that has been disconected*/
-                if(tempEntity!= null)
-                {
-                    /* Set Box2d Body to be dead, and Physics system will handle it */
-                    B2dBodyComponent bodyComponent = tempEntity.getComponent(B2dBodyComponent.class);
-                    bodyComponent.isDead = true;
-                }
-                else
-                {
-                    logger.error("tempEntity is empty");
-                }
+                /* Do not need return value of markPlayerBodyToBeDeleted */
+                markPlayerBodyToBeDeleted(entityPlayers, playerDataContainer);
 
             break;
+
+            case ClientHandler.GO_OUT_FROM_THE_ROOM_RESP:
+
+                logger.info("GO_OUT_FROM_THE_ROOM_RESP");
+                PlayerComponent.PlayerConnectivity playerConnectivity;
+                playerConnectivity = markPlayerBodyToBeDeleted(entityPlayers, playerDataContainer);
+
+                if(playerConnectivity == PlayerComponent.PlayerConnectivity.LOCAL)
+                {
+                    this.clientHandler.notifyToGoOutFromTheRoom();
+                }
+
+                break;
 
             case ClientHandler.CREATE_ALL_ENEMIES:
 
@@ -282,6 +279,38 @@ public class DataReceivingSystem extends IteratingSystem {
             default:
                 logger.error("processData no entity: Wrong action type" + actionType);
         }
+    }
+
+    private PlayerComponent.PlayerConnectivity markPlayerBodyToBeDeleted(ImmutableArray<Entity> entityPlayers,
+                                           PlayerDataContainer playerDataContainer)
+    {
+        Entity tempEntity = null;
+        PlayerComponent.PlayerConnectivity playerConnectivityTemp = PlayerComponent.PlayerConnectivity.NONE;
+
+        for (Entity entityPlayer: entityPlayers)
+        {
+            PlayerComponent playerComponent = entityPlayer.getComponent(PlayerComponent.class);
+            if(playerComponent.playerID == playerDataContainer.getPlayerID())
+            {
+                tempEntity = entityPlayer;
+                playerConnectivityTemp = playerComponent.typeOfPlayer;
+                break;
+            }
+        }
+
+        /* Delete Entity that contains player component that has been disconected*/
+        if(tempEntity!= null)
+        {
+            /* Set Box2d Body to be dead, and Physics system will handle it */
+            B2dBodyComponent bodyComponent = tempEntity.getComponent(B2dBodyComponent.class);
+            bodyComponent.isDead = true;
+        }
+        else
+        {
+            logger.error("tempEntity is empty");
+        }
+
+        return playerConnectivityTemp;
     }
 
     public GameWorldCreator getGameWorldCreator() {

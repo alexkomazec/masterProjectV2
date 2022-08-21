@@ -12,6 +12,7 @@ import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.CharacterStatsComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
+import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
@@ -27,12 +28,14 @@ public class PhysicsSystem extends IteratingSystem {
 
     private final ComponentMapper<B2dBodyComponent> bm = ComponentMapper.getFor(B2dBodyComponent.class);
     private final ComponentMapper<TransformComponent> tm = ComponentMapper.getFor(TransformComponent.class);
+    private MatchTracker matchTracker;
 
     @SuppressWarnings("unchecked")
-	public PhysicsSystem(World world) {
+	public PhysicsSystem(World world, MatchTracker matchTracker) {
         super(Family.all(B2dBodyComponent.class, TransformComponent.class).get());
         this.world = world;
         this.bodiesQueue = new Array<Entity>();
+        this.matchTracker = matchTracker;
     }
 
     @Override
@@ -56,6 +59,13 @@ public class PhysicsSystem extends IteratingSystem {
                 if(bodyComp.isDead){
                     logger.debug("Removing a body and entity");
                 	world.destroyBody(bodyComp.body);
+
+                	/* Inform matchTracker that player died */
+                    PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+                    if(playerComponent != null)
+                    {
+                        this.matchTracker.decreaseNoOfAlivePlayers(playerComponent);
+                    }
 
                 	if(characterStatsComponent != null)
                         characterStatsComponent.removeTable();

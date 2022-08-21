@@ -43,11 +43,13 @@ import com.mygdx.game.entitycomponentsystem.system.RenderGameHud;
 import com.mygdx.game.entitycomponentsystem.system.RenderTiledMapSystem;
 import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
 import com.mygdx.game.entitycomponentsystem.system.SteeringSystem;
-import com.mygdx.game.entitycomponentsystem.system.ViewAreaSystem;
+import com.mygdx.game.entitycomponentsystem.system.SensorSystem;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
+import com.mygdx.game.gameworld.TileMapHandler;
 import com.mygdx.game.screens.menuScreens.MenuScreen;
-import com.mygdx.game.ui.PauseMenu;
+import com.mygdx.game.ui.EndMatchPanel;
+import com.mygdx.game.ui.PausePanel;
 import com.mygdx.game.utils.ScreenOrientation;
 
 public class GameScreen implements Screen, Observer {
@@ -63,7 +65,8 @@ public class GameScreen implements Screen, Observer {
     private Viewport hudViewport;
 
     private Button pauseButton;
-    private PauseMenu pauseMenu;
+    private PausePanel pausePanel;
+    private EndMatchPanel gameOverPanel;
 
     Stage stageHUD;
     Stage characterHUD;
@@ -71,11 +74,16 @@ public class GameScreen implements Screen, Observer {
     public GameScreen()
     {
         this.game = MyGdxGame.getInstance();
+
+        if(game.getClientHandler() != null)
+        {
+            this.game.getClientHandler().loadSystems();
+        }
+
         initGameWorld();
-        GameWorldCreator.currentAvailablePlayerID = 0;
 
         this.game.registerObserver(Topics.PLAYER_LEAVE_ROOM, this);
-        this.pauseMenu = new PauseMenu(new PauseMenu.Listener()
+        this.pausePanel = new PausePanel(new PausePanel.Listener()
         {
             @Override
             public void exit() {
@@ -85,18 +93,53 @@ public class GameScreen implements Screen, Observer {
 
             @Override
             public void quit() {
-                game.getClientHandler().goOutFromTheRoom();
+                if(game.getClientHandler() == null)
+                {
+                    game.backOneScreen();
+                }
+                else
+                {
+                    game.getClientHandler().goOutFromTheRoom();
+                }
             }
 
             @Override
             public void resume() {
-                pauseMenu.hide();
+                pausePanel.hide();
             }
         }, game.getUiSkin());
 
-        pauseMenu.setPosition(0,0);
-        pauseMenu.setFillParent(true);
-        pauseMenu.setVisible(false);
+        this.gameOverPanel = new EndMatchPanel(new EndMatchPanel.Listener()
+        {
+            @Override
+            public void exit() {
+                Gdx.app.exit();
+                System.exit(-1);
+            }
+
+            @Override
+            public void quit() {
+                if(game.getClientHandler() == null)
+                {
+                    game.backOneScreen();
+                }
+                else
+                {
+                    game.getClientHandler().goOutFromTheRoom();
+                }
+            }
+
+        }, game.getUiSkin());
+
+
+        pausePanel.setPosition(0,0);
+        pausePanel.setFillParent(true);
+        pausePanel.setVisible(false);
+
+        gameOverPanel.setPosition(0,0);
+        gameOverPanel.setFillParent(true);
+        gameOverPanel.setVisible(false);
+        this.game.getMatchTracker().setGameOverPanel(gameOverPanel);
 
         ScreenOrientation screenOrientation = this.game.getScreenOrientation();
         if(screenOrientation != null)
@@ -115,8 +158,6 @@ public class GameScreen implements Screen, Observer {
 
         this.game.getPooledEngine().addSystem(new AnimationSystem());
         HealthManagerSystem healthManagerSystem = new HealthManagerSystem();
-        this.game.getPooledEngine().addSystem(healthManagerSystem);
-        this.game.getWorldCreator().setHealthManagerSystem(healthManagerSystem);
 
         this.game.getPooledEngine().addSystem(
                 new PlayerControlSystem(
@@ -136,16 +177,18 @@ public class GameScreen implements Screen, Observer {
                 new CollisionEffectsSystem(this.game.getGameWorldCreator().getCollisionEffectFrames().size)
         );
         this.game.getPooledEngine().addSystem(
-                new PhysicsSystem(this.gameWorld.getWorldSingleton().getWorld()));
+                new PhysicsSystem(this.gameWorld.getWorldSingleton().getWorld(), this.game.getMatchTracker()));
         this.game.getPooledEngine().addSystem(
-                new CollisionSystem());
+                new CollisionSystem(this.game.getMatchTracker()));
         this.game.getPooledEngine().addSystem(
                 new BulletSystem(game.getWorldCreator()));
         this.game.getPooledEngine().addSystem(
                 new EnemySystem(game.getWorldCreator(), this.gameWorld, game.getPooledEngine())
         );
+        this.game.getPooledEngine().addSystem(healthManagerSystem);
+        this.game.getWorldCreator().setHealthManagerSystem(healthManagerSystem);
         this.game.getPooledEngine().addSystem(
-                new ViewAreaSystem()
+                new SensorSystem(this.game.getPooledEngine())
         );
         this.game.getPooledEngine().addSystem(
                 new SteeringSystem());
@@ -176,6 +219,7 @@ public class GameScreen implements Screen, Observer {
         ViewPortConfiguration.setupPhysicalSize();
         this.game.getWorldCreator().setCharacterHUD(this.characterHUD);
         this.game.getWorldCreator().createPlatforms();
+        this.game.getWorldCreator().createPortals();
         this.game.getWorldCreator().createPlayer(true, this.game.getConnectionType(),null);
         //this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
         this.game.getWorldCreator().createBasicCollectibles();
@@ -207,12 +251,13 @@ public class GameScreen implements Screen, Observer {
             @Override
             public void clicked(InputEvent event, float x, float y){
                 //pause();
-                pauseMenu.show();
+                pausePanel.show();
                 logger.debug("Clicked!");
             }
         });
 
-        this.stageHUD.addActor(pauseMenu);
+        this.stageHUD.addActor(gameOverPanel);
+        this.stageHUD.addActor(pausePanel);
         this.stageHUD.addActor(pauseButton);
         this.game.getInputMultiplexer().addProcessor(this.stageHUD);
     }
@@ -240,7 +285,8 @@ public class GameScreen implements Screen, Observer {
 
         if(readyToChangeScreen)
         {
-            pauseMenu.hide();
+            pausePanel.hide();
+            gameOverPanel.hide();
             this.game.backOneScreen();
             readyToChangeScreen = false;
         }
@@ -264,12 +310,6 @@ public class GameScreen implements Screen, Observer {
 
     @Override
     public void hide() {
-        DataReceivingSystem dataReceivingSystem = game.getPooledEngine().
-                getSystem(DataReceivingSystem.class);
-        DataTransmittingSystem dataTransmittingSystem = game.getPooledEngine().
-                getSystem(DataTransmittingSystem.class);
-        InputManagerTransmittingSystem inputManagerTransmittingSystem = game.getPooledEngine().
-                getSystem(InputManagerTransmittingSystem.class);
 
         game.getPooledEngine().getSystem(InputManagerSystem.class).removeInputProcessor();
         this.game.getInputMultiplexer().removeProcessor(this.stageHUD);
@@ -277,9 +317,12 @@ public class GameScreen implements Screen, Observer {
         game.getPooledEngine().removeAllEntities();
         game.getPooledEngine().removeAllSystems();
 
-        game.getPooledEngine().addSystem(dataReceivingSystem);
-        game.getPooledEngine().addSystem(dataTransmittingSystem);
-        game.getPooledEngine().addSystem(inputManagerTransmittingSystem);
+        if(this.game.getClientHandler() != null)
+        {
+            this.game.getClientHandler().clearSystems();
+            this.game.getClientHandler().getReceivedMessageArray().clear();
+            this.game.getClientHandler().getTransmitingMessageArray().clear();
+        }
 
         this.gameWorld = null;
     }
@@ -313,7 +356,17 @@ public class GameScreen implements Screen, Observer {
 
     private void initGameWorld()
     {
+        resetGame();
+        TileMapHandler.instance = null;
+        this.game.setTiledMapHandler(TileMapHandler.getInstance(GameConfig.LEVEL1));
         this.gameWorld = new GameWorld(this.game.getTileMapHandler().getTiledMap());
         this.game.setGameWorld(this.gameWorld);
+        GameWorldCreator.currentAvailablePlayerID = 0;
+    }
+
+    private void resetGame()
+    {
+        this.game.getMatchTracker().reset();
+        //this.gameWorld.reset();
     }
 }

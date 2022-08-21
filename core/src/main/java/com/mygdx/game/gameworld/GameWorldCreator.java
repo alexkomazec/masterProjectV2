@@ -1,8 +1,18 @@
 package com.mygdx.game.gameworld;
 
+import static com.mygdx.game.config.GameConfig.BULLET_BIT;
+import static com.mygdx.game.config.GameConfig.CLOUD_BIT;
+import static com.mygdx.game.config.GameConfig.COLLECTIBLE_BIT;
+import static com.mygdx.game.config.GameConfig.ENEMY_BIT;
+import static com.mygdx.game.config.GameConfig.GROUND_BIT;
 import static com.mygdx.game.config.GameConfig.MULTIPLY_BY_PPM;
+import static com.mygdx.game.config.GameConfig.PLAYER_BIT;
+import static com.mygdx.game.config.GameConfig.PORTAL_BIT;
+import static com.mygdx.game.config.GameConfig.POTIONS_BIT;
 import static com.mygdx.game.config.GameConfig.SPELL_HEIGHT;
 import static com.mygdx.game.config.GameConfig.SPELL_WIDTH;
+import static com.mygdx.game.config.GameConfig.SENSOR_BIT;
+import static com.mygdx.game.config.GameConfig.VIEW_AREA_BIT;
 
 import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
@@ -24,8 +34,8 @@ import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Skin;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
-import com.mygdx.game.ai.SteeringPresets;
 import com.mygdx.game.common.Direction;
+import com.mygdx.game.common.SensorType;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
@@ -44,6 +54,7 @@ import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.CharacterStatsComponent;
+import com.mygdx.game.entitycomponentsystem.components.PortalComponent;
 import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.RemoteInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
@@ -51,9 +62,10 @@ import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
 import com.mygdx.game.entitycomponentsystem.components.TextureComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
-import com.mygdx.game.entitycomponentsystem.components.ViewAreaComponent;
+import com.mygdx.game.entitycomponentsystem.components.SensorComponent;
 import com.mygdx.game.entitycomponentsystem.system.HealthManagerSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerSystem;
+import com.mygdx.game.entitycomponentsystem.system.MatchTracker;
 
 
 public class GameWorldCreator {
@@ -86,6 +98,7 @@ public class GameWorldCreator {
     HealthManagerSystem healthManagerSystem;
     OrthographicCamera orthographicCamera;
     AssetManagmentHandler assetManagmentHandler;
+    MatchTracker matchTracker;
 
     Stage characterHUD;
 
@@ -196,30 +209,63 @@ public class GameWorldCreator {
 
     private void createViewArea(Rectangle rectangle, Entity owner)
     {
+        Short categoryFilterBits = VIEW_AREA_BIT;
+        Short maskFilterBits = PLAYER_BIT;
         Entity entity = this.pooledEngine.createEntity();
-        ViewAreaComponent viewAreaComponent = this.pooledEngine.createComponent(ViewAreaComponent.class);
+        SensorComponent sensorComponent = this.pooledEngine.createComponent(SensorComponent.class);
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
-        typeComponent.type = TypeComponent.VIEW_AREA;
+        typeComponent.type = TypeComponent.VIEW_AREA_SENSOR;
         /* View area should be wider, than enemy's surface */
         rectangle.width *= 5;
         rectangle.height *= 5;
 
-        viewAreaComponent.viewAreaBody = bodyCreator.makeCirclePolyBody(rectangle,
+        sensorComponent.sensorBody = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
-        viewAreaComponent.viewAreaBody.setBullet(true);
-        bodyCreator.makeAllFixturesSensors(viewAreaComponent.viewAreaBody);
-        viewAreaComponent.viewAreaBody.setUserData(entity);
-        viewAreaComponent.owner = owner;
-        entity.add(viewAreaComponent);
+                true, categoryFilterBits, maskFilterBits);
+        bodyCreator.makeAllFixturesSensors(sensorComponent.sensorBody);
+        sensorComponent.sensorBody.setUserData(entity);
+        sensorComponent.owner = owner;
+        sensorComponent.sensorType = SensorType.VIEW_AREA;
+
+        entity.add(sensorComponent);
         entity.add(typeComponent);
 
         this.pooledEngine.addEntity(entity);
     }
+
+    private void createEnemySensor(Rectangle rectangle, Entity owner)
+    {
+        short categoryFilterBits = SENSOR_BIT;
+        short maskFilterBits = PLAYER_BIT;
+        Entity entity = this.pooledEngine.createEntity();
+        SensorComponent sensorComponent = this.pooledEngine.createComponent(SensorComponent.class);
+        TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        typeComponent.type = TypeComponent.ENEMY_SENSOR;
+
+        sensorComponent.sensorBody = bodyCreator.makeCirclePolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.DynamicBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true, categoryFilterBits, maskFilterBits);
+
+        bodyCreator.makeAllFixturesSensors(sensorComponent.sensorBody);
+        sensorComponent.sensorBody.setUserData(entity);
+        sensorComponent.owner = owner;
+        sensorComponent.sensorType = SensorType.ENEMY_SENSOR;
+
+        entity.add(sensorComponent);
+        entity.add(typeComponent);
+
+        this.pooledEngine.addEntity(entity);
+    }
+
     private void createCloud(MapObject object)
     {
+        Short categoryFilterBits = CLOUD_BIT;
+        Short maskFilterBits = BULLET_BIT | GROUND_BIT;
+
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
@@ -238,7 +284,7 @@ public class GameWorldCreator {
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
+                true, categoryFilterBits, maskFilterBits);
 
         b2dBodyComponent.body.setGravityScale(0f);  // no gravity for our floating enemy
         b2dBodyComponent.body.setLinearDamping(0.3f); // setting linear dampening so the enemy slows down in our box2d world(or it can float on forever)
@@ -279,8 +325,63 @@ public class GameWorldCreator {
         entity.add(steeringComponent);
         entity.add(directionComponent);
 
+        createEnemySensor(rectangle, entity);
         createViewArea(rectangle, entity);
         this.healthManagerSystem.initializeHealth(entity);
+        this.pooledEngine.addEntity(entity);
+    }
+
+    public void createPortals()
+    {
+        TiledMap map = this.gameWorld.getTiledMap();
+        //Create Platform
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_PORTALS);
+        if(mapLayer != null)
+        {
+            for(TextureMapObject object : mapLayer.getObjects().getByType(TextureMapObject.class))
+            {
+                createPortal(object);
+            }
+        }
+    }
+
+    private void createPortal(TextureMapObject object)
+    {
+        Short categoryFilterBits = PORTAL_BIT;
+        Short maskFilterBits = PLAYER_BIT;
+
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent    b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TypeComponent       typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        TransformComponent  transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        CollisionComponent  colComp = this.pooledEngine.createComponent(CollisionComponent.class);
+        PortalComponent     portalComponent = this.pooledEngine.createComponent(PortalComponent.class);
+        Rectangle rectangle = getRectangle(object);
+
+        //Create a box2d body for each tiled object in the layer
+        b2dBodyComponent.body = bodyCreator.makeBoxPolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.StaticBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true, categoryFilterBits, maskFilterBits);
+
+        /* Set an object that represents an unique ID for the body */
+        b2dBodyComponent.body.setUserData(entity);
+        entity.add(b2dBodyComponent);
+
+        /* Set type component*/
+        typeComponent.type = TypeComponent.PORTALS;
+        entity.add(typeComponent);
+
+        portalComponent.textureMapObject = object;
+        entity.add(portalComponent);
+
+        /* Set transformation component*/
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
+        entity.add(transformComponent);
+        entity.add(colComp);
+
+        /* Add the index to the brick component*/
         this.pooledEngine.addEntity(entity);
     }
 
@@ -300,6 +401,8 @@ public class GameWorldCreator {
 
     private void createPlatform (TextureMapObject object)
     {
+        Short categoryFilterBits = GROUND_BIT;
+        Short maskFilterBits = CLOUD_BIT | PLAYER_BIT | ENEMY_BIT | BULLET_BIT;
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent    b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TypeComponent       typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
@@ -312,7 +415,7 @@ public class GameWorldCreator {
                 BodyCreator.STONE,
                 BodyDef.BodyType.StaticBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
+                true, categoryFilterBits, maskFilterBits);
 
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
@@ -351,6 +454,9 @@ public class GameWorldCreator {
 
     private Entity createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer, boolean isOnlineMode)
     {
+        Short categoryFilterBits = PLAYER_BIT;
+        Short maskFilterBits = GROUND_BIT | COLLECTIBLE_BIT | POTIONS_BIT | PORTAL_BIT | SENSOR_BIT | BULLET_BIT | VIEW_AREA_BIT;
+
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
@@ -370,6 +476,9 @@ public class GameWorldCreator {
 
         rectangle = (isLocalPlayer) ? getRectangle(object) : getRectangle(position);
         playerComponent.playerID = currentAvailablePlayerID;
+        playerComponent.typeOfPlayer = (isLocalPlayer) ? PlayerComponent.PlayerConnectivity.LOCAL:PlayerComponent.PlayerConnectivity.ONLINE;
+        this.matchTracker.increaseNoOfAlivePlayers(playerComponent);
+
         logger.debug("[createPlayer]: playerComponent.playerID assigned to " + playerComponent.playerID);
         currentAvailablePlayerID++;
         entity.add(playerComponent);
@@ -378,11 +487,12 @@ public class GameWorldCreator {
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
+                true, categoryFilterBits, maskFilterBits);
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
         // Do not allow unit to sleep or it wil sleep through events if stationary too long
         b2dBodyComponent.body.setSleepingAllowed(false);
+
         entity.add(b2dBodyComponent);
 
         transformComponent.position.set(b2dBodyComponent.body.getPosition().x
@@ -442,6 +552,7 @@ public class GameWorldCreator {
         else
         {
             inputTypeForPlayerComponent = this.pooledEngine.createComponent(RemoteInputComponent.class);
+            b2dBodyComponent.body.setGravityScale(0f);  // no gravity for online players, online players will transmit their position
         }
         entity.add(inputTypeForPlayerComponent);
 
@@ -466,6 +577,8 @@ public class GameWorldCreator {
     }
 
     private Entity createEnemy(MapObject object){
+        short categoryFilterBits = ENEMY_BIT;
+        short maskFilterBits = GROUND_BIT | BULLET_BIT;
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
@@ -483,7 +596,7 @@ public class GameWorldCreator {
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
+                true, categoryFilterBits, maskFilterBits);
 
         stateCom.set(StateComponent.STATE_NORMAL);
         entity.add(stateCom);
@@ -528,9 +641,11 @@ public class GameWorldCreator {
         entity.add(transformComponent);
         entity.add(enemyComponent);
         entity.add(typeComponent);
+
+        createEnemySensor(rectangle, entity);
+        createViewArea(rectangle, entity);
         this.healthManagerSystem.initializeHealth(entity);
         this.pooledEngine.addEntity(entity);
-
 
         return entity;
     }
@@ -550,6 +665,10 @@ public class GameWorldCreator {
     }
 
     private Entity createBasicCollectible(TextureMapObject object){
+
+        Short categoryFilterBits = COLLECTIBLE_BIT;
+        Short maskFilterBits = GROUND_BIT | PLAYER_BIT;
+
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
@@ -563,7 +682,7 @@ public class GameWorldCreator {
                 BodyCreator.STONE,
                 BodyDef.BodyType.StaticBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
+                true, categoryFilterBits, maskFilterBits);
 
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
@@ -610,6 +729,10 @@ public class GameWorldCreator {
     }
 
     private Entity createPotion(TextureMapObject object){
+
+        Short categoryFilterBits = POTIONS_BIT;
+        Short maskFilterBits = GROUND_BIT | PLAYER_BIT;
+
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
@@ -622,7 +745,7 @@ public class GameWorldCreator {
                 BodyCreator.STONE,
                 BodyDef.BodyType.StaticBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
-                true);
+                true, categoryFilterBits, maskFilterBits);
 
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
@@ -653,6 +776,9 @@ public class GameWorldCreator {
                                EnemyComponent enemyComponent,
                                BulletComponent.Owner own, B2dBodyComponent ownerRef, PooledEngine pooledEngine, World world)
     {
+        Short categoryFilterBits = BULLET_BIT;
+        Short maskFilterBits = PLAYER_BIT | ENEMY_BIT | CLOUD_BIT | GROUND_BIT;
+
         Entity entity = pooledEngine.createEntity();
         B2dBodyComponent b2dbody = pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent position = pooledEngine.createComponent(TransformComponent.class);
@@ -673,7 +799,7 @@ public class GameWorldCreator {
         b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,world,
-                true);
+                true, categoryFilterBits, maskFilterBits);
         b2dbody.body.setBullet(true); // increase physics computation to limit body travelling through other objects
         bodyCreator.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
         position.position.set(x,y);
@@ -723,6 +849,7 @@ public class GameWorldCreator {
 
     public void createExplosionEffect(float x, float y)
     {
+        Short filterBits = 0;
         Entity entity = pooledEngine.createEntity();
         CollisionEffectComponent collisionEffectComponent = pooledEngine.createComponent(CollisionEffectComponent.class);
         AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
@@ -831,5 +958,9 @@ public class GameWorldCreator {
         float offsetPos;
         offsetPos = (direction == Direction.LEFT)? (x - 50):(x + 50);
         return offsetPos;
+    }
+
+    public void setMatchTracker(MatchTracker matchTracker) {
+        this.matchTracker = matchTracker;
     }
 }

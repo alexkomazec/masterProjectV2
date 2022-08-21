@@ -24,24 +24,35 @@ import org.json.JSONArray;
  *  */
 public class InputManagerTransmittingSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(InputManagerTransmittingSystem.class.getSimpleName(), Logger.INFO);
+    protected static final Logger logger = new Logger(InputManagerTransmittingSystem.class.getSimpleName(), Logger.DEBUG);
     private ClientHandler clientHandler;
     private Vector2 lastStoredPosition;
     boolean isMagicFired = false;
     Direction currentDirection = Direction.RIGHT;
+    private boolean isInit;
 
     public InputManagerTransmittingSystem(ClientHandler clientHandler) {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class).get());
+        logger.debug("InputManagerTransmittingSystem has been created");
         this.clientHandler = clientHandler;
         this.lastStoredPosition = new Vector2();
+        this.isInit = false;
     }
 
     @Override
     protected void processEntity(Entity entity, float deltaTime) {
-        ControlledInputComponent cntrlInComp    = entity.getComponent(ControlledInputComponent.class);
+        ControlledInputComponent cntrlInComp = entity.getComponent(ControlledInputComponent.class);
         TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
         PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
         DirectionComponent directionComponent = entity.getComponent(DirectionComponent.class);
+
+        if(!isInit)
+        {
+            this.lastStoredPosition.x = transformComponent.position.x;
+            this.lastStoredPosition.y = transformComponent.position.y;
+            this.currentDirection = directionComponent.direction;
+            isInit =  true;
+        }
 
         boolean posTheSame = false;
 
@@ -60,7 +71,11 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
         }
         if(!posTheSame)
         {
-            logger.debug("updatePlayerInputPosition: Player with ID " + playerComponent.playerID + " changed position");
+            //logger.debug("updatePlayerInputPosition: Player with ID " + playerComponent.playerID + " changed position");
+            //logger.debug(" lastStoredPosition.x " + x +
+            //        " lastStoredPosition.y " + y +
+            //        " x1 " + x1 +
+            //        " y1 " + y1);
             this.clientHandler.getSocket().emit("updatePlayerInputPosition",
                     transformComponent.position.x,
                     transformComponent.position.y,

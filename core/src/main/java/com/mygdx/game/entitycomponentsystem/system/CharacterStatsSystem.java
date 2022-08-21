@@ -10,7 +10,7 @@ import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 
 public class CharacterStatsSystem extends IteratingSystem {
 
-    private final Logger logger = new Logger(CharacterStatsSystem.class.getSimpleName(), Logger.DEBUG);
+    private final Logger logger = new Logger(CharacterStatsSystem.class.getSimpleName(), Logger.INFO);
 
     public CharacterStatsSystem() {
         super(Family.all(CharacterStatsComponent.class, HealthComponent.class).get());

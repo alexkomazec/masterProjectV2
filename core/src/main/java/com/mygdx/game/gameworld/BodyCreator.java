@@ -35,7 +35,7 @@ public class BodyCreator {
 	}
 
 	public Body makeBoxPolyBody(Rectangle rectangle,int material,
-								BodyType bodyType, World world, boolean fixedRotation)
+								BodyType bodyType, World world, boolean fixedRotation, short categoryFilterBits, short maskFilterBits)
 	{
 
 		// create a definition
@@ -52,24 +52,23 @@ public class BodyCreator {
 				(rectangle.getWidth()/2)  * GameConfig.DIVIDE_BY_PPM,
 				(rectangle.getHeight()/2) * GameConfig.DIVIDE_BY_PPM);
 		boxBody.createFixture(makeFixture(material,poly));
+
+		/* Add filter data in order to prevent some collisions if needed*/
+		Filter filter  = new Filter();
+		filter.categoryBits = categoryFilterBits;
+		filter.maskBits = maskFilterBits;
+		boxBody.getFixtureList().get(0).setFilterData(filter);
+
 		poly.dispose();
 
 		return boxBody;
 	}
 
-	public Body makeBullet(Rectangle rectangle, float radius, int material, World world, BodyType bodyType)
-	{
-		Body body = makeCirclePolyBody( rectangle,  material,  bodyType,  world, false);
-			for(Fixture fix :body.getFixtureList()){
-			fix.setSensor(true);
-			}
-		body.setBullet(true);
-		return body;
-	}
 	
 	public Body makeCirclePolyBody(Rectangle rectangle,
 								   int material, BodyType bodyType,
-								   World world, boolean fixedRotation)
+								   World world, boolean fixedRotation,
+								   short categoryFilterBits, short maskFilterBits)
 	{
 		// create a definition
 		BodyDef boxBodyDef = new BodyDef();
@@ -84,6 +83,38 @@ public class BodyCreator {
 		float radius = rectangle.getWidth()/2;
 		circleShape.setRadius(radius * GameConfig.DIVIDE_BY_PPM);
 		boxBody.createFixture(makeFixture(material,circleShape));
+
+		/* Add filter data in order to prevent some collisions if needed*/
+		Filter filter  = new Filter();
+		filter.categoryBits = categoryFilterBits;
+		filter.maskBits = maskFilterBits;
+
+		for (int i = 0; i < boxBody.getFixtureList().size; i++) {
+			boxBody.getFixtureList().get(i).setFilterData(filter);
+		}
+
+		circleShape.dispose();
+		return boxBody;
+	}
+
+	public Body makeCirclePolyBody(Rectangle rectangle,
+								   int material, BodyType bodyType,
+								   World world, boolean fixedRotation)
+	{
+		// create a definition
+		BodyDef boxBodyDef = new BodyDef();
+		boxBodyDef.type = bodyType;
+		boxBodyDef.position.x = (rectangle.getX() + rectangle.getWidth()/2) * GameConfig.DIVIDE_BY_PPM;
+		boxBodyDef.position.y = (rectangle.getY() + rectangle.getHeight()/2) * GameConfig.DIVIDE_BY_PPM;
+		boxBodyDef.fixedRotation = fixedRotation;
+
+		//create the body to attach said definition
+		Body boxBody = world.createBody(boxBodyDef);
+		CircleShape circleShape = new CircleShape();
+		float radius = rectangle.getWidth()/2;
+		circleShape.setRadius(radius * GameConfig.DIVIDE_BY_PPM);
+		boxBody.createFixture(makeFixture(material,circleShape));
+
 		circleShape.dispose();
 		return boxBody;
 	}

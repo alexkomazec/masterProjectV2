@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="19" nextobjectid="499">
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="20" nextobjectid="501">
  <tileset firstgid="1" source="tiles/platform/Platform1.tsx"/>
  <tileset firstgid="2" source="tiles/platform/Platform11.tsx"/>
  <tileset firstgid="3" source="tiles/platform/Platform12.tsx"/>
@@ -15,11 +15,15 @@
  <tileset firstgid="13" source="tiles/basicPowerUps/stompPowerUp.tsx"/>
  <tileset firstgid="14" source="tiles/basicPowerUps/longJumpPowerUp.tsx"/>
  <tileset firstgid="15" source="tiles/basicPowerUps/doubleFirePowerUp.tsx"/>
+ <tileset firstgid="16" source="tiles/Objects/Portal.tsx"/>
  <objectgroup id="14" name="Backgronds" visible="0">
   <object id="378" gid="10" x="0" y="40000" width="9000" height="2500"/>
   <object id="379" gid="10" x="8864" y="40000" width="8936" height="2500"/>
   <object id="381" gid="1073741834" x="0" y="37600" width="9000" height="2500"/>
   <object id="382" gid="1073741834" x="8800" y="37600" width="9000" height="2500"/>
+ </objectgroup>
+ <objectgroup id="19" name="Portals">
+  <object id="499" gid="16" x="3800" y="38800" width="200" height="200"/>
  </objectgroup>
  <objectgroup id="15" name="Backgrounds_stone">
   <object id="401" gid="11" x="12" y="37972" width="1000" height="1000"/>
@@ -258,6 +262,7 @@
   <object id="492" gid="2" x="5000" y="39200" width="200" height="200"/>
   <object id="493" gid="4" x="5200" y="39000" width="200" height="200"/>
   <object id="494" gid="5" x="5200" y="39200" width="200" height="200"/>
+  <object id="500" gid="4" x="3400" y="38800" width="200" height="200"/>
  </objectgroup>
  <objectgroup id="18" name="CloudEnemies">
   <object id="498" x="1800" y="38000" width="200" height="200">

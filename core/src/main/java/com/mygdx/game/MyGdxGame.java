@@ -25,6 +25,7 @@ import com.mygdx.game.common.Topics;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.system.MatchTracker;
 import com.mygdx.game.entitycomponentsystem.system.RenderingSystem;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
@@ -82,10 +83,13 @@ public class MyGdxGame extends Game implements Publisher {
 	private Array<Observer> updateRoomsStateObservers;
 	private Array<Observer> playerLeaveRoomObservers;
 
+	private MatchTracker matchTracker;
+
 	/*Class Methods*/
 
 	private MyGdxGame()
 	{
+		matchTracker = MatchTracker.getInstance();
 		screensMap = new HashMap<>();
 		screensMap.put(MENU_SCREEN, null);
 		screensMap.put(GAME_SCREEN, null);
@@ -116,7 +120,6 @@ public class MyGdxGame extends Game implements Publisher {
 
 		Gdx.app.setLogLevel(Application.LOG_DEBUG);
 		this.InputMultiplexer = new InputMultiplexer();
-		this.tileMapHandler = TileMapHandler.getInstance(GameConfig.LEVEL1);
 		//this.viewport	= new StretchViewport(GameConfig.VIRTUAL_WIDTH ,GameConfig.VIRTUAL_HEIGHT);
 		this.viewport	= new StretchViewport(566,566);
 		this.batch = new SpriteBatch();
@@ -127,6 +130,7 @@ public class MyGdxGame extends Game implements Publisher {
 		this.gameWorldCreator.setPooledEngine(pooledEngine);
 		this.gameWorldCreator.setAssetManagementHandler(this.assetManagmentHandler);
 		this.gameWorldCreator.setUiSkin(this.uiSkin);
+		this.gameWorldCreator.setMatchTracker(this.matchTracker);
 		this.generalInfoContainer = new GeneralInfoContainer();
 
 		onlineMatchInitObservers = new Array<>();
@@ -250,6 +254,10 @@ public class MyGdxGame extends Game implements Publisher {
 
 	public TileMapHandler getTileMapHandler() {
 		return tileMapHandler;
+	}
+
+	public void setTiledMapHandler(TileMapHandler tiledMapHandler) {
+		this.tileMapHandler = tiledMapHandler;
 	}
 
 	public GameWorldCreator getWorldCreator() {
@@ -444,4 +452,10 @@ public class MyGdxGame extends Game implements Publisher {
 		/* Send to all who need it*/
 		this.gameWorldCreator.setGameWorld(gameWorld);
 	}
+
+	public MatchTracker getMatchTracker() {
+		return matchTracker;
+	}
+
+
 }

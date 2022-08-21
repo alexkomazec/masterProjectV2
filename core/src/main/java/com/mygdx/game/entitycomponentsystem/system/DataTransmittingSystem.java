@@ -21,7 +21,7 @@ public class DataTransmittingSystem extends IteratingSystem {
 
     public DataTransmittingSystem(ClientHandler clientHandler) {
         super(Family.all(PlayerComponent.class, LocalInputComponent.class).get());
-
+        logger.debug("DataTransmittingSystem has been created");
         this.clientHandler = clientHandler;
     }
 

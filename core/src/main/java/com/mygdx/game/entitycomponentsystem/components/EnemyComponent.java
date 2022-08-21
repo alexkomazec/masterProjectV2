@@ -10,6 +10,7 @@ public class EnemyComponent implements Component, Poolable{
 	public enum Type {BASIC_ENEMY, CLOUD };
 	public static float RIGHT_SPEED = 0.01f;
 	public static float LEFT_SPEED = -0.01f;
+	public boolean playerTouchedViewArea;
 
 	public boolean isDead = false;
 	public float xPosCenter = -1;
@@ -23,6 +24,8 @@ public class EnemyComponent implements Component, Poolable{
 
 	@Override
 	public void reset() {
+		playerTouchedViewArea = false;
+		target = null;
 		shootDelay = 2f;
 		timeSinceLastShot = 0f;
 		enemyType = Type.BASIC_ENEMY;

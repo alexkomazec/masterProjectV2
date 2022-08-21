@@ -5,6 +5,7 @@ import com.badlogic.ashley.core.Entity;
 import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.common.SensorType;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
@@ -12,28 +13,31 @@ import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicArrayComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollectibleBasicComponent;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
+import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.PotionComponent;
 import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.entitycomponentsystem.components.TypeComponent;
-import com.mygdx.game.entitycomponentsystem.components.ViewAreaComponent;
+import com.mygdx.game.entitycomponentsystem.components.SensorComponent;
 
 public class CollisionSystem extends IteratingSystem {
 
-	protected static final Logger logger = new Logger(CollisionSystem.class.getSimpleName(), Logger.INFO);
-	ComponentMapper<CollisionComponent> cm;
-	ComponentMapper<PlayerComponent> pm;
-	ComponentMapper<StateComponent> sm;
+	private static final Logger logger = new Logger(CollisionSystem.class.getSimpleName(), Logger.INFO);
+	private ComponentMapper<CollisionComponent> cm;
+	private ComponentMapper<PlayerComponent> pm;
+	private ComponentMapper<StateComponent> sm;
+	private MatchTracker matchTracker;
 
 	@SuppressWarnings("unchecked")
-	public CollisionSystem() {
+	public CollisionSystem(MatchTracker matchTracker) {
 		super(Family.all(CollisionComponent.class).get());
-		
-		 cm = ComponentMapper.getFor(CollisionComponent.class);
-		 pm = ComponentMapper.getFor(PlayerComponent.class);
-		 sm = ComponentMapper.getFor(StateComponent.class);
+
+		 this.matchTracker = matchTracker;
+		 this.cm = ComponentMapper.getFor(CollisionComponent.class);
+		 this.pm = ComponentMapper.getFor(PlayerComponent.class);
+		 this.sm = ComponentMapper.getFor(StateComponent.class);
 	}
 
 	@Override
@@ -58,11 +62,15 @@ public class CollisionSystem extends IteratingSystem {
 						logger.debug("player hit enemy");
 						cc.healthAction[GameConfig.DECREASE_HP] = true;
 						break;
-					case TypeComponent.VIEW_AREA:
-						logger.debug("player hit viewArea");
-						ViewAreaComponent viewAreaComponent = collidedEntity.getComponent(ViewAreaComponent.class);
-						viewAreaComponent.bodyThatColidedViewArea = entity;
-						viewAreaComponent.collisionHappened = true;
+					case TypeComponent.ENEMY_SENSOR:
+						logger.debug("player hit enemySensor");
+						cc.healthAction[GameConfig.DECREASE_HP] = true;
+						break;
+					case TypeComponent.VIEW_AREA_SENSOR:
+						SensorComponent sensorComponent = collidedEntity.getComponent(SensorComponent.class);
+						sensorComponent.bodyThatColidedViewArea = entity;
+						sensorComponent.collisionHappened = true;
+
 						break;
 					case TypeComponent.SCENERY:
 						pm.get(entity).onPlatform = true;
@@ -116,8 +124,15 @@ public class CollisionSystem extends IteratingSystem {
 						b2bcColided.isDead = true;
 						collisionComponent.healthAction[GameConfig.INCREASE_HP] = true;
 						break;
+
+					case TypeComponent.PORTALS:
+						PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
+						entity.remove(ControllableComponent.class);
+						this.matchTracker.playerFinishedMatch(playerComponent);
+
+						break;
 					default:
-						logger.error("No matching type found");
+						//logger.error("No matching type found");
 					}
 					cc.collisionEntity = null; // collision handled reset component
 				}else{
@@ -156,7 +171,7 @@ public class CollisionSystem extends IteratingSystem {
 						}
 						break;
 					default:
-						logger.error("No matching type found");
+						//logger.error("No matching type found");
 					}
 					cc.collisionEntity = null; // collision handled reset component
 				}else{
@@ -220,7 +235,7 @@ public class CollisionSystem extends IteratingSystem {
 							logger.debug("bullet hit other");
 							break;
 						default:
-							logger.error("No matching type found");
+							//logger.error("No matching type found");
 					}
 					cc.collisionEntity = null; // collision handled reset component
 				}
@@ -248,7 +263,7 @@ public class CollisionSystem extends IteratingSystem {
 							collisionComponent.healthAction[GameConfig.INCREASE_HP] = true;
 							break;
 						default:
-							logger.error("No matching type found");
+							//logger.error("No matching type found");
 					}
 				}
 				else
@@ -289,7 +304,7 @@ public class CollisionSystem extends IteratingSystem {
 							cbc.isDead = true;
 							break;
 						default:
-							logger.error("No matching type found");
+							//logger.error("No matching type found");
 					}
 				}
 				else
@@ -298,7 +313,7 @@ public class CollisionSystem extends IteratingSystem {
 				}
 			}
 		}
-		else if(thisType.type == TypeComponent.VIEW_AREA)
+		else if(thisType.type == TypeComponent.ENEMY_SENSOR)
 		{
 			if(collidedEntity != null)
 			{
@@ -307,12 +322,71 @@ public class CollisionSystem extends IteratingSystem {
 				if(type != null) {
 					switch (type.type) {
 						case TypeComponent.PLAYER:
-							ViewAreaComponent viewAreaComponent = entity.getComponent(ViewAreaComponent.class);
-							viewAreaComponent.bodyThatColidedViewArea = collidedEntity;
-							viewAreaComponent.collisionHappened = true;
+							SensorComponent sensorComponent = entity.getComponent(SensorComponent.class);
+							CollisionComponent collisionComponent = collidedEntity.getComponent(CollisionComponent.class);
+
+							if(sensorComponent.sensorType == SensorType.VIEW_AREA)
+							{
+								sensorComponent.bodyThatColidedViewArea = collidedEntity;
+								sensorComponent.collisionHappened = true;
+							}
+							else if(sensorComponent.sensorType == SensorType.ENEMY_SENSOR)
+							{
+								logger.debug("enemy hit player");
+								collisionComponent.healthAction[GameConfig.DECREASE_HP] = true;
+							}
+
 							break;
 						default:
-							logger.error("No matching type found");
+							//logger.error("No matching type found");
+					}
+				}
+				else
+				{
+					logger.error("type is null");
+				}
+			}
+		}
+		else if(thisType.type == TypeComponent.VIEW_AREA_SENSOR)
+		{
+			if(collidedEntity != null)
+			{
+				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+
+				if(type != null) {
+					switch (type.type) {
+						case TypeComponent.PLAYER:
+
+							SensorComponent sensorComponent = entity.getComponent(SensorComponent.class);
+							sensorComponent.bodyThatColidedViewArea = collidedEntity;
+							sensorComponent.collisionHappened = true;
+
+							break;
+						default:
+							//logger.error("No matching type found");
+					}
+				}
+				else
+				{
+					logger.error("type is null");
+				}
+			}
+		}
+		else if(thisType.type == TypeComponent.PORTALS)
+		{
+			if(collidedEntity != null)
+			{
+				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+
+				if(type != null) {
+					switch (type.type) {
+						case TypeComponent.PLAYER:
+							PlayerComponent playerComponent = collidedEntity.getComponent(PlayerComponent.class);
+							collidedEntity.remove(ControllableComponent.class);
+							this.matchTracker.playerFinishedMatch(playerComponent);
+							break;
+						default:
+							//logger.error("No matching type found");
 					}
 				}
 				else

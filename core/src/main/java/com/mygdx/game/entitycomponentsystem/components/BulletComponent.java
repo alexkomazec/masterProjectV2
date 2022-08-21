@@ -26,5 +26,6 @@ public class BulletComponent implements Component, Poolable{
 		isDead = false;
 		livingTime = 0;
 		ownerReference = null;
+		direction = Direction.LEFT;
 	}
 }

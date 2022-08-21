@@ -4,16 +4,18 @@ import com.badlogic.ashley.core.Component;
 import com.badlogic.ashley.core.Entity;
 import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Pool;
+import com.mygdx.game.common.SensorType;
 
-public class ViewAreaComponent implements Component, Pool.Poolable {
+public class SensorComponent implements Component, Pool.Poolable {
 
-    public Body viewAreaBody;
+    public Body sensorBody;
     public Entity owner;
     public Entity bodyThatColidedViewArea;
     public boolean collisionHappened;
+    public SensorType sensorType = SensorType.DEFAULT;
 
     @Override
     public void reset() {
-        viewAreaBody = null;
+        sensorBody = null;
     }
 }

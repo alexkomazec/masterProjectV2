@@ -8,49 +8,34 @@ import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
 import com.badlogic.gdx.utils.Align;
 
+public class EndMatchPanel extends Panel{
 
-public class PauseMenu extends Panel {
-
-    private TextButton resume;
-    private TextButton settings;
+    private TextButton quit;
     private TextButton exit;
     private Label label;
-    public Listener listener;
+    public EndMatchPanel.Listener listener;
 
     public interface Listener{
         void exit();
         void quit();
-        void resume();
     }
 
-    public PauseMenu(final Listener listener1, Skin skin){
+    public EndMatchPanel(final EndMatchPanel.Listener listener, Skin skin){
         super(skin);
-        this.listener = listener1;
+        this.listener =  listener;
 
-        label = new Label("PAUSE",skin,"default");
+        label = new Label("GAME OVER",skin,"default");
         label.setColor(Color.BROWN);
 
-        resume = new TextButton("RESUME",skin,"default");
-        //resume.addListener(UI_Utils.clickSound());
-        resume.addListener(new ClickListener(){
-            @Override
-            public void clicked(InputEvent event, float x, float y){
-                listener.resume();
-            }
-        });
-
-        settings = new TextButton("QUIT",skin,"default");
-        //settings.addListener(UI_Utils.clickSound());
-        settings.addListener(new ClickListener(){
+        quit = new TextButton("QUIT",skin,"default");
+        quit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
                 listener.quit();
             }
         });
 
-
         exit = new TextButton("EXIT",skin,"default");
-        //exit.addListener(UI_Utils.clickSound());
         exit.addListener(new ClickListener(){
             @Override
             public void clicked(InputEvent event, float x, float y){
@@ -64,9 +49,7 @@ public class PauseMenu extends Panel {
         float padD = 70;
         root.add(label).pad(padA).padBottom(padC).padTop(padD);
         root.row();
-        root.add(resume).pad(padA);
-        root.row();
-        root.add(settings).pad(padA);
+        root.add(quit).pad(padA);
         root.row();
         root.add(exit).pad(padA).padBottom(padD);
         root.pad(padB);
@@ -77,5 +60,9 @@ public class PauseMenu extends Panel {
         float size=Math.max(root.getWidth(), root.getHeight());
 
         add(root).center().size(size);
+    }
+
+    public void setLabelText(String labelString) {
+        this.label.setText(labelString);
     }
 }

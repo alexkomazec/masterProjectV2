@@ -11,7 +11,6 @@ import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.ViewPortConfiguration;
-import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
@@ -27,7 +26,7 @@ import com.mygdx.game.utils.GdxUtils;
 
 public class PlayerControlSystem extends IteratingSystem{
 
-	protected static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.INFO);
+	private static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.DEBUG);
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;
@@ -65,7 +64,7 @@ public class PlayerControlSystem extends IteratingSystem{
 		ControlledInputComponent cntrlComponent = cp.get(entity);
 		LocalInputComponent localInputComponent = null;
 		CoolDownComponent coolDownComponent = entity.getComponent(CoolDownComponent.class);
-		coolDownComponent.elapsedTimeInSeconds += deltaTime;
+		coolDownComponent.coolDown.elapsedTimeInSeconds += deltaTime;
 		boolean isMoving = false;
 
 		localInputComponent = entity.getComponent(LocalInputComponent.class);
@@ -103,6 +102,7 @@ public class PlayerControlSystem extends IteratingSystem{
 
 		if (GdxUtils.isInputCommandTrue(GameConfig.LEFT, cntrlComponent))
 		{
+			logger.debug("GdxUtils.isInputCommandTrue(GameConfig.LEFT, cntrlComponent)");
  			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, -7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			directionComponent.direction = Direction.LEFT;
 			isMoving = true;
@@ -110,6 +110,7 @@ public class PlayerControlSystem extends IteratingSystem{
 
 		if (GdxUtils.isInputCommandTrue(GameConfig.RIGHT, cntrlComponent))
 		{
+			//logger.debug("GdxUtils.isInputCommandTrue(GameConfig.RIGHT, cntrlComponent)");
 			b2dbodyComponent.body.setLinearVelocity(MathUtils.lerp(b2dbodyComponent.body.getLinearVelocity().x, 7f, 0.2f), b2dbodyComponent.body.getLinearVelocity().y);
 			directionComponent.direction = Direction.RIGHT;
 			isMoving = true;
@@ -139,8 +140,8 @@ public class PlayerControlSystem extends IteratingSystem{
 			float startBulletPositionY;
 			float xVel;
 
-			if(coolDownComponent.elapsedTimeInSeconds >= coolDownComponent.COOLDOWN) {
-				coolDownComponent.elapsedTimeInSeconds = 0;
+			if(coolDownComponent.coolDown.elapsedTimeInSeconds >= coolDownComponent.coolDown.cooldown) {
+				coolDownComponent.coolDown.elapsedTimeInSeconds = 0;
 
 				if (directionComponent.direction == Direction.LEFT) {
 					startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) - 16f * 3;

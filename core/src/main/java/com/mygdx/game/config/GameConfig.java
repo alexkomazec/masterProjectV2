@@ -119,9 +119,14 @@ public class GameConfig {
     //Box2D Collision Bits
     public static final short GROUND_BIT = 1;
     public static final short PLAYER_BIT = 2;
-    public static final short MAGIC_BIT = 4;
+    public static final short BULLET_BIT = 4;
     public static final short COLLECTIBLE_BIT = 8;
-    public static final short ENEMY_BIT = 16;
+    public static final short POTIONS_BIT = 16;
+    public static final short ENEMY_BIT = 32;
+    public static final short CLOUD_BIT = 64;
+    public static final short PORTAL_BIT = 128;
+    public static final short SENSOR_BIT = 256;
+    public static final short VIEW_AREA_BIT = 512;
 
     public enum HeroType{WARRIOR_SELECTED,MAGE_SELECTED,HUNTER_SELECTED};
 
@@ -193,6 +198,9 @@ public class GameConfig {
     public static final int ROOM0 = 0;
     public static final int ROOM1 = 1;
     public static final int ROOM2 = 2;
+
+    public static final boolean LOCAL_PLAYER = true;
+    public static final boolean ONLINE_PLAYER = false;
 
     public static final float FRAME_DURATION = 0.1f; // Frame duration for one frame in seconds
     private GameConfig(){}

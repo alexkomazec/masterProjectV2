@@ -18,7 +18,7 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 
 public class HealthManagerSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(HealthManagerSystem.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(HealthManagerSystem.class.getSimpleName(), Logger.INFO);
     HealthComponent healthComponent;
     CollisionComponent collisionComponent;
     B2dBodyComponent b2dBodyComponent;

@@ -1,31 +1,24 @@
 package com.mygdx.game.client;
 
-import static com.mygdx.game.MyGdxGame.GAME_SCREEN;
 
 import com.badlogic.ashley.core.PooledEngine;
-import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.MyGdxGame;
-import com.mygdx.game.client.data.GeneralInfoContainer;
 import com.mygdx.game.client.data.PlayerDataContainer;
-import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.Topics;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 import com.mygdx.game.entitycomponentsystem.system.DataTransmittingSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerTransmittingSystem;
-import com.mygdx.game.screens.loadingScreens.LoadingIntroScreen;
 
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.net.URISyntaxException;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 
 import io.socket.client.IO;
@@ -39,7 +32,7 @@ public class ClientHandler {
 
     public static ClientHandler getInstance(PooledEngine pooledEngine, MyGdxGame game) {
         if (instance == null) {
-            instance = new ClientHandler(pooledEngine, game);
+            instance = new ClientHandler(game);
         }
         return instance;
     }
@@ -74,14 +67,14 @@ public class ClientHandler {
     public static final int CLIENT_JOIN_ROOM = 14;              /* Inform the server that a client wants to join the certain room */
     public static final int GO_OUT_FROM_THE_ROOM = 15;          /* Inform server that the player leaves from the room */
 
-    private ClientHandler(PooledEngine pooledEngine, MyGdxGame game) {
+    private ClientHandler(MyGdxGame game) {
         createSocket();
         this.receivedMessageArray = new Array<>();
         this.transmitingMessageArray = new Array<>();
         this.game = game;
-        pooledEngine.addSystem(new DataReceivingSystem(this));
-        pooledEngine.addSystem(new DataTransmittingSystem(this));
-        pooledEngine.addSystem(new InputManagerTransmittingSystem(this));
+        game.getPooledEngine().addSystem(new DataReceivingSystem(this));
+        game.getPooledEngine().addSystem(new DataTransmittingSystem(this));
+        game.getPooledEngine().addSystem(new InputManagerTransmittingSystem(this));
     }
 
     public boolean isRecMessageArrayEmpty() {
@@ -273,32 +266,13 @@ public class ClientHandler {
             }
         });
 
-        this.socket.on("goOutFromRoomResp", new Emitter.Listener()
-        {
-            @Override
-            public void call(Object... args)
-            {
-                try {
-                    goOutFromTheRoomResp(args);
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
-
     }
 
     //===============Callbacks for event listener ==========================//
 
-    public void goOutFromTheRoomResp(Object... args) throws JSONException {
-
-        logger.debug("GO_OUT_FROM_THE_ROOM_RESP " + GO_OUT_FROM_THE_ROOM_RESP);
-        this.game.notifyObservers(Topics.PLAYER_LEAVE_ROOM);
-    }
-
     public void redefinePlayerPosition(Object... args) throws JSONException
     {
-        logger.info("REDEFINE_PLAYER_POSITION");
+        logger.debug("REDEFINE_PLAYER_POSITION");
         JSONArray jsonArray = (JSONArray) args[0];
         PlayerDataContainer playerDataContainer = new PlayerDataContainer();
         float xPosition = (float)((double)jsonArray.get(1));
@@ -365,10 +339,25 @@ public class ClientHandler {
 
         logger.debug("PLAYER_DISCONNECTED");
         int playerId = (int) args[0];
+        int respType = (int) args[1];
+        Message message;
 
-        Message message = new Message(PLAYER_DISCONNECTED, false);
-        message.addPlayerDataContainer(new PlayerDataContainer(new boolean[GameConfig.LIST_COMMANDS_MAX], playerId));
-        receivedMessageArray.add(message);
+        if(respType == 0)
+        {
+            message = new Message(PLAYER_DISCONNECTED, false);
+            message.addPlayerDataContainer(new PlayerDataContainer(new boolean[GameConfig.LIST_COMMANDS_MAX], playerId));
+            receivedMessageArray.add(message);
+        }
+        else if(respType == 1)
+        {
+            message = new Message(GO_OUT_FROM_THE_ROOM_RESP, false);
+            message.addPlayerDataContainer(new PlayerDataContainer(new boolean[GameConfig.LIST_COMMANDS_MAX], playerId));
+            receivedMessageArray.add(message);
+        }
+        else
+        {
+            logger.error("Wrong PLAYER_DISCONNECTED type");
+        }
     }
 
     private void playerChangedDir(Object... args) throws JSONException
@@ -527,8 +516,13 @@ public class ClientHandler {
         return socket;
     }
 
-    public Array<Message> getTransmitingMessageArray() {
+    public Array<Message> getTransmitingMessageArray()
+    {
         return transmitingMessageArray;
+    }
+
+    public Array<Message> getReceivedMessageArray() {
+        return receivedMessageArray;
     }
 
     public void addTransmitingMessage(Message message)
@@ -542,7 +536,26 @@ public class ClientHandler {
         this.socket.emit("goOutFromRoom", this.socket.id());
     }
 
+    public void notifyToGoOutFromTheRoom()
+    {
+        this.game.notifyObservers(Topics.PLAYER_LEAVE_ROOM);
+    }
+
     public MyGdxGame getGame() {
         return game;
+    }
+
+    public void loadSystems()
+    {
+        game.getPooledEngine().addSystem(new DataReceivingSystem(this));
+        game.getPooledEngine().addSystem(new DataTransmittingSystem(this));
+        game.getPooledEngine().addSystem(new InputManagerTransmittingSystem(this));
+    }
+
+    public void clearSystems()
+    {
+        game.getPooledEngine().removeSystem(game.getPooledEngine().getSystem(DataReceivingSystem.class));
+        game.getPooledEngine().removeSystem(game.getPooledEngine().getSystem(DataTransmittingSystem.class));
+        game.getPooledEngine().removeSystem(game.getPooledEngine().getSystem(InputManagerTransmittingSystem.class));
     }
 }

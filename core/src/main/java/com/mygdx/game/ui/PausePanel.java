@@ -1,0 +1,81 @@
+package com.mygdx.game.ui;
+
+import com.badlogic.gdx.graphics.Color;
+import com.badlogic.gdx.scenes.scene2d.InputEvent;
+import com.badlogic.gdx.scenes.scene2d.ui.Label;
+import com.badlogic.gdx.scenes.scene2d.ui.Skin;
+import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
+import com.badlogic.gdx.scenes.scene2d.utils.ClickListener;
+import com.badlogic.gdx.utils.Align;
+
+
+public class PausePanel extends Panel {
+
+    private TextButton resume;
+    private TextButton quit;
+    private TextButton exit;
+    private Label label;
+    public Listener listener;
+
+    public interface Listener{
+        void exit();
+        void quit();
+        void resume();
+    }
+
+    public PausePanel(final Listener listener1, Skin skin){
+        super(skin);
+        this.listener = listener1;
+
+        label = new Label("PAUSE",skin,"default");
+        label.setColor(Color.BROWN);
+
+        resume = new TextButton("RESUME",skin,"default");
+        //resume.addListener(UI_Utils.clickSound());
+        resume.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                listener.resume();
+            }
+        });
+
+        quit = new TextButton("QUIT",skin,"default");
+        //settings.addListener(UI_Utils.clickSound());
+        quit.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                listener.quit();
+            }
+        });
+
+
+        exit = new TextButton("EXIT",skin,"default");
+        //exit.addListener(UI_Utils.clickSound());
+        exit.addListener(new ClickListener(){
+            @Override
+            public void clicked(InputEvent event, float x, float y){
+                listener.exit();
+            }
+        });
+
+        float padA = 20;
+        float padB = 0;
+        float padC = 30;
+        float padD = 70;
+        root.add(label).pad(padA).padBottom(padC).padTop(padD);
+        root.row();
+        root.add(resume).pad(padA);
+        root.row();
+        root.add(quit).pad(padA);
+        root.row();
+        root.add(exit).pad(padA).padBottom(padD);
+        root.pad(padB);
+        root.pack();
+        root.setTransform(true);
+        root.setOrigin(Align.center);
+
+        float size=Math.max(root.getWidth(), root.getHeight());
+
+        add(root).center().size(size);
+    }
+}

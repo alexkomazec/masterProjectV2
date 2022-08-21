@@ -7,8 +7,8 @@ import com.badlogic.gdx.physics.box2d.ContactListener;
 import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.physics.box2d.Manifold;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.CollisionComponent;
-import com.mygdx.game.entitycomponentsystem.system.CollisionSystem;
 
 
 public class B2dContactListener implements ContactListener {
@@ -19,16 +19,21 @@ public class B2dContactListener implements ContactListener {
 	public void beginContact(Contact contact) {
 		Fixture fa = contact.getFixtureA();
 		Fixture fb = contact.getFixtureB();
-		
-		if(fa.getBody().getUserData() instanceof Entity){
-			Entity ent = (Entity) fa.getBody().getUserData();
-			logger.debug("fa.getBody() = entity");
-			entityCollision(ent,fb);
-		}else if(fb.getBody().getUserData() instanceof Entity){
-			Entity ent = (Entity) fb.getBody().getUserData();
-			logger.debug("fb.getBody() = entity");
-			entityCollision(ent,fa);
-		}
+
+		int cDef = fa.getFilterData().categoryBits | fb.getFilterData().categoryBits;
+
+		//if(cDef != GameConfig.PLAYER_ENEMY_COLLISION && cDef != GameConfig.PLAYER_CLOUD_COLLISION)
+		//{
+			if(fa.getBody().getUserData() instanceof Entity){
+				Entity ent = (Entity) fa.getBody().getUserData();
+				logger.debug("fa.getBody() = entity");
+				entityCollision(ent,fb);
+			}else if(fb.getBody().getUserData() instanceof Entity){
+				Entity ent = (Entity) fb.getBody().getUserData();
+				logger.debug("fb.getBody() = entity");
+				entityCollision(ent,fa);
+			}
+		//}
 	}
 
 	private void entityCollision(Entity ent, Fixture fb) {

@@ -19,7 +19,7 @@ import java.util.Comparator;
 
 public class RenderingSystem extends SortedIteratingSystem {
 	// debug stuff
-    private static final Logger logger = new Logger(RenderingSystem.class.getName(), Logger.DEBUG);
+    private static final Logger logger = new Logger(RenderingSystem.class.getName(), Logger.INFO);
     private boolean shouldRender = true;
     public static final float PPM = 200.0f;
     static final float FRUSTUM_WIDTH = Gdx.graphics.getWidth()/PPM;//37.5f;
