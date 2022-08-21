@@ -127,6 +127,8 @@ public class GameConfig {
     public static final short PORTAL_BIT = 128;
     public static final short SENSOR_BIT = 256;
     public static final short VIEW_AREA_BIT = 512;
+    public static final short LIMIT_AREA_BIT = 1024;
+    public static final short HURTABLE_OBJECTS_BIT = 2048;
 
     public enum HeroType{WARRIOR_SELECTED,MAGE_SELECTED,HUNTER_SELECTED};
 
@@ -171,9 +173,11 @@ public class GameConfig {
     public static final int MAX_BASIC_ENEMY_LIVES = 2;
     public static final int MAX_CLOUD = 4;
     public static final int ERROR = -1;
-    public static final int MAX_SIZE = 2;
+
+    public static final int MAX_SIZE = 3;
     public static final int INCREASE_HP = 0;
     public static final int DECREASE_HP = 1;
+    public static final int KILL_OBJECT = 2;
 
 
     /* Collectibles basic */

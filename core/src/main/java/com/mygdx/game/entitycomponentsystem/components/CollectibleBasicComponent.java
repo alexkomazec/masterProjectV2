@@ -11,9 +11,17 @@ import com.mygdx.game.gameworld.GameWorld;
 public class CollectibleBasicComponent extends TiledMapComponent
 {
     public int type;
+
     CollectibleBasicComponent()
     {
        this.type = GameConfig.DEFAULT_TYPE;
        this.belongsToLayer = GameWorld.TM_LAYER_BASIC_COLLECTIBLES;
+    }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.type = GameConfig.DEFAULT_TYPE;
+        this.belongsToLayer = GameWorld.TM_LAYER_BASIC_COLLECTIBLES;
     }
 }

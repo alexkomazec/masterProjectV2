@@ -8,4 +8,10 @@ public class PotionComponent extends TiledMapComponent
     {
         this.belongsToLayer = GameWorld.TM_LAYER_POTIONS;
     }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.belongsToLayer = GameWorld.TM_LAYER_POTIONS;
+    }
 }

@@ -20,6 +20,8 @@ public class GameWorld {
     public static final String TM_LAYER_PLATFORM = "Platform";
     public static final String TM_LAYER_PLAYERS_SPAWN_SPOTS = "PlayersSpawnSpots";
     public static final String TM_LAYER_PORTALS = "Portals";
+    public static final String TM_LAYER_LIMIT_LAYER = "LimitLayer";
+    public static final String TM_LAYER_HURTABLE_OBJECTS_LAYER = "HurtableObjectsLayer";
 
     public static final String TM_LAYER_BASIC_ENEMIES = "BasicEnemies";
     public static final String TM_LAYER_CLOUD_ENEMIES = "CloudEnemies";

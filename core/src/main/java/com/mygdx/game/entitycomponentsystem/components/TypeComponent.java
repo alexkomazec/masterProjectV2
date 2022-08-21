@@ -18,6 +18,7 @@ public class TypeComponent implements Component, Poolable {
 	public static final int ENEMY_SENSOR = 9;
 	public static final int VIEW_AREA_SENSOR = 10;
 	public static final int PORTALS = 11;
+	public static final int HURTABLE_OBJECT = 12;
 	
 	public int type = OTHER;
 

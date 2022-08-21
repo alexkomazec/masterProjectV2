@@ -131,6 +131,11 @@ public class CollisionSystem extends IteratingSystem {
 						this.matchTracker.playerFinishedMatch(playerComponent);
 
 						break;
+
+					case TypeComponent.HURTABLE_OBJECT:
+						logger.debug("player hit hurtable object");
+						cc.healthAction[GameConfig.KILL_OBJECT] = true;
+						break;
 					default:
 						//logger.error("No matching type found");
 					}
@@ -384,6 +389,28 @@ public class CollisionSystem extends IteratingSystem {
 							PlayerComponent playerComponent = collidedEntity.getComponent(PlayerComponent.class);
 							collidedEntity.remove(ControllableComponent.class);
 							this.matchTracker.playerFinishedMatch(playerComponent);
+							break;
+						default:
+							//logger.error("No matching type found");
+					}
+				}
+				else
+				{
+					logger.error("type is null");
+				}
+			}
+		}
+		else if(thisType.type == TypeComponent.HURTABLE_OBJECT)
+		{
+			if(collidedEntity != null)
+			{
+				TypeComponent type = collidedEntity.getComponent(TypeComponent.class);
+				CollisionComponent collisionComponent = collidedEntity.getComponent(CollisionComponent.class);
+
+				if(type != null) {
+					switch (type.type) {
+						case TypeComponent.PLAYER:
+							collisionComponent.healthAction[GameConfig.KILL_OBJECT] = true;
 							break;
 						default:
 							//logger.error("No matching type found");

@@ -22,8 +22,8 @@ public class RenderingSystem extends SortedIteratingSystem {
     private static final Logger logger = new Logger(RenderingSystem.class.getName(), Logger.INFO);
     private boolean shouldRender = true;
     public static final float PPM = 200.0f;
-    static final float FRUSTUM_WIDTH = Gdx.graphics.getWidth()/PPM;//37.5f;
-    static final float FRUSTUM_HEIGHT = Gdx.graphics.getHeight()/PPM;//.0f;
+    static final float FRUSTUM_WIDTH = (Gdx.graphics.getWidth()/PPM);
+    static final float FRUSTUM_HEIGHT = (Gdx.graphics.getHeight()/PPM);
 
     public static final float PIXELS_TO_METRES = 1.0f / PPM;
 

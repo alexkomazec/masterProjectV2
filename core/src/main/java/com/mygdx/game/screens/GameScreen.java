@@ -220,6 +220,8 @@ public class GameScreen implements Screen, Observer {
         this.game.getWorldCreator().setCharacterHUD(this.characterHUD);
         this.game.getWorldCreator().createPlatforms();
         this.game.getWorldCreator().createPortals();
+        this.game.getWorldCreator().createLimitAreaObjects();
+        this.game.getWorldCreator().createHurtableObjects();
         this.game.getWorldCreator().createPlayer(true, this.game.getConnectionType(),null);
         //this.game.getWorldCreator().setConnectionType(this.game.getConnectionType());
         this.game.getWorldCreator().createBasicCollectibles();

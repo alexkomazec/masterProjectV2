@@ -53,6 +53,20 @@ public class HealthManagerSystem extends IteratingSystem {
             collisionComponent.healthAction[GameConfig.INCREASE_HP] = false;
             addLife();
         }
+
+        if(this.collisionComponent.healthAction[GameConfig.KILL_OBJECT])
+        {
+            this.collisionComponent.healthAction[GameConfig.KILL_OBJECT] = false;
+            int remainNoOfLives;
+            remainNoOfLives = removeAllLives();
+
+            if(isGameObjectDead(remainNoOfLives))
+            {
+                entity.remove(this.healthComponent.getClass());
+                isEntityRemoved(this.healthComponent);
+                this.b2dBodyComponent.isDead = true;
+            }
+        }
     }
 
     public void initializeHealth(Entity entity)
@@ -98,6 +112,13 @@ public class HealthManagerSystem extends IteratingSystem {
     {
         logger.debug("Remove life");
         return --this.healthComponent.hpPoints;
+    }
+
+    private int removeAllLives()
+    {
+        logger.debug("Remove all lives");
+        this.healthComponent.hpPoints = 0;
+        return this.healthComponent.hpPoints;
     }
 
     private void addLife()

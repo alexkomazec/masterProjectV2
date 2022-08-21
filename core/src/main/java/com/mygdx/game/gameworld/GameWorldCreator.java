@@ -5,6 +5,8 @@ import static com.mygdx.game.config.GameConfig.CLOUD_BIT;
 import static com.mygdx.game.config.GameConfig.COLLECTIBLE_BIT;
 import static com.mygdx.game.config.GameConfig.ENEMY_BIT;
 import static com.mygdx.game.config.GameConfig.GROUND_BIT;
+import static com.mygdx.game.config.GameConfig.HURTABLE_OBJECTS_BIT;
+import static com.mygdx.game.config.GameConfig.LIMIT_AREA_BIT;
 import static com.mygdx.game.config.GameConfig.MULTIPLY_BY_PPM;
 import static com.mygdx.game.config.GameConfig.PLAYER_BIT;
 import static com.mygdx.game.config.GameConfig.PORTAL_BIT;
@@ -24,6 +26,7 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
+import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
@@ -51,6 +54,8 @@ import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
 import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
+import com.mygdx.game.entitycomponentsystem.components.HurtableObjectComponent;
+import com.mygdx.game.entitycomponentsystem.components.LimitAreaComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.CharacterStatsComponent;
@@ -435,6 +440,107 @@ public class GameWorldCreator {
         this.pooledEngine.addEntity(entity);
     }
 
+    public void createHurtableObjects()
+    {
+        TiledMap map = this.gameWorld.getTiledMap();
+        //Create Platform
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_HURTABLE_OBJECTS_LAYER);
+        if(mapLayer != null)
+        {
+            for(TextureMapObject object : mapLayer.getObjects().getByType(TextureMapObject.class))
+            {
+                createHurtableObject(object);
+            }
+        }
+    }
+
+    private void createHurtableObject (TextureMapObject object)
+    {
+        Short categoryFilterBits = HURTABLE_OBJECTS_BIT;
+        Short maskFilterBits = PLAYER_BIT;
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent    b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TypeComponent       typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        TransformComponent  transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        HurtableObjectComponent hurtableObjectComponent = this.pooledEngine.createComponent(HurtableObjectComponent.class);
+        Rectangle rectangle = getRectangle(object);
+
+        //Create a box2d body for each tiled object in the layer
+        b2dBodyComponent.body = bodyCreator.makeBoxPolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.StaticBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true, categoryFilterBits, maskFilterBits);
+
+        /* Set an object that represents an unique ID for the body */
+        b2dBodyComponent.body.setUserData(entity);
+        entity.add(b2dBodyComponent);
+
+        /* Set type component*/
+        typeComponent.type = TypeComponent.HURTABLE_OBJECT;
+        entity.add(typeComponent);
+
+        /* Set transformation component*/
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
+        entity.add(transformComponent);
+
+        /* Add the index to the brick component*/
+        hurtableObjectComponent.textureMapObject = object;
+        entity.add(hurtableObjectComponent);
+        this.pooledEngine.addEntity(entity);
+    }
+
+    public void createLimitAreaObjects()
+    {
+        TiledMap map = this.gameWorld.getTiledMap();
+        //Create Platform
+        MapLayer mapLayer = map.getLayers().get(GameWorld.TM_LAYER_LIMIT_LAYER);
+        if(mapLayer != null)
+        {
+            for(TextureMapObject object : mapLayer.getObjects().getByType(TextureMapObject.class))
+            {
+                createLimitArea(object);
+            }
+        }
+    }
+
+    private void createLimitArea(TextureMapObject object)
+    {
+        Short categoryFilterBits = LIMIT_AREA_BIT;
+        Short maskFilterBits = CLOUD_BIT | PLAYER_BIT | ENEMY_BIT;
+
+        Entity entity = this.pooledEngine.createEntity();
+        B2dBodyComponent    b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
+        TypeComponent       typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
+        TransformComponent  transformComponent = this.pooledEngine.createComponent(TransformComponent.class);
+        LimitAreaComponent  limitAreaComponent = this.pooledEngine.createComponent(LimitAreaComponent.class);
+        Rectangle rectangle = getRectangle(object);
+
+        //Create a box2d body for each tiled object in the layer
+        b2dBodyComponent.body = bodyCreator.makeBoxPolyBody(rectangle,
+                BodyCreator.STONE,
+                BodyDef.BodyType.StaticBody,
+                this.gameWorld.getWorldSingleton().getWorld(),
+                true, categoryFilterBits, maskFilterBits);
+
+        /* Set an object that represents an unique ID for the body */
+        b2dBodyComponent.body.setUserData(entity);
+        entity.add(b2dBodyComponent);
+
+        /* Set type component*/
+        typeComponent.type = TypeComponent.SCENERY;
+        entity.add(typeComponent);
+
+        /* Set transformation component*/
+        transformComponent.position.set(rectangle.getX(), rectangle.getY());
+        entity.add(transformComponent);
+
+        /* Add the index to the brick component*/
+        limitAreaComponent.textureMapObject = object;
+        entity.add(limitAreaComponent);
+        this.pooledEngine.addEntity(entity);
+    }
+
     public Entity createPlayer(boolean isLocalPlayer, boolean isOnlineMode, Vector2 position)
     {
         TiledMap map = this.gameWorld.getTiledMap();
@@ -455,7 +561,9 @@ public class GameWorldCreator {
     private Entity createPlayer(MapObject object, Vector2 position, boolean isLocalPlayer, boolean isOnlineMode)
     {
         Short categoryFilterBits = PLAYER_BIT;
-        Short maskFilterBits = GROUND_BIT | COLLECTIBLE_BIT | POTIONS_BIT | PORTAL_BIT | SENSOR_BIT | BULLET_BIT | VIEW_AREA_BIT;
+        Short maskFilterBits = GROUND_BIT | COLLECTIBLE_BIT | POTIONS_BIT |
+                               PORTAL_BIT | SENSOR_BIT | BULLET_BIT | VIEW_AREA_BIT |
+                               LIMIT_AREA_BIT | HURTABLE_OBJECTS_BIT;
 
         Entity entity = this.pooledEngine.createEntity();
         B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);

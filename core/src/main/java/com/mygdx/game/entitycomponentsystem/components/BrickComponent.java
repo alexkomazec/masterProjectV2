@@ -10,4 +10,10 @@ public class BrickComponent extends TiledMapComponent {
      {
          this.belongsToLayer = GameWorld.TM_LAYER_PLATFORM;
      }
+
+    @Override
+    public void reset() {
+        super.reset();
+        this.belongsToLayer = GameWorld.TM_LAYER_PLATFORM;
+    }
 }
