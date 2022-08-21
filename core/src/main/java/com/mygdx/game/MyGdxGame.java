@@ -277,6 +277,12 @@ public class MyGdxGame extends Game implements Publisher {
 		this.clientHandler = ClientHandler.getInstance(pooledEngine, this);
 	}
 
+	public void removeClientHandler()
+	{
+		this.clientHandler.clearSystems();
+		this.clientHandler = null;
+	}
+
 	public void setConnectionType(boolean connectionType) {
 		this.connectionType = connectionType;
 	}

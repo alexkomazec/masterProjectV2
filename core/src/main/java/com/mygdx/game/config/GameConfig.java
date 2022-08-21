@@ -15,7 +15,7 @@ public class GameConfig {
     public static final float DIVIDE_BY_PPM = 1/PPM;
 
 
-    public static final int   NUMBER_OF_TILES = 10; // One tile is sized PPMxPPM
+    public static final int   NUMBER_OF_TILES = 15; // One tile is sized PPMxPPM
     public static final float WORLD_WIDTH = PPM*NUMBER_OF_TILES;
     public static final float WORLD_HEIGHT = PPM*NUMBER_OF_TILES;
 

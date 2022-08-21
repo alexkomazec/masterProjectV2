@@ -9,7 +9,7 @@ import java.util.HashMap;
 
 public class MatchTracker {
 
-    private static final Logger logger = new Logger(MatchTracker.class.getSimpleName(), Logger.DEBUG);
+    private static final Logger logger = new Logger(MatchTracker.class.getSimpleName(), Logger.INFO);
 
     public static MatchTracker instance;
     private HashMap<PlayerComponent, Boolean> activePlayers;

@@ -31,7 +31,7 @@ import io.socket.emitter.Emitter;
 
 public class LoginForm extends VisWindow
 {
-	protected static final Logger logger = new Logger(LoginForm.class.getSimpleName(), Logger.DEBUG);
+	protected static final Logger logger = new Logger(LoginForm.class.getSimpleName(), Logger.INFO);
 	private MyGdxGame game;
 	private Stage stage;
 	private ConnectScreen connectScreen;

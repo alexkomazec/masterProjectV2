@@ -29,6 +29,12 @@ public class ConnectionTypeScreen extends MenuScreenBase {
 
     @Override
     protected Actor createUi() {
+
+        if(game.getClientHandler() != null)
+        {
+            game.removeClientHandler();
+        }
+
         Table table = new Table();
 
         //Getting texture atlas from asset manager

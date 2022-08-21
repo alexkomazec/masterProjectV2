@@ -9,7 +9,7 @@ import com.mygdx.game.entitycomponentsystem.system.PlayerControlSystem;
 
 public class KeyboardController extends InputAdapterWrapper {
 
-	private static final Logger logger = new Logger(KeyboardController.class.getSimpleName(), Logger.DEBUG);
+	private static final Logger logger = new Logger(KeyboardController.class.getSimpleName(), Logger.INFO);
 	private final Vector2 mouseLocation = new Vector2(0,0);
 
 	public KeyboardController()

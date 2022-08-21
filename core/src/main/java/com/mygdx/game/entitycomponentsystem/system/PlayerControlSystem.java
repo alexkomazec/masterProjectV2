@@ -26,7 +26,7 @@ import com.mygdx.game.utils.GdxUtils;
 
 public class PlayerControlSystem extends IteratingSystem{
 
-	private static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.DEBUG);
+	private static final Logger logger = new Logger(PlayerControlSystem.class.getSimpleName(), Logger.INFO);
 	ComponentMapper<PlayerComponent> pm;
 	ComponentMapper<B2dBodyComponent> bodm;
 	ComponentMapper<StateComponent> sm;

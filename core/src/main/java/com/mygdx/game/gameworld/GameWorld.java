@@ -9,7 +9,7 @@ import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 
 public class GameWorld {
 
-    private static final Logger logger = new Logger(GameWorld.class.getSimpleName(), Logger.DEBUG);
+    private static final Logger logger = new Logger(GameWorld.class.getSimpleName(), Logger.INFO);
 
     /* box2d world represents all bodies in the game world as 2d body with regular physics*/
     private WorldSingleton box2dWorldSingleton;

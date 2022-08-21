@@ -6,6 +6,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Screen;
 import com.badlogic.gdx.graphics.GL30;
 import com.badlogic.gdx.graphics.OrthographicCamera;
+import com.badlogic.gdx.physics.box2d.Contact;
 import com.badlogic.gdx.scenes.scene2d.InputEvent;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Button;
@@ -16,12 +17,15 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.badlogic.gdx.utils.viewport.StretchViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 import com.mygdx.game.MyGdxGame;
+import com.mygdx.game.common.B2dContactListener;
+import com.mygdx.game.common.FixturePair;
 import com.mygdx.game.common.Observer;
 import com.mygdx.game.common.Topics;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.AnimationSystem;
+import com.mygdx.game.entitycomponentsystem.system.B2dContactSystem;
 import com.mygdx.game.entitycomponentsystem.system.BulletSystem;
 import com.mygdx.game.entitycomponentsystem.system.CharacterStatsSystem;
 import com.mygdx.game.entitycomponentsystem.system.CollectibleBasicManagerSystem;
@@ -52,10 +56,13 @@ import com.mygdx.game.ui.EndMatchPanel;
 import com.mygdx.game.ui.PausePanel;
 import com.mygdx.game.utils.ScreenOrientation;
 
+import java.util.ArrayList;
+import java.util.HashSet;
+
 public class GameScreen implements Screen, Observer {
 
     private static final String CLASS_NAME  = MenuScreen.class.getSimpleName();
-    private static final Logger logger         = new Logger(CLASS_NAME, Logger.DEBUG);
+    private static final Logger logger         = new Logger(CLASS_NAME, Logger.INFO);
     private boolean readyToChangeScreen        = false;
 
     private final MyGdxGame game;
@@ -68,11 +75,19 @@ public class GameScreen implements Screen, Observer {
     private PausePanel pausePanel;
     private EndMatchPanel gameOverPanel;
 
+    /* This buffer is used to synhronize aync B2dContactListener and synh CollisionSystem
+    *  B2dContactListener put fresh contacts into this buffer,
+    *  B2dContactSystem then reads it (one per cycle)
+    *  CollisionSystem then resolve certain collision
+    * */
+    public static ArrayList<FixturePair> bufferOfFixtures = new ArrayList<>();
+
     Stage stageHUD;
     Stage characterHUD;
 
     public GameScreen()
     {
+        bufferOfFixtures.clear();
         this.game = MyGdxGame.getInstance();
 
         if(game.getClientHandler() != null)
@@ -178,6 +193,8 @@ public class GameScreen implements Screen, Observer {
         );
         this.game.getPooledEngine().addSystem(
                 new PhysicsSystem(this.gameWorld.getWorldSingleton().getWorld(), this.game.getMatchTracker()));
+        this.game.getPooledEngine().addSystem(
+                new B2dContactSystem());
         this.game.getPooledEngine().addSystem(
                 new CollisionSystem(this.game.getMatchTracker()));
         this.game.getPooledEngine().addSystem(

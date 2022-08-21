@@ -75,7 +75,7 @@ import com.mygdx.game.entitycomponentsystem.system.MatchTracker;
 
 public class GameWorldCreator {
 
-    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.DEBUG);
+    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.INFO);
     private BodyCreator bodyCreator;
     public static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
@@ -221,8 +221,8 @@ public class GameWorldCreator {
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
         typeComponent.type = TypeComponent.VIEW_AREA_SENSOR;
         /* View area should be wider, than enemy's surface */
-        rectangle.width *= 5;
-        rectangle.height *= 5;
+        rectangle.width *= 15;
+        rectangle.height *= 15;
 
         sensorComponent.sensorBody = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
