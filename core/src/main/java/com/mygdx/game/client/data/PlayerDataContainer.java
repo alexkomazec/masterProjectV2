@@ -1,15 +1,19 @@
 package com.mygdx.game.client.data;
 
 import com.badlogic.gdx.math.Vector2;
+import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 
 /* Player Data ready to send over the network */
 public class PlayerDataContainer {
 
     private boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
     private Vector2 position       = new Vector2();
+    private float bulletXvelocity  = 0f;
     private float playerWidth      = 0f;
     private int playerID;
+    private Direction bulletDirection = Direction.LEFT;
 
     public PlayerDataContainer() {}
 
@@ -17,6 +21,22 @@ public class PlayerDataContainer {
     {
         this.abInputCommandList = abInputCommandList;
         this.playerID = playerID;
+    }
+
+    public PlayerDataContainer(boolean[] abInputCommandList, int playerID, float bulletXvelocity)
+    {
+        this.abInputCommandList = abInputCommandList;
+        this.playerID = playerID;
+        this.bulletXvelocity = bulletXvelocity;
+    }
+
+    public PlayerDataContainer(Direction bulletDirection, boolean[] abInputCommandList, Vector2 position, int playerID, float bulletXvelocity)
+    {
+        this.abInputCommandList = abInputCommandList;
+        this.position = position;
+        this.playerID = playerID;
+        this.bulletXvelocity = bulletXvelocity;
+        this.bulletDirection = bulletDirection;
     }
 
     public boolean[] getAbInputCommandList() {
@@ -54,5 +74,13 @@ public class PlayerDataContainer {
 
     public void setPlayerWidth(float playerWidth) {
         this.playerWidth = playerWidth;
+    }
+
+    public float getBulletXvelocity() {
+        return this.bulletXvelocity;
+    }
+
+    public Direction getBulletDirection() {
+        return bulletDirection;
     }
 }

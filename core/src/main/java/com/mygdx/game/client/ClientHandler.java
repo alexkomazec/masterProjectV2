@@ -8,6 +8,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.client.data.PlayerDataContainer;
+import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.Topics;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
@@ -72,9 +73,6 @@ public class ClientHandler {
         this.receivedMessageArray = new Array<>();
         this.transmitingMessageArray = new Array<>();
         this.game = game;
-        game.getPooledEngine().addSystem(new DataReceivingSystem(this));
-        game.getPooledEngine().addSystem(new DataTransmittingSystem(this));
-        game.getPooledEngine().addSystem(new InputManagerTransmittingSystem(this));
     }
 
     public boolean isRecMessageArrayEmpty() {
@@ -382,7 +380,7 @@ public class ClientHandler {
 
     private void updatePlayerPos(Object... args) throws JSONException {
 
-        logger.debug("UPDATE_PLAYER_POS");
+        //logger.debug("UPDATE_PLAYER_POS");
         JSONArray arrPlayers = new JSONArray ();
         arrPlayers.put(args[0]);
         Message message = new Message(UPDATE_PLAYER_POS, true);
@@ -438,7 +436,32 @@ public class ClientHandler {
         logger.debug("PLAYER_FIRED");
         JSONArray jsonArray = (JSONArray) args[0];
         int playerId = (int)jsonArray.get(0);
+
         JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
+        float playerPositonX;
+        float playerPositonY;
+
+        if(jsonArray.get(2) instanceof Double)
+        {
+            playerPositonX = (float)((double)jsonArray.get(2));
+        }
+        else
+        {
+            playerPositonX = (float)((Integer)jsonArray.get(2));
+        }
+
+        if(jsonArray.get(3) instanceof Double)
+        {
+            playerPositonY = (float)((double)jsonArray.get(3));
+        }
+        else
+        {
+            playerPositonY = (float)((Integer)jsonArray.get(3));
+        }
+
+        float xVel = (float)((Integer)jsonArray.get(4));
+        Direction bulletDirection = (jsonArray.get(5).equals("RIGHT") )?Direction.RIGHT:Direction.LEFT;
+
         boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
 
         for (int index = 0; index < inputCommandList.length(); index++)
@@ -447,9 +470,8 @@ public class ClientHandler {
         }
 
         Message message = new Message(PLAYER_FIRED, true);
-        message.addPlayerDataContainer(new PlayerDataContainer(abInputCommandList, playerId));
+        message.addPlayerDataContainer(new PlayerDataContainer(bulletDirection, abInputCommandList, new Vector2(playerPositonX, playerPositonY), playerId, xVel));
         receivedMessageArray.add(message);
-
     }
 
 
@@ -464,7 +486,7 @@ public class ClientHandler {
             try
             {
                 jsonObjectCurPlayer = (JSONObject)arrPlayers.get(index);
-                logger.debug(jsonObjectCurPlayer.toString());
+                //logger.debug(jsonObjectCurPlayer.toString());
             }
             catch (JSONException e)
             {
@@ -545,9 +567,25 @@ public class ClientHandler {
         return game;
     }
 
+    public void loadDataReceivingSystem()
+    {
+        game.getPooledEngine().addSystem(new DataReceivingSystem(this,this.game.getPooledEngine()));
+    }
+
+    public void loadDataTransmittingSystem()
+    {
+        game.getPooledEngine().addSystem(new DataTransmittingSystem(this));
+    }
+
+    public void loadInputManagerTransmittingSystem()
+    {
+        game.getPooledEngine().addSystem(new InputManagerTransmittingSystem(this));
+    }
+
+
     public void loadSystems()
     {
-        game.getPooledEngine().addSystem(new DataReceivingSystem(this));
+        game.getPooledEngine().addSystem(new DataReceivingSystem(this,this.game.getPooledEngine()));
         game.getPooledEngine().addSystem(new DataTransmittingSystem(this));
         game.getPooledEngine().addSystem(new InputManagerTransmittingSystem(this));
     }

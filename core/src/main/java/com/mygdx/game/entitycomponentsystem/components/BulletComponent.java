@@ -16,7 +16,6 @@ public class BulletComponent implements Component, Poolable{
 	public boolean isDead = false;
 	public Owner owner = Owner.NONE;
 	public B2dBodyComponent ownerReference;
-	public Direction direction = Direction.LEFT;
 	
 	@Override
 	public void reset() {
@@ -26,6 +25,5 @@ public class BulletComponent implements Component, Poolable{
 		isDead = false;
 		livingTime = 0;
 		ownerReference = null;
-		direction = Direction.LEFT;
 	}
 }

@@ -7,10 +7,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.client.ClientHandler;
+import com.mygdx.game.common.CoolDown;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputRemoteComponent;
+import com.mygdx.game.entitycomponentsystem.components.CoolDownComponent;
 import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
@@ -32,7 +34,7 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
     private boolean isInit;
 
     public InputManagerTransmittingSystem(ClientHandler clientHandler) {
-        super(Family.all(PlayerComponent.class, LocalInputComponent.class).get());
+        super(Family.all(PlayerComponent.class, LocalInputComponent.class).get(), 1);
         logger.debug("InputManagerTransmittingSystem has been created");
         this.clientHandler = clientHandler;
         this.lastStoredPosition = new Vector2();
@@ -96,21 +98,39 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
             cntrlInComp.newInputHappend = false;
 
             /* Send event only if the player fired magic. Other player movements are updated
-            * using updatePlayerInputPosition event*/
+             * using updatePlayerInputPosition event*/
             if(cntrlInComp.abInputCommandList[GameConfig.SPACE] != this.isMagicFired)
             {
-                for (int index = 0; index < cntrlInComp.abInputCommandList.length-1; index++)
+
+                if (playerComponent.readyToTransmitBullet)
                 {
-                    /* Add dummy boolean false*/
-                    jAInputCommandList.put(false);
+                    playerComponent.readyToTransmitBullet = false;
+                    for (int index = 0; index < cntrlInComp.abInputCommandList.length - 1; index++) {
+                        /* Add dummy boolean false*/
+                        jAInputCommandList.put(false);
+                    }
+                    jAInputCommandList.put(cntrlInComp.abInputCommandList[GameConfig.SPACE]);
+                    logger.debug("magicFired: Player with ID " + playerComponent.playerID + " fire Magic");
+                    logger.debug(
+                            "playerComponent.bulletPosition: " + playerComponent.bulletPosition +
+                                    "playerComponent.bulletXvel: " + playerComponent.bulletXvel +
+                                    "playerComponent.bulletDirectionOnShoot: " + playerComponent.bulletDirectionOnShoot);
+
+                    this.clientHandler.getSocket().emit("magicFired",
+                            this.clientHandler.getSocket().id(),
+                            jAInputCommandList,
+                            playerComponent.bulletPosition.x,
+                            playerComponent.bulletPosition.y,
+                            playerComponent.bulletXvel,
+                            playerComponent.bulletDirectionOnShoot
+                    );
+
+                    //playerComponent.bulletPosition.x, //playerComponent.bulletPosition.x,
+                    //        playerComponent.bulletPosition.y, //playerComponent.bulletPosition.y,
+                    //        playerComponent.bulletXvel, //playerComponent.bulletXvel,
+                    //        directionComponent.direction//playerComponent.bulletDirectionOnShoot
+                    this.isMagicFired = cntrlInComp.abInputCommandList[GameConfig.SPACE];
                 }
-                jAInputCommandList.put(cntrlInComp.abInputCommandList[GameConfig.SPACE]);
-                logger.debug("magicFired: Player with ID " + playerComponent.playerID + " fire Magic");
-                this.clientHandler.getSocket().emit("magicFired",
-                        this.clientHandler.getSocket().id(),
-                        jAInputCommandList
-                        );
-                this.isMagicFired = cntrlInComp.abInputCommandList[GameConfig.SPACE];
             }
         }
     }

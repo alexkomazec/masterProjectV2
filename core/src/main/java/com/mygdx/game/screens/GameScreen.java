@@ -90,11 +90,6 @@ public class GameScreen implements Screen, Observer {
         bufferOfFixtures.clear();
         this.game = MyGdxGame.getInstance();
 
-        if(game.getClientHandler() != null)
-        {
-            this.game.getClientHandler().loadSystems();
-        }
-
         initGameWorld();
 
         this.game.registerObserver(Topics.PLAYER_LEAVE_ROOM, this);
@@ -169,60 +164,15 @@ public class GameScreen implements Screen, Observer {
         this.hudViewport = new StretchViewport(700,700);
         this.stageHUD = new Stage(hudViewport, this.game.getBatch());
         this.characterHUD = new Stage(viewport, this.game.getBatch());
-        setRenderSystems(renderingSystem, this.characterHUD, this.stageHUD);
 
-        this.game.getPooledEngine().addSystem(new AnimationSystem());
-        HealthManagerSystem healthManagerSystem = new HealthManagerSystem();
-
-        this.game.getPooledEngine().addSystem(
-                new PlayerControlSystem(
-                        game.getWorldCreator(),
-                        game.getPooledEngine(),
-                        this.gameWorld.getWorldSingleton().getWorld(),
-                        game.getAssetManagmentHandler().getResources(AssetDescriptors.SHOOT_SOUND)
-                        //game.getAssetManagmentHandler().getResources(AssetDescriptors.CLICK_SOUND)
-                )
-        );
-        this.game.getPooledEngine().addSystem(
-                new CollectibleBasicManagerSystem(game.getWorldCreator(),
-                                                  this.gameWorld.getWorldSingleton().getWorld(),
-                                                  game.getPooledEngine())
-        );
-        this.game.getPooledEngine().addSystem(
-                new CollisionEffectsSystem(this.game.getGameWorldCreator().getCollisionEffectFrames().size)
-        );
-        this.game.getPooledEngine().addSystem(
-                new PhysicsSystem(this.gameWorld.getWorldSingleton().getWorld(), this.game.getMatchTracker()));
-        this.game.getPooledEngine().addSystem(
-                new B2dContactSystem());
-        this.game.getPooledEngine().addSystem(
-                new CollisionSystem(this.game.getMatchTracker()));
-        this.game.getPooledEngine().addSystem(
-                new BulletSystem(game.getWorldCreator()));
-        this.game.getPooledEngine().addSystem(
-                new EnemySystem(game.getWorldCreator(), this.gameWorld, game.getPooledEngine())
-        );
-        this.game.getPooledEngine().addSystem(healthManagerSystem);
-        this.game.getWorldCreator().setHealthManagerSystem(healthManagerSystem);
-        this.game.getPooledEngine().addSystem(
-                new SensorSystem(this.game.getPooledEngine())
-        );
-        this.game.getPooledEngine().addSystem(
-                new SteeringSystem());
-        this.game.getPooledEngine().addSystem(
-                new CharacterStatsSystem()
-        );
+        InputManagerAndroidSystem inManAndroidSys = null;
 
         if(Gdx.app.getType() == Application.ApplicationType.Android)
         {
             /* Running application is on android device*/
-            InputManagerAndroidSystem inManAndroidSys =
-                    new InputManagerAndroidSystem(this.game.getBatch(), hudViewport, this.game.getInputMultiplexer());
-            RenderAndroidControllerSystem renderASys =
-                    new RenderAndroidControllerSystem(inManAndroidSys.getAndroidController());
+            inManAndroidSys = new InputManagerAndroidSystem(this.game.getBatch(), hudViewport, this.game.getInputMultiplexer());
 
             this.game.getPooledEngine().addSystem(inManAndroidSys);
-            this.game.getPooledEngine().addSystem(renderASys);
         }
         else
         {
@@ -231,6 +181,70 @@ public class GameScreen implements Screen, Observer {
                     new InputManagerSystem(this.game.getConnectionType(), this.game.getInputMultiplexer())
             );
         }
+
+        this.game.getPooledEngine().addSystem(
+                new PlayerControlSystem(
+                        game.getWorldCreator(),
+                        game.getPooledEngine(),
+                        this.gameWorld.getWorldSingleton().getWorld(),
+                        game.getAssetManagmentHandler().getResources(AssetDescriptors.SHOOT_SOUND)
+                )
+        );
+        if(this.game.getClientHandler() != null)
+        {
+            this.game.getClientHandler().loadInputManagerTransmittingSystem();
+        }
+
+        this.game.getPooledEngine().addSystem(
+                new CollectibleBasicManagerSystem(game.getWorldCreator(),
+                        this.gameWorld.getWorldSingleton().getWorld(),
+                        game.getPooledEngine())
+        );
+
+        this.game.getPooledEngine().addSystem(
+                new B2dContactSystem());
+
+        this.game.getPooledEngine().addSystem(
+                new CollisionSystem(this.game.getMatchTracker()));
+
+        this.game.getPooledEngine().addSystem(
+                new RenderTiledMapSystem(game.getTileMapHandler().getOrthogonalTiledMapRenderer(),
+                        this.camera,
+                        this.gameWorld.getTiledMap()));
+        
+        HealthManagerSystem healthManagerSystem = new HealthManagerSystem();
+        this.game.getPooledEngine().addSystem(healthManagerSystem);
+        this.game.getWorldCreator().setHealthManagerSystem(healthManagerSystem);
+
+        this.game.getPooledEngine().addSystem(new CharacterStatsSystem());
+
+        this.game.getPooledEngine().addSystem(
+                new BulletSystem(game.getWorldCreator()));
+
+        this.game.getPooledEngine().addSystem(
+                new CollisionEffectsSystem(this.game.getGameWorldCreator().getCollisionEffectFrames().size)
+        );
+
+        this.game.getPooledEngine().addSystem(
+                new EnemySystem(game.getWorldCreator(), this.gameWorld, game.getPooledEngine())
+        );
+
+        this.game.getPooledEngine().addSystem(new SensorSystem(this.game.getPooledEngine())
+        );
+
+        this.game.getPooledEngine().addSystem(new SteeringSystem());
+
+        this.game.getPooledEngine().addSystem(
+                new PhysicsSystem(this.gameWorld.getWorldSingleton().getWorld(), this.game.getMatchTracker()));
+
+        if(game.getClientHandler() != null)
+        {
+            this.game.getClientHandler().loadDataReceivingSystem();
+            this.game.getClientHandler().loadDataTransmittingSystem();
+        }
+
+        setRenderSystems(renderingSystem, this.characterHUD, this.stageHUD, inManAndroidSys);
+
         buildUI();
 
         ViewPortConfiguration.setupPhysicalSize();
@@ -352,12 +366,9 @@ public class GameScreen implements Screen, Observer {
     }
 
     /* Put all systems that are responsisble for rendering */
-    private void setRenderSystems(RenderingSystem renderingSystem, Stage characterHudStage, Stage gameHudStage)
+    private void setRenderSystems(RenderingSystem renderingSystem, Stage characterHudStage, Stage gameHudStage, InputManagerAndroidSystem inManAndroidSys)
     {
-        this.game.getPooledEngine().addSystem(
-                new RenderTiledMapSystem(game.getTileMapHandler().getOrthogonalTiledMapRenderer(),
-                        this.camera,
-                        this.gameWorld.getTiledMap()));
+        this.game.getPooledEngine().addSystem(new AnimationSystem());
         this.game.getPooledEngine().addSystem(new RenderCharacterHudSystem(characterHudStage));
         this.game.getPooledEngine().addSystem(renderingSystem);
         this.game.getPooledEngine().addSystem
@@ -365,6 +376,12 @@ public class GameScreen implements Screen, Observer {
                         this.camera));
         this.game.getPooledEngine().addSystem(
                 new RenderGameHud(gameHudStage));
+
+        if(Gdx.app.getType() == Application.ApplicationType.Android)
+        {
+            this.game.getPooledEngine().addSystem(
+                    new RenderAndroidControllerSystem(inManAndroidSys.getAndroidController()));
+        }
     }
 
     @Override

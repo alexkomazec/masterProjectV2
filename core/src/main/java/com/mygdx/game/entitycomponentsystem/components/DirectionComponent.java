@@ -5,6 +5,8 @@ import com.badlogic.gdx.utils.Pool;
 import com.mygdx.game.common.Direction;
 
 public class DirectionComponent implements Component, Pool.Poolable {
+
+    /* Current character direction */
     public Direction direction = Direction.LEFT;
 
     @Override

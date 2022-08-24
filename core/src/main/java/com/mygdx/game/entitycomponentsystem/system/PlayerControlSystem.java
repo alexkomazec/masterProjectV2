@@ -7,6 +7,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.math.MathUtils;
+import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.common.Direction;
@@ -133,37 +134,63 @@ public class PlayerControlSystem extends IteratingSystem{
 			playerComponent.onPlatform = false;
 		}
 
+		if(playerComponent.typeOfPlayer == PlayerComponent.PlayerConnectivity.ONLINE
+				&& playerComponent.needTofire)
+		{
+			float startBulletPositionX = 0;
+			float startBulletPositionY = 0;
+			float xVel = 0;
+			Direction direction = null;
+
+
+			logger.info("playerComponent.typeOfPlayer is ONLINE");
+			playerComponent.needTofire = false;
+
+			direction = playerComponent.bulletDirectionOnShoot;
+			startBulletPositionX = playerComponent.bulletPosition.x;
+			startBulletPositionY = playerComponent.bulletPosition.y;
+			xVel = playerComponent.bulletXvel;
+
+			coolDownComponent.coolDown.elapsedTimeInSeconds = 0;
+			playerComponent.alreadyFired = true;
+			playerComponent.fired = true;
+
+			this.shootSound.play();
+			this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
+					xVel, 0,
+					direction,
+					null,
+					BulletComponent.Owner.PLAYER,
+					b2dbodyComponent,
+					this.pooledEngine,
+					world);
+
+			logger.info("======= SHOOTING BULLET ============");
+			logger.info("playerComponent.playerID: " + playerComponent.playerID);
+			logger.info("playerComponent.typeOfPlayer: " + playerComponent.typeOfPlayer);
+			logger.info("startBulletPositionX: " + startBulletPositionX);
+			logger.info("startBulletPositionY: " + startBulletPositionY);
+			logger.info("xVel: " + xVel);
+			logger.info("direction: " + direction);
+			logger.info("======= END SHOOTING BULLET ============");
+		}
+
 		boolean condition = GdxUtils.isInputCommandTrue(GameConfig.SPACE, cntrlComponent) && !playerComponent.alreadyFired;
 		if (condition)
 		{
-			float startBulletPositionX;
-			float startBulletPositionY;
-			float xVel;
+			if(playerComponent.typeOfPlayer == PlayerComponent.PlayerConnectivity.LOCAL)
+			{
+				if(coolDownComponent.coolDown.elapsedTimeInSeconds >= coolDownComponent.coolDown.cooldown)
+				{
+					logger.info("playerComponent.typeOfPlayer: " +  playerComponent.typeOfPlayer);
+					logger.info("directionComponent.direction:" + directionComponent.direction);
 
-			if(coolDownComponent.coolDown.elapsedTimeInSeconds >= coolDownComponent.coolDown.cooldown) {
-				coolDownComponent.coolDown.elapsedTimeInSeconds = 0;
-
-				if (directionComponent.direction == Direction.LEFT) {
-					startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) - 16f * 3;
-					xVel = -7;
-				} else {
-					startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) + 16f;
-					xVel = 7;
+					handleLocalFiring(directionComponent,b2dbodyComponent,playerComponent, coolDownComponent);
 				}
-
-				startBulletPositionY = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
-
-				this.shootSound.play();
-				this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
-						xVel, 0,
-						directionComponent.direction,
-						null,
-						BulletComponent.Owner.PLAYER,
-						b2dbodyComponent,
-						this.pooledEngine,
-						world);
-				playerComponent.alreadyFired = true;
-				playerComponent.fired = true;
+			}
+			else
+			{
+				logger.error("Error, wrong player connectivity ");
 			}
 		}
 
@@ -173,4 +200,58 @@ public class PlayerControlSystem extends IteratingSystem{
 			playerComponent.alreadyFired = false;
 		}
 	}
+
+	public void handleLocalFiring(DirectionComponent directionComponent,
+								  B2dBodyComponent b2dbodyComponent,
+								  PlayerComponent playerComponent,
+								  CoolDownComponent coolDownComponent)
+	{
+		logger.info("playerComponent.typeOfPlayer is LOCAL");
+		Direction direction;
+		float startBulletPositionX;
+		float xVel;
+
+		coolDownComponent.coolDown.elapsedTimeInSeconds = 0;
+
+		if (directionComponent.direction == Direction.LEFT) {
+			direction = Direction.LEFT;
+			startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) - 16f * 3;
+			xVel = -7;
+		} else {
+			direction = Direction.RIGHT;
+			startBulletPositionX = (b2dbodyComponent.body.getPosition().x * GameConfig.MULTIPLY_BY_PPM) + 16f;
+			xVel = 7;
+		}
+
+		float startBulletPositionY = b2dbodyComponent.body.getPosition().y * GameConfig.MULTIPLY_BY_PPM;
+
+		/* Store temp data for the bullet */
+		playerComponent.bulletDirectionOnShoot = directionComponent.direction;
+		playerComponent.bulletXvel = xVel;
+		playerComponent.bulletPosition = new Vector2(startBulletPositionX, startBulletPositionY);
+
+		this.shootSound.play();
+		this.gameWorldCreator.createBullet(startBulletPositionX, startBulletPositionY,
+				xVel, 0,
+				direction,
+				null,
+				BulletComponent.Owner.PLAYER,
+				b2dbodyComponent,
+				this.pooledEngine,
+				world);
+
+		playerComponent.alreadyFired = true;
+		playerComponent.fired = true;
+		playerComponent.readyToTransmitBullet = true;
+
+		logger.info("======= SHOOTING BULLET ============");
+		logger.info("playerComponent.playerID: " + playerComponent.playerID);
+		logger.info("playerComponent.typeOfPlayer: " + playerComponent.typeOfPlayer);
+		logger.info("startBulletPositionX: " + startBulletPositionX);
+		logger.info("startBulletPositionY: " + startBulletPositionY);
+		logger.info("xVel: " + xVel);
+		logger.info("direction: " + direction);
+		logger.info("======= END SHOOTING BULLET ============");
+	}
+
 }

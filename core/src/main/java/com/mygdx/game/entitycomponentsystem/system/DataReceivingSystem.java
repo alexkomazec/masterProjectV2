@@ -8,6 +8,7 @@ import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.utils.Logger;
+import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.Message;
@@ -16,6 +17,7 @@ import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
+import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControllableComponent;
 import com.mygdx.game.entitycomponentsystem.components.ControlledInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
@@ -24,20 +26,25 @@ import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
 
+import java.util.ArrayList;
+
 import javax.swing.text.TabExpander;
 
 public class DataReceivingSystem extends IteratingSystem {
 
-    protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.INFO);
+    protected static final Logger logger = new Logger(DataReceivingSystem.class.getSimpleName(), Logger.DEBUG);
     private ClientHandler clientHandler;
     private GameWorldCreator gameWorldCreator;
     private GeneralInfoContainer generalInfoContainer;
     private Message message;
+    private PooledEngine pooledEngine;
 
-    public DataReceivingSystem(ClientHandler clientHandler) {
+    public DataReceivingSystem(ClientHandler clientHandler, PooledEngine pooledEngine) {
         super(Family.all(PlayerComponent.class, ControlledInputComponent.class).get());
         logger.debug("DataReceivingSystem has been created");
         this.clientHandler = clientHandler;
+        this.pooledEngine = pooledEngine;
+
         this.gameWorldCreator = GameWorldCreator.getInstance();
         this.generalInfoContainer = generalInfoContainer;
     }
@@ -171,7 +178,12 @@ public class DataReceivingSystem extends IteratingSystem {
 
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
+                    logger.debug("PLAYER_FIRED: playerComponent.playerID: " + playerComponent.playerID);
                     controlledInputComponent.abInputCommandList = playerDataContainer.getAbInputCommandList();
+                    playerComponent.bulletDirectionOnShoot = playerDataContainer.getBulletDirection();
+                    playerComponent.bulletXvel = playerDataContainer.getBulletXvelocity();
+                    playerComponent.bulletPosition = playerDataContainer.getPosition();
+                    playerComponent.needTofire = true;
                 }
             break;
 
@@ -254,6 +266,7 @@ public class DataReceivingSystem extends IteratingSystem {
 
                 if(playerConnectivity == PlayerComponent.PlayerConnectivity.LOCAL)
                 {
+                    logger.debug(" Local player with id : " + playerDataContainer.getPlayerID() + " will go out of the room");
                     this.clientHandler.notifyToGoOutFromTheRoom();
                 }
 
@@ -286,6 +299,8 @@ public class DataReceivingSystem extends IteratingSystem {
     {
         Entity tempEntity = null;
         PlayerComponent.PlayerConnectivity playerConnectivityTemp = PlayerComponent.PlayerConnectivity.NONE;
+        boolean localFound = false;
+        boolean onlineFound = false;
 
         for (Entity entityPlayer: entityPlayers)
         {
@@ -296,7 +311,19 @@ public class DataReceivingSystem extends IteratingSystem {
                 playerConnectivityTemp = playerComponent.typeOfPlayer;
                 break;
             }
+            else
+            {
+                if(playerComponent.typeOfPlayer == PlayerComponent.PlayerConnectivity.LOCAL)
+                {
+                    localFound = true;
+                }
+                else
+                {
+                    onlineFound = true;
+                }
+            }
         }
+
 
         /* Delete Entity that contains player component that has been disconected*/
         if(tempEntity!= null)
@@ -307,7 +334,25 @@ public class DataReceivingSystem extends IteratingSystem {
         }
         else
         {
+            /* Entity is already deleted, reason:  PhysicsSystem already delete the body */
             logger.error("tempEntity is empty");
+
+            if(localFound && !onlineFound)
+            {
+                playerConnectivityTemp = PlayerComponent.PlayerConnectivity.ONLINE;
+            }
+            else if(localFound && onlineFound)
+            {
+                playerConnectivityTemp = PlayerComponent.PlayerConnectivity.ONLINE;
+            }
+            else if(!localFound)
+            {
+                playerConnectivityTemp = PlayerComponent.PlayerConnectivity.LOCAL;
+            }
+            else
+            {
+                logger.error("Wrong combination");
+            }
         }
 
         return playerConnectivityTemp;
