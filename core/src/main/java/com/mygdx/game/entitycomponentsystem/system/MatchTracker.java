@@ -74,7 +74,7 @@ public class MatchTracker {
                 }
             }
 
-            if(allPlayersFinished)
+            if(allPlayersFinished && activePlayers.isEmpty())
             {
                 //Display Message WIN GAME
                 logger.info("allPlayersFinished");
