@@ -10,6 +10,9 @@ import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.World;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.client.ClientHandler;
+import com.mygdx.game.client.Message;
+import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.common.ViewPortConfiguration;
 import com.mygdx.game.config.GameConfig;
@@ -24,6 +27,8 @@ import com.mygdx.game.entitycomponentsystem.components.StateComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.utils.GdxUtils;
 
+import org.json.JSONArray;
+
 
 public class PlayerControlSystem extends IteratingSystem{
 
@@ -37,6 +42,7 @@ public class PlayerControlSystem extends IteratingSystem{
 	PooledEngine pooledEngine;
 	World world;
 	Sound shootSound;
+	ClientHandler clientHandler;
 
 	@SuppressWarnings("unchecked")
 	public PlayerControlSystem(GameWorldCreator gameWorldCreator,
@@ -54,6 +60,25 @@ public class PlayerControlSystem extends IteratingSystem{
 		sm = ComponentMapper.getFor(StateComponent.class);
 		cp = ComponentMapper.getFor(ControlledInputComponent.class);
 		this.shootSound = sound;
+	}
+
+	public PlayerControlSystem(GameWorldCreator gameWorldCreator,
+							   PooledEngine pooledEngine,
+							   World world,
+							   Sound sound,
+							   ClientHandler clientHandler)
+	{
+		super(Family.all(PlayerComponent.class).get());
+		this.gameWorldCreator = gameWorldCreator;
+		this.pooledEngine = pooledEngine;
+		this.world = world;
+
+		pm = ComponentMapper.getFor(PlayerComponent.class);
+		bodm = ComponentMapper.getFor(B2dBodyComponent.class);
+		sm = ComponentMapper.getFor(StateComponent.class);
+		cp = ComponentMapper.getFor(ControlledInputComponent.class);
+		this.shootSound = sound;
+		this.clientHandler = clientHandler;
 	}
 	@Override
 	protected void processEntity(Entity entity, float deltaTime) {
@@ -185,7 +210,7 @@ public class PlayerControlSystem extends IteratingSystem{
 					logger.info("playerComponent.typeOfPlayer: " +  playerComponent.typeOfPlayer);
 					logger.info("directionComponent.direction:" + directionComponent.direction);
 
-					handleLocalFiring(directionComponent,b2dbodyComponent,playerComponent, coolDownComponent);
+					handleLocalFiring(directionComponent,b2dbodyComponent,playerComponent, coolDownComponent, cntrlComponent);
 				}
 			}
 			else
@@ -204,7 +229,8 @@ public class PlayerControlSystem extends IteratingSystem{
 	public void handleLocalFiring(DirectionComponent directionComponent,
 								  B2dBodyComponent b2dbodyComponent,
 								  PlayerComponent playerComponent,
-								  CoolDownComponent coolDownComponent)
+								  CoolDownComponent coolDownComponent,
+								  ControlledInputComponent cntrlInComp)
 	{
 		logger.info("playerComponent.typeOfPlayer is LOCAL");
 		Direction direction;
@@ -252,6 +278,39 @@ public class PlayerControlSystem extends IteratingSystem{
 		logger.info("xVel: " + xVel);
 		logger.info("direction: " + direction);
 		logger.info("======= END SHOOTING BULLET ============");
+
+
+		if(this.clientHandler != null)
+		{
+			if(cntrlInComp.abInputCommandList[GameConfig.SPACE])
+			{
+				boolean[] inputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+
+				if (playerComponent.readyToTransmitBullet)
+				{
+					playerComponent.readyToTransmitBullet = false;
+					inputCommandList[GameConfig.SPACE] = cntrlInComp.abInputCommandList[GameConfig.SPACE];
+
+					logger.debug("magicFired: Player with ID " + playerComponent.playerID + " fire Magic");
+					logger.debug(
+							"playerComponent.bulletPosition: " + playerComponent.bulletPosition +
+									"playerComponent.bulletXvel: " + playerComponent.bulletXvel +
+									"playerComponent.bulletDirectionOnShoot: " + playerComponent.bulletDirectionOnShoot);
+
+					/* Fill message */
+					PlayerDataContainer playerDataContainerTmp = new PlayerDataContainer();
+					playerDataContainerTmp.setPlayerID(playerComponent.playerID);
+					playerDataContainerTmp.setAbInputCommandList(inputCommandList);
+					playerDataContainerTmp.setPosition(new Vector2(playerComponent.bulletPosition));
+					playerDataContainerTmp.setBulletXvelocity(playerComponent.bulletXvel);
+					playerDataContainerTmp.setBulletDirection(playerComponent.bulletDirectionOnShoot);
+
+					Message message = new Message(ClientHandler.PLAYER_FIRED_SEND, true);
+					message.addPlayerDataContainer(playerDataContainerTmp);
+					this.clientHandler.getTransmitingMessageArray().add(message);
+				}
+			}
+		}
 	}
 
 }

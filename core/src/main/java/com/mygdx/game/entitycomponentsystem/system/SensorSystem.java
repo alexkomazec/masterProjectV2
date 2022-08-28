@@ -14,7 +14,7 @@ import com.mygdx.game.entitycomponentsystem.components.SensorComponent;
 public class SensorSystem extends IteratingSystem
 {
     PooledEngine pooledEngine;
-    private static final Logger logger = new Logger(SensorSystem.class.getSimpleName(), Logger.INFO);
+    private static final Logger logger = new Logger(SensorSystem.class.getSimpleName(), Logger.DEBUG);
 
     public SensorSystem(PooledEngine pooledEngine) {
         super(Family.all(SensorComponent.class).get());
@@ -25,6 +25,7 @@ public class SensorSystem extends IteratingSystem
     protected void processEntity(Entity entity, float deltaTime)
     {
         SensorComponent sensorComponent = entity.getComponent(SensorComponent.class);
+        B2dBodyComponent bodyComponent = entity.getComponent(B2dBodyComponent.class);
 
         if(!sensorComponent.owner.getComponent(B2dBodyComponent.class).isDead)
         {
@@ -33,7 +34,7 @@ public class SensorSystem extends IteratingSystem
             float posY = sensorComponent.owner.
                     getComponent(B2dBodyComponent.class).body.getPosition().y;
 
-            sensorComponent.sensorBody.setTransform(new Vector2(posX, posY), 0);
+            bodyComponent.body.setTransform(new Vector2(posX, posY), 0);
 
             if (sensorComponent.collisionHappened)
             {

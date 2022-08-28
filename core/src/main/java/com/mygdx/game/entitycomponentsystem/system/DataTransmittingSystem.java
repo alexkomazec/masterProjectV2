@@ -31,20 +31,32 @@ public class DataTransmittingSystem extends IteratingSystem {
         /* Optimization: Go through all entities only if there is some new data */
         if(!this.clientHandler.isTransMessageArrayEmpty())
         {
-            this.message = this.clientHandler.getTransmittingMessage();
-            if(this.message.doesActionDependsOnEntity())
+            /* Check if the first element is related to player Data, so just peek in the buffer */
+            this.message = this.clientHandler.peekAtFirstTrans();
+
+            if(!this.message.getPlayerDataContainerArray().isEmpty())
             {
-                super.update(deltaTime);
+                if(this.message.doesActionDependsOnEntity())
+                {
+                    super.update(deltaTime);
+                }
+                else
+                {
+                    for (int index = 0; index < this.message.getPlayerDataContainerArray().size; index++)
+                    {
+                        processData(this.message.getPlayerDataContainerByIndex(index), this.message.getActionType());
+                    }
+                }
+
+                /* Message has been processed, so it is okay to remove it from the buffer now */
+                this.clientHandler.getTransmitingMessageArray().removeIndex(0);
             }
             else
             {
-                for (int index = 0; index < this.message.getPlayerDataContainerArray().size; index++)
-                {
-                    processData(this.message.getPlayerDataContainerByIndex(index), this.message.getActionType());
-                }
+                logger.debug("This message is not related to Player");
             }
         }
-        /* The message has been processed in one of conditions above */
+        /* Set message to be ready for the next reading */
         this.message = null;
     }
 
@@ -89,6 +101,20 @@ public class DataTransmittingSystem extends IteratingSystem {
                         socket.id());
             break;
 
+            case ClientHandler.PLAYER_FIRED_SEND:
+
+                logger.debug("PLAYER_FIRED_SEND");
+
+                this.clientHandler.getSocket().emit("magicFired",
+                        this.clientHandler.getSocket().id(),
+                        playerDataContainer.getAbInputCommandList(),
+                        playerDataContainer.getPosition().x,
+                        playerDataContainer.getPosition().y,
+                        playerDataContainer.getBulletXvelocity(),
+                        playerDataContainer.getBulletDirection()
+                );
+                break;
+
             default:
                 logger.error("processData entity: Wrong action type" + actionType);
         }
@@ -110,6 +136,20 @@ public class DataTransmittingSystem extends IteratingSystem {
                         playerDataContainer.getPosition().x,
                         playerDataContainer.getPosition().y,
                         clientHandler.getSocket().id());
+            break;
+
+            case ClientHandler.COLLISION_EVENT:
+
+                logger.debug("COLLISION_EVENT");
+
+                int bodyID1 = message.getGeneralInfoContainer().getBodyIDPair().integerA;
+                int bodyID2 = message.getGeneralInfoContainer().getBodyIDPair().integerB;
+                String bodyName1 = message.getGeneralInfoContainer().getBodyNamesPair().stringA;
+                String bodyName2 = message.getGeneralInfoContainer().getBodyNamesPair().stringB;
+
+                logger.debug("Body with id + " + bodyID1 + " and body with id " + bodyID2 + " is being sent ");
+
+                socket.emit("collisionEvent", socket.id(), bodyID1, bodyName1, bodyID2, bodyName2);
             break;
 
             default:

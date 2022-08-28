@@ -83,4 +83,12 @@ public class PlayerDataContainer {
     public Direction getBulletDirection() {
         return bulletDirection;
     }
+
+    public void setBulletXvelocity(float bulletXvelocity) {
+        this.bulletXvelocity = bulletXvelocity;
+    }
+
+    public void setBulletDirection(Direction bulletDirection) {
+        this.bulletDirection = bulletDirection;
+    }
 }

@@ -1,7 +1,12 @@
 package com.mygdx.game.entitycomponentsystem.system;
 
 
+import static com.mygdx.game.config.GameConfig.GROUND_BIT;
+import static com.mygdx.game.config.GameConfig.PLAYER_BIT;
+
+import com.badlogic.gdx.physics.box2d.Filter;
 import com.badlogic.gdx.utils.Logger;
+import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.ui.EndMatchPanel;
 
@@ -28,10 +33,16 @@ public class MatchTracker {
         activePlayers = new HashMap<>();
     }
 
-    public void playerFinishedMatch(PlayerComponent playerComponent)
+    public void playerFinishedMatch(PlayerComponent playerComponent, B2dBodyComponent b2dBodyComponent)
     {
         this.activePlayers.remove(playerComponent);
         this.activePlayers.put(playerComponent, true);
+
+        /* Make the player invincible because he won the game */
+        Filter filter  = new Filter();
+        filter.categoryBits = PLAYER_BIT;
+        filter.maskBits = GROUND_BIT;
+        b2dBodyComponent.body.getFixtureList().get(0).setFilterData(filter);
 
         //Display Win panel -> Level is finished, Go to next level/ exit
         //Display Message WIN GAME
@@ -62,7 +73,7 @@ public class MatchTracker {
         }
         else
         {
-            boolean allPlayersFinished = true;
+            /*boolean allPlayersFinished = true;
 
             //Online player has been died, check the state of all alive players
             for (Object value : this.activePlayers.values())
@@ -81,7 +92,7 @@ public class MatchTracker {
                 endMatchPanel.setLabelText("WIN GAME");
                 logger.debug(" WIN GAME");
                 endMatchPanel.show();
-            }
+            }*/
 
         }
     }

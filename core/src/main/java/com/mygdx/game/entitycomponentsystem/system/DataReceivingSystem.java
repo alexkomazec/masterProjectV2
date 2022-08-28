@@ -7,6 +7,8 @@ import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
 import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
+import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.Pool;
 import com.badlogic.gdx.utils.TimeUtils;
@@ -15,6 +17,7 @@ import com.mygdx.game.client.Message;
 import com.mygdx.game.client.data.GeneralInfoContainer;
 import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
+import com.mygdx.game.common.FixturePair;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BulletComponent;
@@ -25,6 +28,7 @@ import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.gameworld.GameWorldCreator;
+import com.mygdx.game.screens.GameScreen;
 
 import java.util.ArrayList;
 
@@ -37,13 +41,11 @@ public class DataReceivingSystem extends IteratingSystem {
     private GameWorldCreator gameWorldCreator;
     private GeneralInfoContainer generalInfoContainer;
     private Message message;
-    private PooledEngine pooledEngine;
 
-    public DataReceivingSystem(ClientHandler clientHandler, PooledEngine pooledEngine) {
+    public DataReceivingSystem(ClientHandler clientHandler) {
         super(Family.all(PlayerComponent.class, ControlledInputComponent.class).get());
         logger.debug("DataReceivingSystem has been created");
         this.clientHandler = clientHandler;
-        this.pooledEngine = pooledEngine;
 
         this.gameWorldCreator = GameWorldCreator.getInstance();
         this.generalInfoContainer = generalInfoContainer;
@@ -55,21 +57,34 @@ public class DataReceivingSystem extends IteratingSystem {
         /* Optimization: Go through all entities only if there is some new data */
         if(!this.clientHandler.isRecMessageArrayEmpty())
         {
-            this.message = this.clientHandler.getReceivedMessage();
-            if(this.message.doesActionDependsOnEntity())
+
+            /* Check if the first element is related to player Data, so just peek in the buffer */
+            this.message = this.clientHandler.peekAtFirstRecv();
+
+            if(!this.message.getPlayerDataContainerArray().isEmpty())
             {
-                super.update(deltaTime);
+                if(this.message.doesActionDependsOnEntity())
+                {
+                    super.update(deltaTime);
+                }
+                else
+                {
+                    for (int index = 0; index < this.message.getPlayerDataContainerArray().size; index++)
+                    {
+                        processData(this.message.getPlayerDataContainerByIndex(index), this.message.getActionType());
+                    }
+                }
+
+                /* Message has been processed, so it is okay to remove it from the buffer now */
+                this.clientHandler.getReceivedMessageArray().removeIndex(0);
             }
             else
             {
-                for (int index = 0; index < this.message.getPlayerDataContainerArray().size; index++)
-                {
-                    processData(this.message.getPlayerDataContainerByIndex(index), this.message.getActionType());
-                }
+                logger.debug("This message is not related to Player");
             }
-            /* The message has been processed in one of conditions above */
-            this.message = null;
         }
+        /* Set message to be ready for the next reading */
+        this.message = null;
     }
 
     @Override
@@ -110,11 +125,15 @@ public class DataReceivingSystem extends IteratingSystem {
                 logger.debug("ASSIGN_ID_TO_PLAYER");
                 LocalInputComponent localInputComponent = entity.getComponent(LocalInputComponent.class);
                 TransformComponent transformComponent = entity.getComponent(TransformComponent.class);
+                b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
 
                 if(localInputComponent != null)
                 {
-                    /* Set received ID to a main player */
+                    /* Set received ID to a player */
                     playerComponent.playerID = playerDataContainer.getPlayerID();
+                    this.clientHandler.getGame().setClientIDinGame(playerComponent.playerID);
+                    b2dBodyComponent.bodyID = playerDataContainer.getPlayerID();
+
                     logger.info("[ASSIGN_ID_TO_PLAYER]: playerComponent.playerID assigned to " + playerComponent.playerID);
 
                     this.gameWorldCreator.getGameWorld().getPlayerByReference(entity).
@@ -129,6 +148,14 @@ public class DataReceivingSystem extends IteratingSystem {
                     /* Fill message */
                     PlayerDataContainer playerDataContainerTmp = new PlayerDataContainer();
                     playerDataContainerTmp.setPlayerID(playerComponent.playerID);
+
+                    if(playerComponent.typeOfPlayer == PlayerComponent.PlayerConnectivity.LOCAL
+                        && playerComponent.playerID == 0)
+                    {
+                        /* This player is a host, so need to initialize B2ContactListener*/
+                        this.clientHandler.getGame().setB2ContactListener();
+                    }
+
                     playerDataContainerTmp.setAbInputCommandList(controlledInputComponent.abInputCommandList);
                     playerDataContainerTmp.setPosition(transformComponent.position);
                     playerDataContainerTmp.setPlayerWidth(GameConfig.DEFAULT_PLAYER_WIDTH);
@@ -159,7 +186,7 @@ public class DataReceivingSystem extends IteratingSystem {
 
             case ClientHandler.UPDATE_PLAYER_POS:
 
-                logger.debug("UPDATE_PLAYER_POS");
+                //Alko_uncomment_it: logger.debug("UPDATE_PLAYER_POS");
                 b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
                 //logger.debug("GetLinearVelocity" + b2dBodyComponent.body.getLinearVelocity());
 
@@ -184,6 +211,10 @@ public class DataReceivingSystem extends IteratingSystem {
                     playerComponent.bulletXvel = playerDataContainer.getBulletXvelocity();
                     playerComponent.bulletPosition = playerDataContainer.getPosition();
                     playerComponent.needTofire = true;
+                }
+                else
+                {
+                    logger.debug("Player with id: " + playerDataContainer.getPlayerID() + " did not fired");
                 }
             break;
 
@@ -217,8 +248,6 @@ public class DataReceivingSystem extends IteratingSystem {
                 getEntitiesFor(Family.all(PlayerComponent.class, ControlledInputComponent.class).
                         get());
 
-        Entity tempEntity = null;
-
         switch(actionType)
         {
             case ClientHandler.UPDATE_PLAYER_TABLE:
@@ -237,10 +266,12 @@ public class DataReceivingSystem extends IteratingSystem {
                     }
                 }
 
+                /* If player is found, this player is already in the table, let's go to the next message */
                 if(!isIdFound)
                 {
                     Entity entity = this.gameWorldCreator.createPlayer(false, GameConfig.ONLINE_CONNECTION, playerDataContainer.getPosition());
                     entity.getComponent(PlayerComponent.class).playerID = playerDataContainer.getPlayerID();
+                    entity.getComponent(B2dBodyComponent.class).bodyID = playerDataContainer.getPlayerID();
 
                     logger.info("Player with ID" + entity.getComponent(PlayerComponent.class).playerID + " has been created ");
 
@@ -288,6 +319,36 @@ public class DataReceivingSystem extends IteratingSystem {
                 }
 
             break;
+
+            case ClientHandler.COLLISION_EVENT_RECEIVED:
+
+                logger.debug("COLLISION_EVENT_RECEIVED");
+
+                int bodyID1 = message.getGeneralInfoContainer().getBodyIDPair().integerA;
+                int bodyID2 = message.getGeneralInfoContainer().getBodyIDPair().integerB;
+
+                Fixture fa = getFixture(bodyID1);
+                if(fa == null)
+                    logger.error("Fixture not found for bodyID1: " + bodyID1);
+
+                Fixture fb = getFixture(bodyID2);
+                if(fb == null)
+                    logger.error("Fixture not found for bodyID1: " + bodyID2);
+
+                logger.debug("Fixture for BodyID1: " + bodyID1);
+                logger.debug("Fixture for BodyID1: " + bodyID2);
+
+                if(fa!= null && fb!= null)
+                {
+                    logger.debug("Has been added to bufferOfFixtures");
+                    GameScreen.bufferOfFixtures.add(new FixturePair(fa,fb));
+                }
+                else
+                {
+                    logger.debug("Has not been added to bufferOfFixtures");
+                }
+
+                break;
 
             default:
                 logger.error("processData no entity: Wrong action type" + actionType);
@@ -360,5 +421,29 @@ public class DataReceivingSystem extends IteratingSystem {
 
     public GameWorldCreator getGameWorldCreator() {
         return gameWorldCreator;
+    }
+
+    private Fixture getFixture(int bodyID)
+    {
+        ImmutableArray<Entity> entities = this.clientHandler.getGame().getPooledEngine().getEntitiesFor(Family.all(B2dBodyComponent.class).get());
+        Fixture tempFixture = null;
+
+        for (Entity entity: entities)
+        {
+            B2dBodyComponent b2dBodyComponent = entity.getComponent(B2dBodyComponent.class);
+            int entityBodyID = b2dBodyComponent.bodyID;
+
+            if(bodyID == entityBodyID)
+            {
+                Array<Fixture> fixtureList = b2dBodyComponent.body.getFixtureList();
+                if(fixtureList.size != 1)
+                {
+                    logger.error("fixtureList wrong size");
+                }
+                tempFixture = fixtureList.get(0);
+            }
+        }
+
+        return tempFixture;
     }
 }

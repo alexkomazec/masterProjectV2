@@ -463,5 +463,39 @@ public class MyGdxGame extends Game implements Publisher {
 		return matchTracker;
 	}
 
+	public void setB2ContactListener()
+	{
+		GameScreen gameScreen = getGameScreen();
+		gameScreen.setB2ContactListener();
+	}
+
+	public void setClientIDinGame(int clientID)
+	{
+		GameScreen gameScreen = getGameScreen();
+		gameScreen.setClientIDInGame(clientID);
+	}
+
+	public int getClientIDInGame()
+	{
+		return getGameScreen().getClientIDInGame();
+	}
+
+	private GameScreen getGameScreen()
+	{
+		Screen tempScreen = this.stackScreen.peek();
+		GameScreen gameScreen = null;
+
+		if(tempScreen instanceof GameScreen )
+		{
+			gameScreen = (GameScreen)tempScreen;
+		}
+		else
+		{
+			logger.error(" Current screen is not GameScreen");
+		}
+
+		return gameScreen;
+	}
+
 
 }

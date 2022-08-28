@@ -8,9 +8,11 @@ import com.badlogic.ashley.systems.IteratingSystem;
 import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.physics.box2d.Fixture;
+import com.badlogic.gdx.physics.box2d.Transform;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.ai.SteeringPresets;
+import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.common.Direction;
 import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
@@ -20,6 +22,7 @@ import com.mygdx.game.entitycomponentsystem.components.EnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.Mapper;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.SteeringComponent;
+import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
 import com.mygdx.game.gameworld.GameWorld;
 import com.mygdx.game.gameworld.GameWorldCreator;
 import com.mygdx.game.utils.GdxUtils;
@@ -32,6 +35,8 @@ public class EnemySystem extends IteratingSystem{
 	private GameWorldCreator gameWorldCreator;
 	private GameWorld gameWorld;
 	private PooledEngine pooledEngine;
+	private ClientHandler clientHandler;
+
 	
 	@SuppressWarnings("unchecked")
 	public EnemySystem(GameWorldCreator gameWorldCreator, GameWorld gameWorld, PooledEngine pooledEngine){
@@ -41,6 +46,16 @@ public class EnemySystem extends IteratingSystem{
 		this.gameWorldCreator = gameWorldCreator;
 		this.gameWorld = gameWorld;
 		this.pooledEngine = pooledEngine;
+	}
+
+	public EnemySystem(GameWorldCreator gameWorldCreator, GameWorld gameWorld, PooledEngine pooledEngine, ClientHandler clientHandler){
+		super(Family.all(EnemyComponent.class).get());
+		this.em = ComponentMapper.getFor(EnemyComponent.class);
+		this.bodm = ComponentMapper.getFor(B2dBodyComponent.class);
+		this.gameWorldCreator = gameWorldCreator;
+		this.gameWorld = gameWorld;
+		this.pooledEngine = pooledEngine;
+		this.clientHandler = clientHandler;
 	}
 
 	@Override
@@ -83,6 +98,41 @@ public class EnemySystem extends IteratingSystem{
 			Entity targetEntity = enemyCom.target;
 			B2dBodyComponent b2Enemy = Mapper.b2dCom.get(entity);
 			SteeringComponent scom = Mapper.sCom.get(entity);
+			//TransformComponent transformComponent = Mapper.transCom.get(entity);
+
+			//if(clientHandler!= null)
+			//{
+			//	if(clientHandler.getGame().getClientIDInGame() == 0)
+			//	{
+			//		boolean posTheSame = false;
+			//		/* It is host, need to emit playerPosition */
+
+			//		/* Hint: Cast to int because there is no reason to bother others with the different
+			//		 *        in fifth decimal of the float number. Comparing floats causes a big stream of
+			//		 *        emitting data.
+			//		 * */
+			//		int x = (int)  transformComponent.lastPosition.x;
+			//		int y = (int)  transformComponent.lastPosition.y;
+			//		int x1 = (int) transformComponent.position.x;
+			//		int y1 = (int) transformComponent.position.y;
+
+			//		if(x == x1 && y == y1)
+			//		{
+			//			posTheSame = true;
+			//		}
+
+			//		if(!posTheSame)
+			//		{
+			//			transformComponent.lastPosition = transformComponent.position;
+			//			//this.clientHandler.getTransmitingMessageArray().add();
+			//		}
+
+			//	}
+			//	else
+			//	{
+			//		//Alko_uncomment_it: Need to set b2Enemy position (SetTransform bla bla bla)
+			//	}
+			//}
 
 			if(targetEntity != null)
 			{
@@ -99,6 +149,7 @@ public class EnemySystem extends IteratingSystem{
 						directionComponent.direction = Direction.RIGHT;
 					}
 
+					/* Measure distance, and change enemy position according to that */
 					float distance = b2Player.body.getPosition().dst(b2Enemy.body.getPosition());
 					if(distance < 3 && scom.currentMode != SteeringComponent.SteeringState.FLEE){
 						scom.steeringBehavior = SteeringPresets.getFlee(Mapper.sCom.get(entity),Mapper.sCom.get(targetEntity));

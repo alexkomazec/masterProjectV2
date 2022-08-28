@@ -57,13 +57,13 @@ import com.mygdx.game.ui.PausePanel;
 import com.mygdx.game.utils.ScreenOrientation;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 
 public class GameScreen implements Screen, Observer {
 
     private static final String CLASS_NAME  = MenuScreen.class.getSimpleName();
     private static final Logger logger         = new Logger(CLASS_NAME, Logger.INFO);
     private boolean readyToChangeScreen        = false;
+    private int clientIDInGame = 0;
 
     private final MyGdxGame game;
     private final OrthographicCamera camera;
@@ -182,14 +182,30 @@ public class GameScreen implements Screen, Observer {
             );
         }
 
-        this.game.getPooledEngine().addSystem(
-                new PlayerControlSystem(
-                        game.getWorldCreator(),
-                        game.getPooledEngine(),
-                        this.gameWorld.getWorldSingleton().getWorld(),
-                        game.getAssetManagmentHandler().getResources(AssetDescriptors.SHOOT_SOUND)
-                )
-        );
+        if(this.game.getClientHandler() == null)
+        {
+            this.game.getPooledEngine().addSystem(
+                    new PlayerControlSystem(
+                            game.getWorldCreator(),
+                            game.getPooledEngine(),
+                            this.gameWorld.getWorldSingleton().getWorld(),
+                            game.getAssetManagmentHandler().getResources(AssetDescriptors.SHOOT_SOUND)
+                    )
+            );
+        }
+        else
+        {
+            this.game.getPooledEngine().addSystem(
+                    new PlayerControlSystem(
+                            game.getWorldCreator(),
+                            game.getPooledEngine(),
+                            this.gameWorld.getWorldSingleton().getWorld(),
+                            game.getAssetManagmentHandler().getResources(AssetDescriptors.SHOOT_SOUND),
+                            this.game.getClientHandler()
+                    )
+            );
+        }
+
         if(this.game.getClientHandler() != null)
         {
             this.game.getClientHandler().loadInputManagerTransmittingSystem();
@@ -202,7 +218,7 @@ public class GameScreen implements Screen, Observer {
         );
 
         this.game.getPooledEngine().addSystem(
-                new B2dContactSystem());
+                new B2dContactSystem(this.game.getClientHandler()));
 
         this.game.getPooledEngine().addSystem(
                 new CollisionSystem(this.game.getMatchTracker()));
@@ -225,14 +241,23 @@ public class GameScreen implements Screen, Observer {
                 new CollisionEffectsSystem(this.game.getGameWorldCreator().getCollisionEffectFrames().size)
         );
 
-        this.game.getPooledEngine().addSystem(
-                new EnemySystem(game.getWorldCreator(), this.gameWorld, game.getPooledEngine())
-        );
+        if(this.game.getConnectionType() == GameConfig.LOCAL_CONNECTION)
+        {
+            this.game.getPooledEngine().addSystem(
+                    new EnemySystem(game.getWorldCreator(), this.gameWorld, game.getPooledEngine()));
+        }
+        else
+        {
+            this.game.getPooledEngine().addSystem(
+                    new EnemySystem(game.getWorldCreator(), this.gameWorld, game.getPooledEngine(),
+                            this.game.getClientHandler()));
+        }
+
+
+        this.game.getPooledEngine().addSystem(new SteeringSystem());
 
         this.game.getPooledEngine().addSystem(new SensorSystem(this.game.getPooledEngine())
         );
-
-        this.game.getPooledEngine().addSystem(new SteeringSystem());
 
         this.game.getPooledEngine().addSystem(
                 new PhysicsSystem(this.gameWorld.getWorldSingleton().getWorld(), this.game.getMatchTracker()));
@@ -357,6 +382,8 @@ public class GameScreen implements Screen, Observer {
             this.game.getClientHandler().getTransmitingMessageArray().clear();
         }
 
+        this.setClientIDInGame(0);
+        this.game.getWorldCreator().resetBodyIDCounter();
         this.gameWorld = null;
     }
 
@@ -396,6 +423,11 @@ public class GameScreen implements Screen, Observer {
         TileMapHandler.instance = null;
         this.game.setTiledMapHandler(TileMapHandler.getInstance(GameConfig.LEVEL1));
         this.gameWorld = new GameWorld(this.game.getTileMapHandler().getTiledMap());
+
+        if(this.game.getConnectionType() == GameConfig.LOCAL_CONNECTION)
+        {
+            this.setB2ContactListener();
+        }
         this.game.setGameWorld(this.gameWorld);
         GameWorldCreator.currentAvailablePlayerID = 0;
     }
@@ -404,5 +436,18 @@ public class GameScreen implements Screen, Observer {
     {
         this.game.getMatchTracker().reset();
         //this.gameWorld.reset();
+    }
+
+    public void setB2ContactListener()
+    {
+        this.gameWorld.getWorldSingleton().getWorld().setContactListener(new B2dContactListener());
+    }
+
+    public int getClientIDInGame() {
+        return clientIDInGame;
+    }
+
+    public void setClientIDInGame(int clientIDInGame) {
+        this.clientIDInGame = clientIDInGame;
     }
 }

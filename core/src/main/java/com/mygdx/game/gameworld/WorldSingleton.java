@@ -19,7 +19,6 @@ public class WorldSingleton {
     private WorldSingleton(Vector2 vector, boolean doSleep)
     {
         world = new World(vector, doSleep);
-        world.setContactListener(new B2dContactListener());
     }
 
     public World getWorld()

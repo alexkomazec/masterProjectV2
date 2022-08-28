@@ -6,16 +6,11 @@ import com.badlogic.gdx.physics.box2d.Body;
 import com.badlogic.gdx.utils.Pool;
 import com.mygdx.game.common.SensorType;
 
-public class SensorComponent implements Component, Pool.Poolable {
+public class SensorComponent implements Component{
 
-    public Body sensorBody;
     public Entity owner;
     public Entity bodyThatColidedViewArea;
     public boolean collisionHappened;
     public SensorType sensorType = SensorType.DEFAULT;
 
-    @Override
-    public void reset() {
-        sensorBody = null;
-    }
 }

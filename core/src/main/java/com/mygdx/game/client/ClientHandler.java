@@ -1,16 +1,24 @@
 package com.mygdx.game.client;
 
 
+import com.badlogic.ashley.core.Entity;
+import com.badlogic.ashley.core.Family;
 import com.badlogic.ashley.core.PooledEngine;
+import com.badlogic.ashley.utils.ImmutableArray;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.physics.box2d.Fixture;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.Logger;
 import com.badlogic.gdx.utils.TimeUtils;
 import com.mygdx.game.MyGdxGame;
 import com.mygdx.game.client.data.PlayerDataContainer;
 import com.mygdx.game.common.Direction;
+import com.mygdx.game.common.FixturePair;
+import com.mygdx.game.common.IntegerPair;
+import com.mygdx.game.common.StringPair;
 import com.mygdx.game.common.Topics;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.system.DataReceivingSystem;
 import com.mygdx.game.entitycomponentsystem.system.DataTransmittingSystem;
 import com.mygdx.game.entitycomponentsystem.system.InputManagerTransmittingSystem;
@@ -60,13 +68,16 @@ public class ClientHandler {
     public static final int SET_USERNAME = 8;                   /* Set username to the client */
     public static final int REDEFINE_PLAYER_POSITION = 9;       /* Server redefined player's position */
     public static final int GO_OUT_FROM_THE_ROOM_RESP = 10;     /* Response from the server for go out form the room req */
+    public static final int COLLISION_EVENT_RECEIVED = 12;      /* Collision event received */
 
     /* Transmitting Actions */
-    public static final int SEND_PLAYER_TO_SERVER = 11;          /* Send Player data of a newly created player */
-    public static final int UPLOAD_CURRENT_PLAYER_POS_REQ = 12; /* Upload Current Player Position upon a request */
-    public static final int PLAYER_TABLE_UPDATED = 13;          /* Inform server that player table has been updated */
-    public static final int CLIENT_JOIN_ROOM = 14;              /* Inform the server that a client wants to join the certain room */
-    public static final int GO_OUT_FROM_THE_ROOM = 15;          /* Inform server that the player leaves from the room */
+    public static final int SEND_PLAYER_TO_SERVER = 13;          /* Send Player data of a newly created player */
+    public static final int UPLOAD_CURRENT_PLAYER_POS_REQ = 14; /* Upload Current Player Position upon a request */
+    public static final int PLAYER_TABLE_UPDATED = 15;          /* Inform server that player table has been updated */
+    public static final int CLIENT_JOIN_ROOM = 16;              /* Inform the server that a client wants to join the certain room */
+    public static final int GO_OUT_FROM_THE_ROOM = 17;          /* Inform server that the player leaves from the room */
+    public static final int COLLISION_EVENT = 18;              /* Host should inform others that collision event happened */
+    public static final int PLAYER_FIRED_SEND = 19;            /* Player movement has been sent over the network */
 
     private ClientHandler(MyGdxGame game) {
         createSocket();
@@ -86,7 +97,7 @@ public class ClientHandler {
 
     private void createSocket() {
         this.options = IO.Options.builder()
-                .setReconnectionAttempts(10)
+                .setReconnectionAttempts(3)
                 .setReconnectionDelay(10)
                 .setTimeout(50)
                 .setAuth(new HashMap<String, String>())
@@ -264,6 +275,19 @@ public class ClientHandler {
             }
         });
 
+        this.socket.on("collisionEventReceive", new Emitter.Listener()
+        {
+            @Override
+            public void call(Object... args)
+            {
+                try {
+                    collisionEventReceive(args);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+
     }
 
     //===============Callbacks for event listener ==========================//
@@ -271,18 +295,23 @@ public class ClientHandler {
     public void redefinePlayerPosition(Object... args) throws JSONException
     {
         logger.debug("REDEFINE_PLAYER_POSITION");
-        JSONArray jsonArray = (JSONArray) args[0];
-        PlayerDataContainer playerDataContainer = new PlayerDataContainer();
-        float xPosition = (float)((double)jsonArray.get(1));
-        float yPosition = (float)((double)jsonArray.get(2));
+        boolean disableHandling = true;
+        if(disableHandling)
+        {
+            JSONArray jsonArray = (JSONArray) args[0];
+            PlayerDataContainer playerDataContainer = new PlayerDataContainer();
+            float xPosition = (float)((double)jsonArray.get(1));
+            float yPosition = (float)((double)jsonArray.get(2));
 
-        Vector2 position = new Vector2(xPosition, yPosition);
+            Vector2 position = new Vector2(xPosition, yPosition);
 
-        playerDataContainer.setPlayerID((int)jsonArray.get(0));
-        playerDataContainer.setPosition(position);
-        Message message = new Message(REDEFINE_PLAYER_POSITION, true);
-        message.addPlayerDataContainer(playerDataContainer);
-        receivedMessageArray.add(message);
+            playerDataContainer.setPlayerID((int)jsonArray.get(0));
+            playerDataContainer.setPosition(position);
+            Message message = new Message(REDEFINE_PLAYER_POSITION, true);
+            message.addPlayerDataContainer(playerDataContainer);
+            receivedMessageArray.add(message);
+        }
+
     }
 
     public void parseRoomsStatus(Object... args) throws JSONException {
@@ -403,7 +432,7 @@ public class ClientHandler {
         logger.debug("UPLOAD_CURRENT_PLAYER_POS_REQ");
         Message message = new Message(UPLOAD_CURRENT_PLAYER_POS_REQ, true);
         message.addPlayerDataContainer(new PlayerDataContainer());
-        transmitingMessageArray.add(message);
+        this.getTransmitingMessageArray().add(message);
     }
 
     /* CLARIFICATION: REMOTE_PLAYER_MOVED is deprecated so far, UPDATE_PLAYER_POS is used instead*/
@@ -563,13 +592,55 @@ public class ClientHandler {
         this.game.notifyObservers(Topics.PLAYER_LEAVE_ROOM);
     }
 
+    public void emitCollisionEvent(int bodyID1, String bodyName1, int bodyID2, String bodyName2)
+    {
+        logger.debug("COLLISION_EVENT" + COLLISION_EVENT);
+        logger.debug("Body with id + " + bodyID1 + " and body with id " + bodyID2);
+
+        PlayerDataContainer playerDataContainer = new PlayerDataContainer();
+        Message message = new Message(COLLISION_EVENT, false);
+        message.getGeneralInfoContainer().setBodyIDPair(new IntegerPair(bodyID1, bodyID2));
+        message.getGeneralInfoContainer().setBodyNamesPair(new StringPair(bodyName1, bodyName2));
+        message.addPlayerDataContainer(playerDataContainer);
+        transmitingMessageArray.add(message);
+    }
+
+    public void collisionEventReceive(Object... args) throws JSONException {
+        JSONArray jsonArray = (JSONArray) args[0];
+
+        int bodyID1 = (int)jsonArray.get(0);
+        String bodyName1 = (String)jsonArray.get(1);
+        int bodyID2 = (int)jsonArray.get(2);
+        String bodyName2 = (String)jsonArray.get(3);
+
+        logger.debug("COLLISION_EVENT_RECEIVED");
+
+        logger.debug("bodyID1: " + bodyID1);
+        logger.debug("bodyName1: " + bodyName1);
+        logger.debug("bodyID2: " + bodyID2);
+        logger.debug("bodyName2: " + bodyName2);
+
+
+        /* PlayerDataContainer is not used in this request but bad implementation
+        *  in DataReceivingsystem, protected void processEntity(Entity entity, float deltaTime)
+        *  expects to have atleast one playerDataCotnainer in the for loop
+        *  */
+        PlayerDataContainer playerDataContainer = new PlayerDataContainer();
+        Message message = new Message(COLLISION_EVENT_RECEIVED, false);
+        message.getGeneralInfoContainer().setBodyIDPair(new IntegerPair(bodyID1, bodyID2));
+        message.getGeneralInfoContainer().setBodyNamesPair(new StringPair(bodyName1, bodyName2));
+        message.addPlayerDataContainer(playerDataContainer);
+        receivedMessageArray.add(message);
+
+    }
+
     public MyGdxGame getGame() {
         return game;
     }
 
     public void loadDataReceivingSystem()
     {
-        game.getPooledEngine().addSystem(new DataReceivingSystem(this,this.game.getPooledEngine()));
+        game.getPooledEngine().addSystem(new DataReceivingSystem(this));
     }
 
     public void loadDataTransmittingSystem()
@@ -585,7 +656,7 @@ public class ClientHandler {
 
     public void loadSystems()
     {
-        game.getPooledEngine().addSystem(new DataReceivingSystem(this,this.game.getPooledEngine()));
+        game.getPooledEngine().addSystem(new DataReceivingSystem(this));
         game.getPooledEngine().addSystem(new DataTransmittingSystem(this));
         game.getPooledEngine().addSystem(new InputManagerTransmittingSystem(this));
     }
@@ -596,4 +667,5 @@ public class ClientHandler {
         game.getPooledEngine().removeSystem(game.getPooledEngine().getSystem(DataTransmittingSystem.class));
         game.getPooledEngine().removeSystem(game.getPooledEngine().getSystem(InputManagerTransmittingSystem.class));
     }
+
 }

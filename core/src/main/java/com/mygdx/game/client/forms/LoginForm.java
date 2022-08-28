@@ -36,7 +36,8 @@ public class LoginForm extends VisWindow
 	private Stage stage;
 	private ConnectScreen connectScreen;
 
-	public LoginForm(final MyGdxGame game, final ConnectScreen connectScreen) {
+	public LoginForm(final MyGdxGame game, final ConnectScreen connectScreen)
+	{
 		super("LOGIN PAGE");
 
 		this.game = game;
@@ -173,7 +174,7 @@ public class LoginForm extends VisWindow
 		}
 
 		try {
-			Dialogs.showErrorDialog(stage,message.getString("message"));
+			Dialogs.showOKDialog(stage,"SUCCESSFULLY REGISTERED",message.getString("message"));
 		} catch (JSONException e) {
 			e.printStackTrace();
 		}
@@ -188,4 +189,12 @@ public class LoginForm extends VisWindow
 		Dialogs.showErrorDialog(stage,"Server is offline");
 	}
 
+	@Override
+	protected void close() {
+		if(stage == null)
+		{
+			stage = getStage();
+		}
+		game.backOneScreen();
+	}
 }

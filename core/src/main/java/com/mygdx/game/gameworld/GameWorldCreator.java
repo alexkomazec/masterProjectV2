@@ -26,7 +26,6 @@ import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.maps.MapLayer;
 import com.badlogic.gdx.maps.MapObject;
 import com.badlogic.gdx.maps.objects.EllipseMapObject;
-import com.badlogic.gdx.maps.objects.RectangleMapObject;
 import com.badlogic.gdx.maps.objects.TextureMapObject;
 import com.badlogic.gdx.maps.tiled.TiledMap;
 import com.badlogic.gdx.math.Rectangle;
@@ -42,6 +41,7 @@ import com.mygdx.game.common.SensorType;
 import com.mygdx.game.common.assets.AssetDescriptors;
 import com.mygdx.game.common.assets.AssetManagmentHandler;
 import com.mygdx.game.config.GameConfig;
+import com.mygdx.game.entitycomponentsystem.components.AIEnemyComponent;
 import com.mygdx.game.entitycomponentsystem.components.AnimationComponent;
 import com.mygdx.game.entitycomponentsystem.components.B2dBodyComponent;
 import com.mygdx.game.entitycomponentsystem.components.BrickComponent;
@@ -75,11 +75,13 @@ import com.mygdx.game.entitycomponentsystem.system.MatchTracker;
 
 public class GameWorldCreator {
 
-    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.INFO);
+    protected static final Logger logger = new Logger(GameWorldCreator.class.getSimpleName(), Logger.DEBUG);
     private BodyCreator bodyCreator;
-    public static int currentAvailablePlayerID = 0;
     public static GameWorldCreator instance;
     public boolean connectionType;
+
+    public static int currentAvailablePlayerID = 0;
+    public int bodyIDCounter = 2;
 
     private TextureAtlas playerAtlas;
     private TextureAtlas magicSpellAtlas;
@@ -218,22 +220,39 @@ public class GameWorldCreator {
         Short maskFilterBits = PLAYER_BIT;
         Entity entity = this.pooledEngine.createEntity();
         SensorComponent sensorComponent = this.pooledEngine.createComponent(SensorComponent.class);
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
         typeComponent.type = TypeComponent.VIEW_AREA_SENSOR;
         /* View area should be wider, than enemy's surface */
-        rectangle.width *= 15;
-        rectangle.height *= 15;
 
-        sensorComponent.sensorBody = bodyCreator.makeCirclePolyBody(rectangle,
+        if(owner.getComponent(EnemyComponent.class).enemyType == EnemyComponent.Type.CLOUD)
+        {
+            rectangle.width *= 5;
+            rectangle.height *= 5;
+        }
+        else
+        {
+            rectangle.width *= 15;
+            rectangle.height *= 15;
+        }
+
+        b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
                 true, categoryFilterBits, maskFilterBits);
-        bodyCreator.makeAllFixturesSensors(sensorComponent.sensorBody);
-        sensorComponent.sensorBody.setUserData(entity);
+        bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body);
+        b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "ViewArea";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
+
         sensorComponent.owner = owner;
         sensorComponent.sensorType = SensorType.VIEW_AREA;
 
+        entity.add(b2dBodyComponent);
         entity.add(sensorComponent);
         entity.add(typeComponent);
 
@@ -246,20 +265,29 @@ public class GameWorldCreator {
         short maskFilterBits = PLAYER_BIT;
         Entity entity = this.pooledEngine.createEntity();
         SensorComponent sensorComponent = this.pooledEngine.createComponent(SensorComponent.class);
+        B2dBodyComponent b2dBodyComponent = this.pooledEngine.createComponent(B2dBodyComponent.class);
         TypeComponent typeComponent = this.pooledEngine.createComponent(TypeComponent.class);
         typeComponent.type = TypeComponent.ENEMY_SENSOR;
 
-        sensorComponent.sensorBody = bodyCreator.makeCirclePolyBody(rectangle,
+        b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,
                 this.gameWorld.getWorldSingleton().getWorld(),
                 true, categoryFilterBits, maskFilterBits);
 
-        bodyCreator.makeAllFixturesSensors(sensorComponent.sensorBody);
-        sensorComponent.sensorBody.setUserData(entity);
+        bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body);
+        b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.body.setSleepingAllowed(false);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "EnemySensor";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
+
         sensorComponent.owner = owner;
         sensorComponent.sensorType = SensorType.ENEMY_SENSOR;
 
+        entity.add(b2dBodyComponent);
         entity.add(sensorComponent);
         entity.add(typeComponent);
 
@@ -283,6 +311,8 @@ public class GameWorldCreator {
         DirectionComponent directionComponent = pooledEngine.createComponent(DirectionComponent.class);
         SteeringComponent steeringComponent = this.pooledEngine.createComponent(SteeringComponent.class);
         CharacterStatsComponent characterStatsComponent = this.pooledEngine.createComponent(CharacterStatsComponent.class);
+        AIEnemyComponent aiEnemyComponent = this.pooledEngine.createComponent(AIEnemyComponent.class);
+
         Rectangle rectangle = getRectangle(object);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
@@ -293,6 +323,11 @@ public class GameWorldCreator {
 
         b2dBodyComponent.body.setGravityScale(0f);  // no gravity for our floating enemy
         b2dBodyComponent.body.setLinearDamping(0.3f); // setting linear dampening so the enemy slows down in our box2d world(or it can float on forever)
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "Cloud";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
 
         transformComponent.position.set(rectangle.getX(), rectangle.getY());
         typeComponent.type = TypeComponent.ENEMY;
@@ -329,6 +364,7 @@ public class GameWorldCreator {
         entity.add(stateComponent);
         entity.add(steeringComponent);
         entity.add(directionComponent);
+        entity.add(aiEnemyComponent);
 
         createEnemySensor(rectangle, entity);
         createViewArea(rectangle, entity);
@@ -372,6 +408,11 @@ public class GameWorldCreator {
 
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "Portal";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
         entity.add(b2dBodyComponent);
 
         /* Set type component*/
@@ -424,6 +465,11 @@ public class GameWorldCreator {
 
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "Platform";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
         entity.add(b2dBodyComponent);
 
         /* Set type component*/
@@ -474,6 +520,12 @@ public class GameWorldCreator {
 
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "HurtableObject";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
+
         entity.add(b2dBodyComponent);
 
         /* Set type component*/
@@ -525,6 +577,12 @@ public class GameWorldCreator {
 
         /* Set an object that represents an unique ID for the body */
         b2dBodyComponent.body.setUserData(entity);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "LimitArea";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
+
         entity.add(b2dBodyComponent);
 
         /* Set type component*/
@@ -588,7 +646,6 @@ public class GameWorldCreator {
         this.matchTracker.increaseNoOfAlivePlayers(playerComponent);
 
         logger.debug("[createPlayer]: playerComponent.playerID assigned to " + playerComponent.playerID);
-        currentAvailablePlayerID++;
         entity.add(playerComponent);
 
         b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
@@ -600,6 +657,12 @@ public class GameWorldCreator {
         b2dBodyComponent.body.setUserData(entity);
         // Do not allow unit to sleep or it wil sleep through events if stationary too long
         b2dBodyComponent.body.setSleepingAllowed(false);
+        b2dBodyComponent.bodyID = currentAvailablePlayerID;
+        currentAvailablePlayerID++;
+        b2dBodyComponent.bodyName = "Player";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
 
         entity.add(b2dBodyComponent);
 
@@ -722,6 +785,11 @@ public class GameWorldCreator {
 
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "Enemy";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
         entity.add(b2dBodyComponent);
 
         transformComponent.position.set(rectangle.getX(), rectangle.getY());
@@ -795,6 +863,11 @@ public class GameWorldCreator {
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
         bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "BasicCollectible";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
         entity.add(b2dBodyComponent);
 
         transformComponent.position.set(rectangle.getX(), rectangle.getY());
@@ -858,6 +931,11 @@ public class GameWorldCreator {
         b2dBodyComponent.body.setUserData(entity);
         b2dBodyComponent.body.setSleepingAllowed(false);
         bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body);
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "Potion";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
         entity.add(b2dBodyComponent);
 
         transformComponent.position.set(rectangle.getX(), rectangle.getY());
@@ -888,7 +966,7 @@ public class GameWorldCreator {
         Short maskFilterBits = PLAYER_BIT | ENEMY_BIT | CLOUD_BIT | GROUND_BIT;
 
         Entity entity = pooledEngine.createEntity();
-        B2dBodyComponent b2dbody = pooledEngine.createComponent(B2dBodyComponent.class);
+        B2dBodyComponent b2dBodyComponent = pooledEngine.createComponent(B2dBodyComponent.class);
         TransformComponent position = pooledEngine.createComponent(TransformComponent.class);
         StateComponent stateCom = pooledEngine.createComponent(StateComponent.class);
         TypeComponent type = pooledEngine.createComponent(TypeComponent.class);
@@ -904,12 +982,17 @@ public class GameWorldCreator {
 
         //x = pleaseOffsetX(direction, x);
         Rectangle rectangle = new Rectangle(x,y, SPELL_WIDTH,SPELL_HEIGHT);
-        b2dbody.body = bodyCreator.makeCirclePolyBody(rectangle,
+        b2dBodyComponent.body = bodyCreator.makeCirclePolyBody(rectangle,
                 BodyCreator.STONE,
                 BodyDef.BodyType.DynamicBody,world,
                 true, categoryFilterBits, maskFilterBits);
-        b2dbody.body.setBullet(true); // increase physics computation to limit body travelling through other objects
-        bodyCreator.makeAllFixturesSensors(b2dbody.body); // make bullets sensors so they don't move player
+        b2dBodyComponent.body.setBullet(true); // increase physics computation to limit body travelling through other objects
+        b2dBodyComponent.bodyID = bodyIDCounter;
+        b2dBodyComponent.bodyName = "Bullet";
+        logger.debug("Body created: " + b2dBodyComponent.bodyName);
+        logger.debug("Body ID: " + b2dBodyComponent.bodyID);
+        bodyIDCounter++;
+        bodyCreator.makeAllFixturesSensors(b2dBodyComponent.body); // make bullets sensors so they don't move player
         position.position.set(x,y);
 
         if(enemyComponent!= null)
@@ -939,13 +1022,13 @@ public class GameWorldCreator {
         entity.add(directionComponent);
 
         type.type = TypeComponent.BULLET;
-        b2dbody.body.setUserData(entity);
+        b2dBodyComponent.body.setUserData(entity);
         bul.xVel = xVel * GameConfig.DIVIDE_BY_PPM;
         bul.yVel = yVel * GameConfig.DIVIDE_BY_PPM;
 
         entity.add(bul);
         entity.add(colComp);
-        entity.add(b2dbody);
+        entity.add(b2dBodyComponent);
         entity.add(position);
         entity.add(type);
 
@@ -957,7 +1040,6 @@ public class GameWorldCreator {
 
     public void createExplosionEffect(float x, float y)
     {
-        Short filterBits = 0;
         Entity entity = pooledEngine.createEntity();
         CollisionEffectComponent collisionEffectComponent = pooledEngine.createComponent(CollisionEffectComponent.class);
         AnimationComponent animationComponent = this.pooledEngine.createComponent(AnimationComponent.class);
@@ -1071,4 +1153,10 @@ public class GameWorldCreator {
     public void setMatchTracker(MatchTracker matchTracker) {
         this.matchTracker = matchTracker;
     }
+
+    public void resetBodyIDCounter()
+    {
+        this.bodyIDCounter = 0;
+    }
+
 }

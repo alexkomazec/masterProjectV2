@@ -2,6 +2,8 @@ package com.mygdx.game.client.data;
 
 import com.badlogic.gdx.utils.Array;
 import com.mygdx.game.client.Room;
+import com.mygdx.game.common.IntegerPair;
+import com.mygdx.game.common.StringPair;
 import com.mygdx.game.config.GameConfig;
 
 public class GeneralInfoContainer {
@@ -9,6 +11,8 @@ public class GeneralInfoContainer {
     private String userName;
     private Array<Room> coopRooms;
     private Array<Room> pvpRooms;
+    private IntegerPair bodyIDPair;
+    private StringPair bodyNamesPair;
 
     public GeneralInfoContainer() {
         this.coopRooms = new Array<>();
@@ -45,4 +49,19 @@ public class GeneralInfoContainer {
         this.pvpRooms = pvpRooms;
     }
 
+    public StringPair getBodyNamesPair() {
+        return bodyNamesPair;
+    }
+
+    public void setBodyNamesPair(StringPair bodyNamesPair) {
+        this.bodyNamesPair = bodyNamesPair;
+    }
+
+    public IntegerPair getBodyIDPair() {
+        return bodyIDPair;
+    }
+
+    public void setBodyIDPair(IntegerPair bodyIDPair) {
+        this.bodyIDPair = bodyIDPair;
+    }
 }

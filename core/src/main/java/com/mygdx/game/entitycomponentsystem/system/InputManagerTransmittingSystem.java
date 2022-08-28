@@ -91,47 +91,5 @@ public class InputManagerTransmittingSystem extends IteratingSystem {
             this.clientHandler.getSocket().emit("playerChangedDirReq", this.clientHandler.getSocket().id());
             currentDirection = directionComponent.direction;
         }
-
-        if(cntrlInComp.newInputHappend)
-        {
-            JSONArray jAInputCommandList = new JSONArray();
-            cntrlInComp.newInputHappend = false;
-
-            /* Send event only if the player fired magic. Other player movements are updated
-             * using updatePlayerInputPosition event*/
-            if(cntrlInComp.abInputCommandList[GameConfig.SPACE] != this.isMagicFired)
-            {
-
-                if (playerComponent.readyToTransmitBullet)
-                {
-                    playerComponent.readyToTransmitBullet = false;
-                    for (int index = 0; index < cntrlInComp.abInputCommandList.length - 1; index++) {
-                        /* Add dummy boolean false*/
-                        jAInputCommandList.put(false);
-                    }
-                    jAInputCommandList.put(cntrlInComp.abInputCommandList[GameConfig.SPACE]);
-                    logger.debug("magicFired: Player with ID " + playerComponent.playerID + " fire Magic");
-                    logger.debug(
-                            "playerComponent.bulletPosition: " + playerComponent.bulletPosition +
-                                    "playerComponent.bulletXvel: " + playerComponent.bulletXvel +
-                                    "playerComponent.bulletDirectionOnShoot: " + playerComponent.bulletDirectionOnShoot);
-
-                    this.clientHandler.getSocket().emit("magicFired",
-                            this.clientHandler.getSocket().id(),
-                            jAInputCommandList,
-                            playerComponent.bulletPosition.x,
-                            playerComponent.bulletPosition.y,
-                            playerComponent.bulletXvel,
-                            playerComponent.bulletDirectionOnShoot
-                    );
-
-                    //playerComponent.bulletPosition.x, //playerComponent.bulletPosition.x,
-                    //        playerComponent.bulletPosition.y, //playerComponent.bulletPosition.y,
-                    //        playerComponent.bulletXvel, //playerComponent.bulletXvel,
-                    //        directionComponent.direction//playerComponent.bulletDirectionOnShoot
-                    this.isMagicFired = cntrlInComp.abInputCommandList[GameConfig.SPACE];
-                }
-            }
-        }
     }
 }

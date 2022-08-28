@@ -128,7 +128,7 @@ public class CollisionSystem extends IteratingSystem {
 					case TypeComponent.PORTALS:
 						PlayerComponent playerComponent = entity.getComponent(PlayerComponent.class);
 						entity.remove(ControllableComponent.class);
-						this.matchTracker.playerFinishedMatch(playerComponent);
+						this.matchTracker.playerFinishedMatch(playerComponent, b2dBodyComponent);
 
 						break;
 
@@ -387,8 +387,10 @@ public class CollisionSystem extends IteratingSystem {
 					switch (type.type) {
 						case TypeComponent.PLAYER:
 							PlayerComponent playerComponent = collidedEntity.getComponent(PlayerComponent.class);
+							B2dBodyComponent b2dBodyComponent = collidedEntity.getComponent(B2dBodyComponent.class);
+
 							collidedEntity.remove(ControllableComponent.class);
-							this.matchTracker.playerFinishedMatch(playerComponent);
+							this.matchTracker.playerFinishedMatch(playerComponent, b2dBodyComponent);
 							break;
 						default:
 							//logger.error("No matching type found");
