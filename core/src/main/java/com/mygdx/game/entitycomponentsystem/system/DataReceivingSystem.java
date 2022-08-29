@@ -206,7 +206,8 @@ public class DataReceivingSystem extends IteratingSystem {
                 if(playerComponent.playerID == playerDataContainer.getPlayerID())
                 {
                     logger.debug("PLAYER_FIRED: playerComponent.playerID: " + playerComponent.playerID);
-                    controlledInputComponent.abInputCommandList = playerDataContainer.getAbInputCommandList();
+
+                    controlledInputComponent.abInputCommandList[GameConfig.SPACE] = playerDataContainer.getInputCoommandFire();
                     playerComponent.bulletDirectionOnShoot = playerDataContainer.getBulletDirection();
                     playerComponent.bulletXvel = playerDataContainer.getBulletXvelocity();
                     playerComponent.bulletPosition = playerDataContainer.getPosition();

@@ -7,6 +7,7 @@ import com.badlogic.gdx.utils.Logger;
 import com.mygdx.game.client.ClientHandler;
 import com.mygdx.game.client.Message;
 import com.mygdx.game.client.data.PlayerDataContainer;
+import com.mygdx.game.config.GameConfig;
 import com.mygdx.game.entitycomponentsystem.components.LocalInputComponent;
 import com.mygdx.game.entitycomponentsystem.components.PlayerComponent;
 import com.mygdx.game.entitycomponentsystem.components.TransformComponent;
@@ -107,7 +108,7 @@ public class DataTransmittingSystem extends IteratingSystem {
 
                 this.clientHandler.getSocket().emit("magicFired",
                         this.clientHandler.getSocket().id(),
-                        playerDataContainer.getAbInputCommandList(),
+                        playerDataContainer.getAbInputCommandList()[GameConfig.SPACE],
                         playerDataContainer.getPosition().x,
                         playerDataContainer.getPosition().y,
                         playerDataContainer.getBulletXvelocity(),

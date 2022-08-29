@@ -1,0 +1,115 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<map version="1.8" tiledversion="1.8.4" orientation="orthogonal" renderorder="right-down" width="200" height="200" tilewidth="200" tileheight="200" infinite="0" nextlayerid="30" nextobjectid="1925">
+ <tileset firstgid="1" source="tiles/platform/Platform1.tsx"/>
+ <tileset firstgid="2" source="tiles/platform/Platform11.tsx"/>
+ <tileset firstgid="3" source="tiles/platform/Platform12.tsx"/>
+ <tileset firstgid="4" source="tiles/platform/Platform2.tsx"/>
+ <tileset firstgid="5" source="tiles/platform/Platform21.tsx"/>
+ <tileset firstgid="6" source="tiles/platform/Platform22.tsx"/>
+ <tileset firstgid="7" source="tiles/platform/Platform13.tsx"/>
+ <tileset firstgid="8" source="Platform23.tsx"/>
+ <tileset firstgid="9" source="../animations/characters/friendlycharacters/fireWizard/frames/idle/fireWizard_00_idle.tsx"/>
+ <tileset firstgid="10" source="tiles/backgrounds/darkBackground.tsx"/>
+ <tileset firstgid="11" source="tiles/backgrounds/StoneBg.tsx"/>
+ <tileset firstgid="12" source="tiles/potions/healUp.tsx"/>
+ <tileset firstgid="13" source="tiles/basicPowerUps/stompPowerUp.tsx"/>
+ <tileset firstgid="14" source="tiles/basicPowerUps/longJumpPowerUp.tsx"/>
+ <tileset firstgid="15" source="tiles/basicPowerUps/doubleFirePowerUp.tsx"/>
+ <tileset firstgid="16" source="tiles/Objects/Portal.tsx"/>
+ <tileset firstgid="17" source="tiles/LimitArea/StoneBg2.tsx"/>
+ <tileset firstgid="18" source="tiles/LimitArea/StoneBg2.tsx"/>
+ <tileset firstgid="19" source="tiles/LimitArea/Tree2.tsx"/>
+ <tileset firstgid="20" source="tiles/LimitArea/Tree1.tsx"/>
+ <tileset firstgid="21" source="tiles/LimitArea/Tree3.tsx"/>
+ <tileset firstgid="22" source="tiles/LimitArea/Tree1.tsx"/>
+ <tileset firstgid="23" source="tiles/backgrounds/Branch.tsx"/>
+ <tileset firstgid="24" source="tiles/backgrounds/Bush1.tsx"/>
+ <tileset firstgid="25" source="tiles/backgrounds/SignArrow.tsx"/>
+ <tileset firstgid="26" source="tiles/backgrounds/BridgePole2.tsx"/>
+ <tileset firstgid="27" source="tiles/backgrounds/BridgePole1.tsx"/>
+ <tileset firstgid="28" source="tiles/platform/Bridge.tsx"/>
+ <tileset firstgid="29" source="tiles/HurtableObjects/LavaSprites/Lava.tsx"/>
+ <tileset firstgid="30" source="tiles/HurtableObjects/LavaSprites/Lava.tsx"/>
+ <tileset firstgid="31" source="tiles/HurtableObjects/Spikes/Spike.tsx"/>
+ <tileset firstgid="32" source="tiles/LimitArea/StoneBg2.tsx"/>
+ <tileset firstgid="33" source="tiles/backgrounds/TallLadder.tsx"/>
+ <tileset firstgid="34" source="tiles/backgrounds/Bush3.tsx"/>
+ <tileset firstgid="35" source="tiles/backgrounds/Trunk3.tsx"/>
+ <tileset firstgid="36" source="tiles/HurtableObjects/Spikes/Obstacle.tsx"/>
+ <objectgroup id="14" name="Backgronds"/>
+ <objectgroup id="25" name="Foliage">
+  <object id="1546" gid="24" x="10227.3" y="28003.5" width="1412" height="853"/>
+  <object id="1920" gid="24" x="8600" y="28000" width="1412" height="853"/>
+  <object id="1921" gid="24" x="6318" y="27933.5" width="1412" height="853"/>
+  <object id="1922" gid="24" x="7400" y="28000" width="1412" height="853"/>
+  <object id="1923" gid="24" x="9400" y="28000" width="1412" height="853"/>
+ </objectgroup>
+ <objectgroup id="19" name="Portals">
+  <object id="1924" gid="16" x="11400" y="27800" width="200" height="200"/>
+ </objectgroup>
+ <objectgroup id="15" name="Backgrounds_stone"/>
+ <objectgroup id="23" name="Backgrounds_branches"/>
+ <objectgroup id="29" name="HurtableObjectsLayer"/>
+ <objectgroup id="3" name="Platform">
+  <object id="1377" gid="1" x="6205.33" y="28000.4" width="200" height="200"/>
+  <object id="1380" gid="4" x="6405.33" y="28000.4" width="200" height="200"/>
+  <object id="1389" gid="2147483652" x="6605.33" y="28000.4" width="200" height="200"/>
+  <object id="1395" gid="2147483649" x="6805.33" y="28000.4" width="200" height="200"/>
+  <object id="1401" gid="1" x="7005.33" y="28000.4" width="200" height="200"/>
+  <object id="1404" gid="4" x="7205.33" y="28000.4" width="200" height="200"/>
+  <object id="1879" gid="1" x="6003.03" y="28000" width="200" height="200"/>
+  <object id="1880" gid="1" x="5800" y="28000" width="200" height="200"/>
+  <object id="1881" gid="1" x="5800" y="27800" width="200" height="200"/>
+  <object id="1882" gid="1" x="5800" y="27600" width="200" height="200"/>
+  <object id="1883" gid="1" x="5800" y="27400" width="200" height="200"/>
+  <object id="1887" gid="1" x="5600" y="27800" width="200" height="200"/>
+  <object id="1888" gid="1" x="5600" y="27600" width="200" height="200"/>
+  <object id="1889" gid="1" x="5600" y="27400" width="200" height="200"/>
+  <object id="1894" gid="1" x="5400" y="27800" width="200" height="200"/>
+  <object id="1895" gid="1" x="5400" y="27600" width="200" height="200"/>
+  <object id="1896" gid="1" x="5400" y="27400" width="200" height="200"/>
+  <object id="1898" gid="2147483652" x="7400" y="28000" width="200" height="200"/>
+  <object id="1899" gid="2147483649" x="7600" y="28000" width="200" height="200"/>
+  <object id="1900" gid="1" x="7800" y="28000" width="200" height="200"/>
+  <object id="1901" gid="4" x="8000" y="28000" width="200" height="200"/>
+  <object id="1902" gid="2147483652" x="8200" y="28000" width="200" height="200"/>
+  <object id="1903" gid="2147483649" x="8400" y="28000" width="200" height="200"/>
+  <object id="1904" gid="1" x="8600" y="28000" width="200" height="200"/>
+  <object id="1905" gid="4" x="8800" y="28000" width="200" height="200"/>
+  <object id="1906" gid="2147483649" x="9000" y="28000" width="200" height="200"/>
+  <object id="1907" gid="1" x="9200" y="28000" width="200" height="200"/>
+  <object id="1908" gid="4" x="9400" y="28000" width="200" height="200"/>
+  <object id="1909" gid="2147483652" x="9600" y="28000" width="200" height="200"/>
+  <object id="1910" gid="2147483649" x="9800" y="28000" width="200" height="200"/>
+  <object id="1911" gid="1" x="10000" y="28000" width="200" height="200"/>
+  <object id="1912" gid="4" x="10200" y="28000" width="200" height="200"/>
+  <object id="1913" gid="2147483649" x="10400" y="28000" width="200" height="200"/>
+  <object id="1914" gid="1" x="10600" y="28000" width="200" height="200"/>
+  <object id="1915" gid="4" x="10800" y="28000" width="200" height="200"/>
+  <object id="1916" gid="2147483652" x="11000" y="28000" width="200" height="200"/>
+  <object id="1917" gid="2147483649" x="11200" y="28000" width="200" height="200"/>
+  <object id="1918" gid="1" x="11400" y="28000" width="200" height="200"/>
+  <object id="1919" gid="4" x="11600" y="28000" width="200" height="200"/>
+ </objectgroup>
+ <objectgroup id="20" name="LimitLayer"/>
+ <objectgroup id="26" name="BackgroundObjects"/>
+ <objectgroup id="18" name="CloudEnemies">
+  <object id="1897" x="8000" y="27200" width="200" height="200">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="10" name="BasicEnemies"/>
+ <objectgroup id="6" name="PlayersSpawnSpots">
+  <object id="1376" x="10800" y="27600" width="150" height="150">
+   <ellipse/>
+  </object>
+ </objectgroup>
+ <objectgroup id="17" name="PowerUpsBasic">
+  <object id="1704" name="DoubleFire" gid="15" x="6000" y="27800" width="200" height="200">
+   <properties>
+    <property name="CollectibleType" type="int" value="1"/>
+   </properties>
+  </object>
+ </objectgroup>
+ <objectgroup id="16" name="Potions"/>
+</map>

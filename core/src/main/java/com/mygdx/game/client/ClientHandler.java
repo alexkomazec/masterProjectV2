@@ -48,9 +48,9 @@ public class ClientHandler {
 
     private Socket socket;
     private IO.Options options;
-    //public static String url = "http://138.68.160.152:8080";
+    public static String url = "http://138.68.160.152:8080";
     //public static String url = "http://localhost:8080";
-    public static String url = "http://192.168.0.12:8080";
+    //public static String url = "http://192.168.0.12:8080";
 
     private MyGdxGame game;
     private Array<Message> receivedMessageArray;
@@ -466,7 +466,7 @@ public class ClientHandler {
         JSONArray jsonArray = (JSONArray) args[0];
         int playerId = (int)jsonArray.get(0);
 
-        JSONArray inputCommandList = (JSONArray) jsonArray.get(1);
+        boolean inputCommandFire = (boolean) jsonArray.get(1);
         float playerPositonX;
         float playerPositonY;
 
@@ -491,15 +491,8 @@ public class ClientHandler {
         float xVel = (float)((Integer)jsonArray.get(4));
         Direction bulletDirection = (jsonArray.get(5).equals("RIGHT") )?Direction.RIGHT:Direction.LEFT;
 
-        boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
-
-        for (int index = 0; index < inputCommandList.length(); index++)
-        {
-            abInputCommandList[index] = inputCommandList.getBoolean(index);
-        }
-
         Message message = new Message(PLAYER_FIRED, true);
-        message.addPlayerDataContainer(new PlayerDataContainer(bulletDirection, abInputCommandList, new Vector2(playerPositonX, playerPositonY), playerId, xVel));
+        message.addPlayerDataContainer(new PlayerDataContainer(bulletDirection, inputCommandFire, new Vector2(playerPositonX, playerPositonY), playerId, xVel));
         receivedMessageArray.add(message);
     }
 

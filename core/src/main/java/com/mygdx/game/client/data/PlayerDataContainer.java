@@ -9,6 +9,7 @@ import com.mygdx.game.entitycomponentsystem.components.DirectionComponent;
 public class PlayerDataContainer {
 
     private boolean[] abInputCommandList = new boolean[GameConfig.LIST_COMMANDS_MAX];
+    private boolean inputCoommandFire = false;
     private Vector2 position       = new Vector2();
     private float bulletXvelocity  = 0f;
     private float playerWidth      = 0f;
@@ -30,9 +31,9 @@ public class PlayerDataContainer {
         this.bulletXvelocity = bulletXvelocity;
     }
 
-    public PlayerDataContainer(Direction bulletDirection, boolean[] abInputCommandList, Vector2 position, int playerID, float bulletXvelocity)
+    public PlayerDataContainer(Direction bulletDirection, boolean inputCoommandFire, Vector2 position, int playerID, float bulletXvelocity)
     {
-        this.abInputCommandList = abInputCommandList;
+        this.inputCoommandFire = inputCoommandFire;
         this.position = position;
         this.playerID = playerID;
         this.bulletXvelocity = bulletXvelocity;
@@ -90,5 +91,9 @@ public class PlayerDataContainer {
 
     public void setBulletDirection(Direction bulletDirection) {
         this.bulletDirection = bulletDirection;
+    }
+
+    public boolean getInputCoommandFire() {
+        return inputCoommandFire;
     }
 }
