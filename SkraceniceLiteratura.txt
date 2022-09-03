@@ -1,0 +1,39 @@
+https://www.interactive.org/news/112018_spacewar_pioneer.asp
+Component-Based Entity Systems, Modular Object Construction and High Performance Gameplay , Uppsala Universittet
+ADVANTAGES AND OF ENTITYToni Härkönen COMPONENT IMPLEMENTATION SYS TEM S Faculty of Information Technology and Communication Sciences Bachelor of Science Thesis April 2019
+https://docs.microsoft.com/en-us/openspecs/office_protocols/ms-grvhenc/2c054f5b-804d-40c3-8695-f4298b5931b6
+https://www.cleantutorials.com/html/format-of-http-request-response-header-and-body-with-example
+https://www.vaadata.com/blog/websockets-security-attacks-risks/
+https://javascript.info/long-polling
+https://libgdx.com/wiki/app/modules-overview
+Libgdx Cross-platform Game Development Cookbook
+https://www.iforce2d.net/rube/
+https://github.com/libgdx/gdx-ai/wiki/Steering-Behaviors
+https://socket.io/docs/v4/
+https://libgdx.com/dev/tools/
+https://libgdx.com/wiki/tools/hiero
+https://www.geeksforgeeks.org/explain-the-working-of-node-js/
+https://www.freecodecamp.org/news/introduction-to-mongoose-for-mongodb-d2a7aa593c57/
+
+Lista skracenica:
+MIT - Massachusetts Institute of Technology
+RPG - Role Play Gaming
+MMO RPG - Massively multiplayer online role-playing game
+JNI - Java Native Interface
+GWT - Google Web Toolkit
+ARM - Advanced RISC Machines
+OpenGL - Open Grpahics Library
+LWJGL - Lightweight Java Game Library
+OpenGL ES - Open Grpahics Library for embedded systems
+HTML 5 - Hypertext Markup Language revision 5
+WebGL - Web Graphics Library
+API - Application Programming Interface
+R.U.B.E - Really Useful Box2D Editor
+ECS - Entity Component System
+AI - Artifitial Inteligence
+HTTP - Hypertext Transfer Protocol
+TCP - Transsmision Control Protocol
+JSON - JavaScript Object Notation
+COOP - Cooperative
+PVP - Player vs Player
+

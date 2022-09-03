@@ -1,0 +1,52 @@
+Teme
+
+- Gejming ukratko
+- Uvod o igri, koji je zanr i objasnjenje tih zanrova
+	- Online, 2D, Platformer, RPG, Action, Survival, Battle Royale
+	
+- Koji framework/enigine je koriscen, prednosti/mane te tehnologije
+	- libgdx framework..., more about libgdx, lifecycle,...
+
+- Koriscenji softweri: Krita, texturePacker, ....
+	
+- Alternative te tehnologije i njihove prednosti/mane
+	- unity, unreal, pygame, phaser, ...
+	
+- Od kojih delova se sastoji igra:
+	- Backend:
+		Node.js - backend app 
+		socket.io is an event-driven library for real-time web applications
+		Local server			ipv4
+		Remote Hosting server 	ipv4
+		Malo o ipv4
+	
+	- Database:
+		MongoDB - cross-platform document-oriented database program
+				  Pros and Cons of MongoDB, and alternatives
+	    Mongoose - is a JavaScript object-oriented programming 
+				library that creates a connection between MongoDB and the Node.js JavaScript runtime environment.
+		
+	- Client:
+		OOP part:
+			- some classes...
+		ECS:
+			Systems, definition of ECS
+- Sync/Async system
+
+- Featuri: Nesto svakom featuru i koje komponente sacinjavaju neki feature
+
+
+- Vise o OOP komponentama:
+	- Screen adapter
+	- Game world creator
+	- ClientHandler
+	...
+
+- Vise o ECS sistemima u igri
+	- Rendering
+	- Animation
+	- Physics
+	
+- Backend
+	-
+	

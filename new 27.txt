@@ -1,0 +1,5 @@
+-Proces ulaska igrača u sobu
+- Uvod u servere. Vrste komunikacija Server-Client (Jaci klijent, slabiji server i obrnuto)
+Tehnicka unapredjenja: cist ECS, Drukciji server,...
+- Uvod u rad
+- Zakljucak

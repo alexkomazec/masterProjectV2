@@ -1,0 +1,16 @@
+Jedan igrac se na pocetnoj poziciji nalazi par mesta pored
+iako to ne bi treblao biti tako
+
+
+---------------------------------------------------
+Repliciranje/sync:
+
+Proposal:
+Player 0 se proglasi za hosta.
+Player 0 inicijalizuje sve system.
+Player 0 treba da posalje event kada je neko telo unisteno
+
+Player!0 ne inicijalizuje collision system
+Player!0 i dalje ima contact system tako da se registruje kontakt ali se kolizija ne razresava.
+Player!0 prima event od Playera 0 da treba da unisti neko telo i koje
+Player!0 unistava tela samo na osnovu tog eventa.

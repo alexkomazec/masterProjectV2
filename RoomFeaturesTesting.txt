@@ -1,0 +1,32 @@
+Tests:
+	- DONE: First player enters coop rooms screen. Expected: all rooms should be 0/2
+	- DONE:First player enters pvp rooms screen. Expected: all rooms should be 0/2
+	- DONE:First player enters coop rooms screen, room 0. Second player enters coop rooms. Expected: Second player seees room 0 status 1/2
+	- DONE:First player enters coop rooms screen, room 1. Second player enters coop rooms. Expected: Second player seees room 1 status 1/2
+	- DONE:First player enters coop rooms screen, room 2. Second player enters coop rooms. Expected: Second player seees room 2 status 1/2
+	- DONE:First player enters coop rooms screen, room 0. Second player enters coop rooms, room 0. Third player enter coop rooms. Expected: Third player sees room 0 status 2/2. Try to enter the room, it should not be possible
+	- DONE:First player enters coop rooms screen, room 1. Second player enters coop rooms, room 1. Third player enter coop rooms. Expected: Third player sees room 1 status 2/2. Try to enter the room, it should not be possible
+	- DONE:First player enters coop rooms screen, room 2. Second player enters coop rooms, room 2. Third player enter coop rooms. Expected: Third player sees room 2 status 2/2. Try to enter the room, it should not be possible
+	- DONE:Match in any coop rooms started (room status 2/2), Third player enters the another room
+	- DONE:Match in any coop rooms started (room status 2/2), Third player enters the another room, foruth player enters the same room, and second match starts
+	- DONE:Regarding the previous test: Both games should run smoothly
+	- DONE:One of coop rooms status is 1/2. Two seperate players looks at this status. One player enters the room sucessfuly, another one also tries after it. Expected: Another player should get updated room status (2/2), and entering the room should not be possible
+	- Match is over, both players are kicked out from the room, new room status is 0/2, empty.
+	- DONE:Both players are diconnected, new room status is 0/2, empty.
+	- DONE:Player one enters the room. Then disconnect. New player enters the same room. It should be the only one
+	
+	
+	DONE: on pause menu implement that Quit button goes out from the room, to the rooms screen
+	DONE: back button on screens like rooms or game mode should go one step back, not to go to main main always
+	DONE: Current bug, test next: 2 players enters the room, game starts, one by one leave the room, and again re-enter the game
+	(Also if the current screen is the last screen in online mode, first disconnect from the server, than go back one
+	 screen back)
+	TODO: Implement game over (game over is when: 1. At least one player touches exit door. 
+								2. Both players are dead: In this case, kick out both players from the room, and free the room)
+	TODO: Create demo map (Close the sides so the player can't fall of the map)
+	DONE: Implement cloud enemy's view point area, and just when someone enters this area, the cloud enemy should follow him
+	DONE: Implement PVP mode. PVP mode includes just players that can hit each other.
+	TODO: Test sync in the game (Everything should happen on the same way on both sides. Note: But it does not happen, test why)
+	TODO: Write/Explain somwhere the new concept of the server that will solve the problem with sync 
+	(Master server, independet game process with 2d graphics)
+	

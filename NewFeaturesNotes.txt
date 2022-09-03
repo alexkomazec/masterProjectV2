@@ -1,0 +1,42 @@
+Rooms:
+- Client side:
+	- Screens:
+		- DONE: When a player click start game, first appears screen single player/multiplayer
+		- DONE: When a player click single player, solo game match starts
+		- DONE: When a player click multiplayer, Login screen appears
+		- DONE: When a player logs in sucessfuly, profile page appears. Here is his/her username, and modes (CO-OP, and PVP Mode)
+		- DONE:When a player chooses the mode, Request to server appears. This request is sent in order to get status of rooms.
+		- DONE: When the client gets the answer from the server, the new screen with rooms status opens
+		- DONE: When a player choose the room, the player enters the game, and waits until the second player does the login
+
+- Server side:
+	- Should have 3 rooms (Kind of bufferrs)
+	- Should have 3 socket rooms
+	- Should contain the status of the current room (Empty, 1/2, Full)
+	- Update room status:
+		- If the room is empty, room status is empty
+		- If one player joins the room, room status is 1/2
+		- if two players join the room, room status is 2/2
+		- If both players leaves the match, room status is empty
+	- Should send room status upon client request
+	
+	
+	MORE DETAILS:
+		
+		Each client should have:
+			- username
+			- socket
+			- inGameInfo:
+				- playerID
+				- xPos
+				- yPos
+			- roomID
+		
+		Each room shoud have:
+			- roomStatus:
+				EMPTY, HALF_FULL, FULL
+			- arrayOfplayerIDs
+			
+	
+
+Synhronization problem:	
